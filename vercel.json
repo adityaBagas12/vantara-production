@@ -9,14 +9,10 @@
   },
   "routes": [
     {
-      "src": "/build/assets/(.*)",
+      "src": "\\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|gif|ico|json|webp|mp4|webm)$",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
-      },
-      "continue": true
-    },
-    {
-      "handle": "filesystem"
+      }
     },
     {
       "src": "/(.*)",
@@ -37,3 +33,4 @@
     "LOG_CHANNEL": "stderr"
   }
 }
+
