@@ -9,10 +9,18 @@
   },
   "routes": [
     {
-      "src": "\\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|gif|ico|json|webp|mp4|webm)$",
+      "src": "/index\\.php(.*)",
+      "dest": "/api/index.php"
+    },
+    {
+      "src": "/build/assets/(.*)",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
-      }
+      },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
@@ -33,4 +41,3 @@
     "LOG_CHANNEL": "stderr"
   }
 }
-
