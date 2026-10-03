@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "framework": null,
   "outputDirectory": "public",
   "functions": {
     "api/index.php": {
@@ -9,18 +8,15 @@
   },
   "routes": [
     {
-      "src": "/index\\.php(.*)",
-      "dest": "/api/index.php"
-    },
-    {
-      "src": "/build/assets/(.*)",
+      "src": "/build/(.*)",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
       },
-      "continue": true
+      "dest": "/build/$1"
     },
     {
-      "handle": "filesystem"
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
     },
     {
       "src": "/(.*)",
@@ -41,3 +37,4 @@
     "LOG_CHANNEL": "stderr"
   }
 }
+
