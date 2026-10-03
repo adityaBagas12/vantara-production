@@ -8,15 +8,15 @@
   },
   "routes": [
     {
-      "src": "/build/(.*)",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      },
-      "dest": "/build/$1"
+      "src": "/index\\.php(.*)",
+      "dest": "/api/index.php"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
+      "src": "/",
+      "dest": "/api/index.php"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
@@ -37,4 +37,5 @@
     "LOG_CHANNEL": "stderr"
   }
 }
+
 
