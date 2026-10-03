@@ -133,7 +133,7 @@
                     <div class="font-semibold text-sm mb-0.5" x-text="checkResult?.formatted_date"></div>
                     <p x-text="checkResult?.message"></p>
                     <div x-show="checkResult?.available" class="mt-2">
-                        <a href="{{ route('packages.catalog') }}" class="underline font-semibold text-white">Lihat Paket & Mulai Pemesanan &rarr;</a>
+                        <a :href="'{{ route('packages.catalog') }}?event_date=' + selectedDate" class="underline font-semibold text-white">Lihat Paket & Mulai Pemesanan &rarr;</a>
                     </div>
                 </div>
             </div>

@@ -49,7 +49,8 @@ class DashboardController extends Controller
         $monthlyPerformance = Order::select(
             DB::raw('MONTH(event_date) as month_num'),
             DB::raw('COUNT(*) as total_orders'),
-            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN total_price ELSE 0 END) as revenue')
+            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN total_price ELSE 0 END) as revenue'),
+            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN down_payment ELSE 0 END) as dp_collected')
         )
             ->whereYear('event_date', Carbon::now()->year)
             ->groupBy(DB::raw('MONTH(event_date)'))
@@ -67,6 +68,7 @@ class DashboardController extends Controller
                 'month' => $monthName,
                 'orders' => $data ? $data->total_orders : 0,
                 'revenue' => $data ? (int) $data->revenue : 0,
+                'dp_collected' => $data ? (int) $data->dp_collected : 0,
             ];
         }
 

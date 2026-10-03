@@ -81,6 +81,11 @@ class AdminOrderController extends Controller
             $order->down_payment = (int) $validated['down_payment'];
         }
 
+        // Jika DP diisi > 0 dan status masih pending, otomatis ubah status ke dp_received
+        if ($order->down_payment > 0 && $order->status === 'pending') {
+            $order->status = 'dp_received';
+        }
+
         if (isset($validated['total_price'])) {
             $order->total_price = (int) $validated['total_price'];
         }

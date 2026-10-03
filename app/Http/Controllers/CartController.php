@@ -12,8 +12,14 @@ class CartController extends Controller
     /**
      * Tampilkan halaman keranjang belanja.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        if ($request->filled('event_date')) {
+            session()->put('event_date', $request->input('event_date'));
+        } elseif ($request->filled('date')) {
+            session()->put('event_date', $request->input('date'));
+        }
+
         $cart = session()->get('cart', []);
         $total = 0;
 
@@ -32,7 +38,12 @@ class CartController extends Controller
         $request->validate([
             'package_id' => 'required|exists:packages,id',
             'quantity' => 'nullable|integer|min:1',
+            'event_date' => 'nullable|date|after_or_equal:today',
         ]);
+
+        if ($request->filled('event_date')) {
+            session()->put('event_date', $request->input('event_date'));
+        }
 
         $package = Package::where('is_active', true)->findOrFail($request->package_id);
         $quantity = (int) ($request->quantity ?? 1);

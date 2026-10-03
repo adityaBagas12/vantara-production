@@ -98,7 +98,7 @@
                                                 </a>
                                             </h4>
                                             <div class="text-xs text-[#dfc48e] font-semibold mt-1">
-                                                Rp {{ number_format($item['price'], 0, ',', '.') }} <span class="text-[10px] text-gray-400 font-normal">/ unit</span>
+                                                Rp {{ number_format($item['price'], 0, ',', '.') }} <span class="text-[10px] text-gray-400 font-normal">/ hari</span>
                                             </div>
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                                         <form action="{{ route('cart.update', $id) }}" method="POST" class="flex items-center gap-2">
                                             @csrf
                                             @method('PATCH')
-                                            <label class="text-[11px] text-gray-400 shrink-0">Jumlah:</label>
+                                            <label class="text-[11px] text-gray-400 shrink-0">Durasi (Hari):</label>
                                             <input type="number"
                                                    name="quantity"
                                                    value="{{ $item['quantity'] }}"
@@ -168,6 +168,28 @@
                                     <span>Kru & Operator:</span>
                                     <span class="text-emerald-400 font-semibold">Termasuk</span>
                                 </div>
+                            </div>
+
+                            <!-- Event Date Selection Block -->
+                            <div class="p-3.5 rounded-xl bg-[#090c14] border border-[#242f44] space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label for="cart_event_date" class="text-[11px] font-semibold text-gray-300 uppercase tracking-wider">
+                                        📅 Tanggal Acara Pelaksanaan:
+                                    </label>
+                                    @if(session('event_date') || request('event_date') || request('date'))
+                                        <span class="text-[10px] text-emerald-400 font-semibold lowercase">(terisi)</span>
+                                    @endif
+                                </div>
+                                <form action="{{ route('cart.index') }}" method="GET" class="flex items-center gap-2">
+                                    <input type="date"
+                                           id="cart_event_date"
+                                           name="event_date"
+                                           value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}"
+                                           min="{{ date('Y-m-d') }}"
+                                           onchange="this.form.submit()"
+                                           class="w-full px-3 py-2 bg-[#121824] border border-[#242f44] focus:border-[#c59d5f] rounded text-xs text-white focus:outline-none transition-colors">
+                                </form>
+                                <span class="text-[10px] text-gray-400 block leading-tight">Tanggal ini akan otomatis diisikan pada formulir checkout.</span>
                             </div>
 
                             <div class="pt-4 border-t border-[#1e2538]">

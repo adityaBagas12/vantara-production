@@ -38,7 +38,28 @@
                 </div>
             @endif
 
-            <form action="{{ route('checkout.store') }}" method="POST">
+            <form action="{{ route('checkout.store') }}" method="POST"
+                  x-data="{
+                      rentDuration: {{ $rentDuration }},
+                      startDate: '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}',
+                      get calculatedEndDate() {
+                          if (!this.startDate) return '';
+                          const parts = this.startDate.split('-');
+                          if (parts.length !== 3) return this.startDate;
+                          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                          d.setDate(d.getDate() + (this.rentDuration - 1));
+                          const year = d.getFullYear();
+                          const month = String(d.getMonth() + 1).padStart(2, '0');
+                          const day = String(d.getDate()).padStart(2, '0');
+                          return `${year}-${month}-${day}`;
+                      },
+                      get formattedEndDateIndo() {
+                          if (!this.calculatedEndDate) return '';
+                          const parts = this.calculatedEndDate.split('-');
+                          if (parts.length !== 3) return '';
+                          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                      }
+                  }">
                 @csrf
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -108,19 +129,54 @@
                             </div>
 
                             <div class="space-y-4">
-                                <!-- Tanggal Acara -->
-                                <div>
-                                    <label for="event_date" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                        Tanggal Acara Pelaksanaan <span class="text-rose-400">*</span>
-                                    </label>
-                                    <input type="date"
-                                           id="event_date"
-                                           name="event_date"
-                                           value="{{ old('event_date') }}"
-                                           min="{{ date('Y-m-d') }}"
-                                           required
-                                           class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white focus:outline-none transition-colors">
-                                    <span class="text-[10px] text-gray-400 mt-1 block">Pemberitahuan: Sistem akan memvalidasi ketersediaan tanggal secara otomatis.</span>
+                                <!-- Tanggal Acara Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- Tanggal Mulai Acara (Dikunci) -->
+                                    <div>
+                                        <label for="event_date" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                                            Tanggal Mulai Acara <span class="text-emerald-400 font-normal">🔒 (Dikunci)</span>
+                                        </label>
+                                        <input type="date"
+                                               id="event_date"
+                                               name="event_date"
+                                               x-model="startDate"
+                                               value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date') ?? date('Y-m-d')) }}"
+                                               min="{{ date('Y-m-d') }}"
+                                               required
+                                               readonly
+                                               class="w-full px-4 py-3 bg-[#0a0d14]/70 border border-[#242f44] text-gray-300 rounded-lg text-sm cursor-not-allowed focus:outline-none select-none opacity-80"
+                                               title="Tanggal mulai acara dikunci sesuai pilihan dari keranjang/halaman cek tanggal.">
+                                        <span class="text-[10px] text-emerald-400/90 mt-1 block font-medium">
+                                            Otomatis terisi dari pilihan keranjang.
+                                        </span>
+                                    </div>
+
+                                    <!-- Tanggal Selesai Acara (Otomatis Dikalkulasi & Dikunci) -->
+                                    <div>
+                                        <label for="event_end_date" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                                            Tanggal Selesai Acara <span class="text-emerald-400 font-normal">🔒 (Dikunci)</span>
+                                        </label>
+                                        <input type="date"
+                                               id="event_end_date"
+                                               name="event_end_date"
+                                               :value="calculatedEndDate"
+                                               readonly
+                                               class="w-full px-4 py-3 bg-[#0a0d14]/70 border border-[#242f44] text-gray-300 rounded-lg text-sm cursor-not-allowed focus:outline-none select-none opacity-80"
+                                               title="Tanggal selesai dihitung otomatis dari durasi sewa di keranjang dan dikunci.">
+                                        <span class="text-[10px] text-emerald-400/90 mt-1 block font-medium">
+                                            Otomatis terisi (<span x-text="rentDuration > 1 ? rentDuration + ' Hari Berturut-turut' : 'Selesai di Hari yang Sama'"></span>).
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Multi-day duration banner -->
+                                <div class="p-3.5 rounded-lg bg-[#141b28] border border-[#c59d5f]/40 text-xs text-[#dfc48e] flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span>📅</span>
+                                        <span>Durasi Sewa: <strong x-text="`${rentDuration} Hari`"></strong></span>
+                                        <span class="text-gray-400">•</span>
+                                        <span class="text-gray-300 font-medium" x-text="rentDuration === 1 ? 'Selesai pada hari yang sama' : `Selesai pada tanggal besoknya (${formattedEndDateIndo})`"></span>
+                                    </div>
                                 </div>
 
                                 <!-- Alamat Lengkap Acara -->
@@ -163,7 +219,7 @@
                                     <div class="p-3 rounded-lg bg-[#090c14] border border-[#1e2538] flex items-center justify-between text-xs">
                                         <div>
                                             <div class="font-semibold text-white truncate max-w-[200px]">{{ $item['name'] }}</div>
-                                            <div class="text-[10px] text-gray-400">{{ $item['quantity'] }}x unit · {{ $item['category'] }}</div>
+                                            <div class="text-[10px] text-gray-400">{{ $item['quantity'] }} Hari · {{ $item['category'] }}</div>
                                         </div>
                                         <div class="font-serif font-bold text-[#dfc48e] shrink-0">
                                             Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
@@ -175,7 +231,7 @@
                             <!-- Cost Breakdown -->
                             <div class="pt-4 border-t border-[#1e2538] space-y-3 text-xs">
                                 <div class="flex items-center justify-between text-gray-300">
-                                    <span>Subtotal Paket:</span>
+                                    <span>Subtotal Paket ({{ $rentDuration }} Hari):</span>
                                     <span class="font-semibold text-white">Rp {{ number_format($total, 0, ',', '.') }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-gray-400">

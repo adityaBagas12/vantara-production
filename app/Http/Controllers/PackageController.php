@@ -41,6 +41,12 @@ class PackageController extends Controller
      */
     public function catalog(Request $request): View
     {
+        if ($request->filled('event_date')) {
+            session()->put('event_date', $request->input('event_date'));
+        } elseif ($request->filled('date')) {
+            session()->put('event_date', $request->input('date'));
+        }
+
         $request->validate([
             'category' => ['nullable', 'string', 'max:100'],
             'search' => ['nullable', 'string', 'max:100'],
@@ -92,8 +98,14 @@ class PackageController extends Controller
     /**
      * Display the package detail page with interactive calendar & specifications.
      */
-    public function show(string $slug): View
+    public function show(Request $request, string $slug): View
     {
+        if ($request->filled('event_date')) {
+            session()->put('event_date', $request->input('event_date'));
+        } elseif ($request->filled('date')) {
+            session()->put('event_date', $request->input('date'));
+        }
+
         $package = Package::active()
             ->where('slug', $slug)
             ->firstOrFail();

@@ -151,6 +151,9 @@
                                     <div class="font-serif font-bold text-[#dfc48e]">
                                         Rp {{ number_format($m['revenue'], 0, ',', '.') }}
                                     </div>
+                                    <div class="text-[10px] text-emerald-400 font-medium">
+                                        DP: Rp {{ number_format($m['dp_collected'], 0, ',', '.') }}
+                                    </div>
                                 </div>
                                 <div class="flex items-center gap-1 pl-2 border-l border-[#1e2538]">
                                     <a href="{{ route('admin.reports.pdf', ['month' => $m['month_num'], 'year' => date('Y'), 'stream' => 1]) }}"

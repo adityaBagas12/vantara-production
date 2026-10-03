@@ -130,7 +130,7 @@
 
                             <!-- Action if Available -->
                             <div x-show="checkResult?.available" class="mt-3 pt-3 border-t border-white/10">
-                                <a href="{{ route('packages.catalog') }}"
+                                <a :href="'{{ route('packages.catalog') }}?event_date=' + (selectedDate || checkResult?.date)"
                                    class="block w-full text-center py-2 px-4 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-[11px] uppercase tracking-wider rounded transition-colors">
                                     Lanjut Pilih Paket & Pesan &rarr;
                                 </a>
@@ -273,7 +273,7 @@
                                         <div class="font-bold mb-0.5" x-text="checkResult?.formatted_date"></div>
                                         <p class="text-xs leading-relaxed" x-text="checkResult?.message"></p>
                                         <div x-show="checkResult?.available" class="mt-2">
-                                            <a href="{{ route('packages.catalog') }}"
+                                            <a :href="'{{ route('packages.catalog') }}?event_date=' + (selectedDate || checkResult?.date)"
                                                class="text-xs underline font-semibold text-white hover:text-[#c59d5f]">
                                                 Pilih Paket & Lanjut Pemesanan &rarr;
                                             </a>

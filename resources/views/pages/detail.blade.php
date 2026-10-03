@@ -121,8 +121,9 @@
                         
                         <!-- Pricing & Booking Card with Calendar -->
                         <div class="rounded-2xl bg-gradient-to-b from-[#141b28] to-[#0e131d] border border-[#c59d5f]/40 shadow-2xl overflow-hidden"
-                             x-data="calendarWidget({{ $package->id }})">
-                            
+                             x-data="calendarWidget({{ $package->id }})"
+                             x-init="selectedDate = '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}'">
+
                             <div class="p-5">
                                 <!-- Pricing Header -->
                                 <div class="flex items-baseline justify-between mb-4">
@@ -170,6 +171,17 @@
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                         </button>
                                     </div>
+                                </div>
+
+                                <!-- Note Petunjuk Tanggal -->
+                                <div class="px-5 py-2.5 bg-[#090c14] border-b border-[#1e2538] text-xs text-[#dfc48e] flex items-center justify-between font-medium">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-amber-400 text-sm">💡</span>
+                                        <span><strong>Catatan:</strong> Pilih tanggal lalu checkout</span>
+                                    </div>
+                                    <template x-if="selectedDate">
+                                        <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40" x-text="`Terpilih: ${selectedDate.split('-').reverse().join('/')}`"></span>
+                                    </template>
                                 </div>
 
                                 <!-- Loading -->
@@ -228,6 +240,7 @@
                                 <form action="{{ route('cart.store') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <input type="hidden" name="event_date" :value="selectedDate">
                                     <button type="submit"
                                             class="w-full py-3.5 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01]">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>

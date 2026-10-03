@@ -57,16 +57,24 @@ class Order extends Model
     public static function generateOrderCode(): string
     {
         $prefix = 'VAN-'.date('Ymd').'-';
-        $latestOrder = static::where('order_code', 'LIKE', $prefix.'%')
+        $latestOrder = static::withTrashed()
+            ->where('order_code', 'LIKE', $prefix.'%')
             ->orderBy('id', 'desc')
             ->first();
 
-        if (! $latestOrder) {
-            return $prefix.'0001';
+        $sequence = 1;
+        if ($latestOrder) {
+            $lastSeq = (int) substr($latestOrder->order_code, -4);
+            $sequence = $lastSeq + 1;
         }
 
-        $sequence = (int) substr($latestOrder->order_code, -4);
-
-        return $prefix.str_pad((string) ($sequence + 1), 4, '0', STR_PAD_LEFT);
+        do {
+            $code = $prefix.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+            $exists = static::withTrashed()->where('order_code', $code)->exists();
+            if (! $exists) {
+                return $code;
+            }
+            $sequence++;
+        } while (true);
     }
 }

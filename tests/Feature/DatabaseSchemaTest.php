@@ -60,7 +60,10 @@ class DatabaseSchemaTest extends TestCase
     public function test_order_code_generation_is_unique_and_incremental(): void
     {
         $code1 = Order::generateOrderCode();
-        Order::factory()->create(['order_code' => $code1]);
+        $order1 = Order::factory()->create(['order_code' => $code1]);
+
+        // Soft delete order1
+        $order1->delete();
 
         $code2 = Order::generateOrderCode();
         $this->assertNotEquals($code1, $code2);

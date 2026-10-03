@@ -83,7 +83,16 @@
                         <div>
                             <span class="text-gray-400 block mb-0.5 font-medium">Tanggal Pelaksanaan Acara:</span>
                             <span class="font-semibold text-emerald-400 text-sm">
-                                {{ \Carbon\Carbon::parse($order->event_date)->translatedFormat('l, d F Y') }}
+                                @if ($order->event_end_date && $order->event_end_date != $order->event_date)
+                                    @php
+                                        $sDate = \Carbon\Carbon::parse($order->event_date);
+                                        $eDate = \Carbon\Carbon::parse($order->event_end_date);
+                                        $days = $sDate->diffInDays($eDate) + 1;
+                                    @endphp
+                                    {{ $sDate->translatedFormat('d M Y') }} s/d {{ $eDate->translatedFormat('d M Y') }} ({{ $days }} Hari)
+                                @else
+                                    {{ \Carbon\Carbon::parse($order->event_date)->translatedFormat('l, d F Y') }}
+                                @endif
                             </span>
                         </div>
                         <div>
@@ -107,7 +116,7 @@
                             <div class="p-4 rounded-xl bg-[#090c14] border border-[#1e2538] flex items-center justify-between text-xs">
                                 <div>
                                     <div class="font-bold text-white text-sm">{{ $item->package_name }}</div>
-                                    <div class="text-[11px] text-gray-400 mt-0.5">Kuantitas: {{ $item->quantity }}x unit · Rp {{ number_format($item->unit_price, 0, ',', '.') }} / unit</div>
+                                    <div class="text-[11px] text-gray-400 mt-0.5">Durasi: {{ $item->quantity }} Hari · Rp {{ number_format($item->unit_price, 0, ',', '.') }} / hari</div>
                                 </div>
                                 <div class="font-serif font-bold text-[#dfc48e] text-base">
                                     Rp {{ number_format($item->subtotal, 0, ',', '.') }}
