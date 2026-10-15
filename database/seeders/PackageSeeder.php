@@ -29,6 +29,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Sound 1 Orang',
                 ],
                 'price' => 600000,
+                'stock' => 3,
                 'is_featured' => false,
                 'is_active' => true,
             ],
@@ -45,6 +46,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Sound 1 Orang',
                 ],
                 'price' => 1000000,
+                'stock' => 2,
                 'is_featured' => false,
                 'is_active' => true,
             ],
@@ -62,6 +64,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Sound 1 Orang',
                 ],
                 'price' => 1300000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -79,6 +82,7 @@ class PackageSeeder extends Seeder
                     'Operator Orgen & Kru Teknisi',
                 ],
                 'price' => 1600000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -96,6 +100,7 @@ class PackageSeeder extends Seeder
                     'Operator Orgen & Kru Teknisi Sound',
                 ],
                 'price' => 2500000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -170,6 +175,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Lighting',
                 ],
                 'price' => 2500000,
+                'stock' => 3,
                 'is_featured' => false,
                 'is_active' => true,
             ],
@@ -186,6 +192,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Lighting',
                 ],
                 'price' => 3000000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -202,6 +209,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Lighting',
                 ],
                 'price' => 3500000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -219,6 +227,7 @@ class PackageSeeder extends Seeder
                     'Kru Teknisi Lighting',
                 ],
                 'price' => 4000000,
+                'stock' => 2,
                 'is_featured' => false,
                 'is_active' => true,
             ],
@@ -242,6 +251,7 @@ class PackageSeeder extends Seeder
                     'Operator Videobooth',
                 ],
                 'price' => 1800000,
+                'stock' => 2,
                 'is_featured' => true,
                 'is_active' => true,
             ],
@@ -332,6 +342,7 @@ class PackageSeeder extends Seeder
         ];
 
         foreach ($packages as $pkg) {
+            $pkg['stock'] = $pkg['stock'] ?? 1;
             Package::updateOrCreate(['slug' => $pkg['slug']], $pkg);
         }
     }

@@ -1,161 +1,130 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola Paket Layanan — Admin Vantara Production')
-@section('header_title', 'Kelola Katalog Paket Layanan')
+@section('title', 'Kelola Produk — Admin Vantara Production')
 
 @section('content')
+<div style="display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+    <div style="flex-grow: 1">
+      <h1 class="d" style="font-size: 36px; font-weight: 800">Kelola Produk</h1>
+      <p style="color: var(--admin-mu)">Tambah, ubah, dan hapus produk rental.</p>
+    </div>
+    <a class="btn p" href="{{ route('admin.packages.create') }}">+ Tambah Produk</a>
+  </div>
 
-    <div class="space-y-6">
-
-        <!-- Toolbar: Search, Filter Category, & Add New Package -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-[#111722] border border-[#242f44]">
-
-            <!-- Left: Filter & Search Form -->
-            <form action="{{ route('admin.packages.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                <input type="text"
-                       name="search"
-                       value="{{ request('search') }}"
-                       placeholder="Cari nama atau deskripsi..."
-                       class="px-4 py-2.5 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none w-full sm:w-64">
-
-                <select name="category"
-                        onchange="this.form.submit()"
-                        class="px-3 py-2.5 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-gray-300 focus:outline-none w-full sm:w-auto">
-                    <option value="">Semua Kategori</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>
-                            {{ $cat }}
-                        </option>
-                    @endforeach
-                </select>
-
-                <button type="submit" class="px-4 py-2.5 bg-[#1e2538] hover:bg-[#28324a] text-white text-xs font-semibold rounded-lg transition-colors shrink-0 w-full sm:w-auto">
-                    Cari
-                </button>
-            </form>
-
-            <!-- Right: Add New Package Button -->
-            <a href="{{ route('admin.packages.create') }}"
-               class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                + Tambah Paket Baru
-            </a>
-
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <!-- Tabel Produk -->
+    <div class="card" style="flex: 2 1 480px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px">
+      <form action="{{ route('admin.packages.index') }}" method="GET" class="fld">
+        <label for="cari">Cari produk</label>
+        <div style="display: flex; gap: 8px">
+          <input id="cari" name="search" type="text" value="{{ request('search') }}" placeholder="Ketik nama atau kategori produk" style="flex-grow: 1">
+          <button class="btn" type="submit">Cari</button>
         </div>
+      </form>
 
-        <!-- Packages Data Table -->
-        <div class="bg-[#111722] rounded-2xl border border-[#242f44] overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-[#141b28] text-gray-400 uppercase tracking-wider text-[10px] border-b border-[#1e2538]">
-                        <tr>
-                            <th class="py-4 px-6">Paket Layanan</th>
-                            <th class="py-4 px-6">Kategori</th>
-                            <th class="py-4 px-6">Harga Sewa</th>
-                            <th class="py-4 px-6">Item / Layanan</th>
-                            <th class="py-4 px-6 text-center">Status Aktif</th>
-                            <th class="py-4 px-6 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#1e2538]">
-                        @forelse ($packages as $pkg)
-                            <tr class="hover:bg-[#141b28]/50 transition-colors">
+      <div style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th>Harga / hari</th>
+              <th>Stok Unit</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($packages as $pkg)
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 14px">
+                    @if($pkg->image_path)
+                      <img src="{{ $pkg->image_path }}" alt="{{ $pkg->name }}" class="th" style="object-fit: cover">
+                    @else
+                      <span class="th">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                      </span>
+                    @endif
+                    <div>
+                      <strong style="color: var(--admin-tx)">{{ $pkg->name }}</strong>
+                      <p style="color: var(--admin-mu); font-size: 13px">{{ $pkg->category }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td style="white-space: nowrap; font-family: var(--font-mono); font-weight: 600">
+                  Rp {{ number_format($pkg->price, 0, ',', '.') }}
+                </td>
+                <td style="white-space: nowrap">
+                  <span style="display: inline-block; padding: 4px 10px; border-radius: 8px; background: var(--admin-s2); border: 1px solid var(--admin-line); font-family: var(--font-mono); font-size: 13px; font-weight: 600">
+                    {{ $pkg->stock ?? 1 }} Unit
+                  </span>
+                </td>
+                <td>
+                  <form action="{{ route('admin.packages.toggleActive', $pkg->id) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" style="background: transparent; border: 0; padding: 0; cursor: pointer" title="Klik untuk ubah status">
+                      @if($pkg->is_active)
+                        <span class="tg a">Tersedia</span>
+                      @else
+                        <span class="tg g">Nonaktif</span>
+                      @endif
+                    </button>
+                  </form>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 8px">
+                    <a class="btn ic" href="{{ route('admin.packages.edit', $pkg->id) }}" aria-label="Ubah produk" title="Ubah produk">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 14l1-4 8-8 3 3-8 8zM9.5 3.5l3 3"/></svg>
+                    </a>
+                    <form action="{{ route('admin.packages.destroy', $pkg->id) }}" method="POST" onsubmit="return confirm('Hapus permanen paket \'{{ addslashes($pkg->name) }}\'?')">
+                      @csrf
+                      @method('DELETE')
+                      <button class="btn ic dg" type="submit" aria-label="Hapus produk" title="Hapus produk">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--admin-mu)">Belum ada data produk.</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
 
-                                <!-- Package Info -->
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-lg bg-black overflow-hidden border border-[#242f44] shrink-0">
-                                            <img src="{{ $pkg->image_path ?? 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=200&auto=format&fit=crop' }}"
-                                                 alt="{{ $pkg->name }}"
-                                                 class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-white text-sm flex items-center gap-2">
-                                                <span>{{ $pkg->name }}</span>
-                                                @if ($pkg->is_featured)
-                                                    <span class="px-1.5 py-0.5 rounded bg-[#c59d5f]/20 border border-[#c59d5f]/40 text-[#dfc48e] text-[9px] font-bold uppercase">Unggulan</span>
-                                                @endif
-                                            </div>
-                                            <div class="text-[11px] text-gray-400 truncate max-w-xs mt-0.5">{{ $pkg->description }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <!-- Category -->
-                                <td class="py-4 px-6 whitespace-nowrap">
-                                    <span class="px-2.5 py-1 rounded-full bg-[#141b28] border border-[#242f44] text-[#dfc48e] text-[11px] font-medium">
-                                        {{ $pkg->category }}
-                                    </span>
-                                </td>
-
-                                <!-- Price -->
-                                <td class="py-4 px-6 whitespace-nowrap font-serif font-bold text-white text-sm">
-                                    Rp {{ number_format($pkg->price, 0, ',', '.') }}
-                                </td>
-
-                                <!-- Items Count -->
-                                <td class="py-4 px-6">
-                                    <span class="text-xs text-gray-300 font-semibold">{{ count($pkg->items ?? []) }} Item</span>
-                                    <div class="text-[10px] text-gray-400 truncate max-w-[200px] mt-0.5">
-                                        {{ implode(', ', array_slice($pkg->items ?? [], 0, 2)) }}...
-                                    </div>
-                                </td>
-
-                                <!-- Status Active Toggle -->
-                                <td class="py-4 px-6 text-center whitespace-nowrap">
-                                    <form action="{{ route('admin.packages.toggleActive', $pkg->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit"
-                                                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all {{ $pkg->is_active ? 'bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-900' : 'bg-rose-950/80 border border-rose-500/60 text-rose-300 hover:bg-rose-900' }}">
-                                            {{ $pkg->is_active ? '✓ Aktif' : '✕ Non-Aktif' }}
-                                        </button>
-                                    </form>
-                                </td>
-
-                                <!-- Actions -->
-                                <td class="py-4 px-6 text-right whitespace-nowrap">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('admin.packages.edit', $pkg->id) }}"
-                                           class="p-2 rounded-lg bg-[#141b28] hover:bg-[#1e2538] text-gray-300 hover:text-white transition-colors border border-[#242f44]"
-                                           title="Edit Paket">
-                                            ✏️
-                                        </a>
-
-                                        <form action="{{ route('admin.packages.destroy', $pkg->id) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus paket {{ $pkg->name }}?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="p-2 rounded-lg bg-[#141b28] hover:bg-rose-950/60 text-gray-400 hover:text-rose-300 transition-colors border border-[#242f44]"
-                                                    title="Hapus Paket">
-                                                🗑️
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="py-12 text-center text-gray-500 text-xs">
-                                    Tidak ada paket yang ditemukan.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination Links -->
-            @if ($packages->hasPages())
-                <div class="p-4 border-t border-[#1e2538]">
-                    {{ $packages->links() }}
-                </div>
-            @endif
+      @if($packages->hasPages())
+        <div style="margin-top: 12px">
+          {{ $packages->links() }}
         </div>
-
+      @endif
     </div>
 
+    <!-- Panel Tambah Cepat / Info -->
+    <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 20px">
+      <div class="card" style="display: flex; flex-direction: column; gap: 16px">
+        <h2 class="d" style="font-size: 22px">Aksi Cepat</h2>
+        <p style="font-size: 14px; color: var(--admin-mu)">
+          Gunakan tombol di bawah untuk menambahkan varian sound system, lighting, atau orgen baru ke katalog sewa.
+        </p>
+        <a class="btn p" href="{{ route('admin.packages.create') }}" style="text-align: center">
+          + Formulir Tambah Produk
+        </a>
+      </div>
+
+      <div class="card" style="display: flex; flex-direction: column; gap: 12px">
+        <strong style="color: var(--admin-tx)">Petunjuk Pengelolaan Produk</strong>
+        <p style="font-size: 14px; color: var(--admin-mu)">
+          • Klik badge status (Tersedia / Nonaktif) untuk toggle langsung tanpa membuka form.<br>
+          • Gunakan ikon pensil untuk mengubah nama, rincian teknis, dan harga sewa harian.<br>
+          • Icon sampah akan menghapus paket dari daftar katalog online.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection

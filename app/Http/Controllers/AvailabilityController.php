@@ -61,27 +61,85 @@ class AvailabilityController extends Controller
         }
 
         $orders = $query->with('items.package')->get();
-
         $bookedDates = collect();
-        foreach ($orders as $order) {
-            $packageName = $order->items->first()?->package_name ?? 'Layanan Vantara Production';
-            $start = Carbon::parse($order->event_date)->startOfDay();
-            $end = $order->event_end_date ? Carbon::parse($order->event_end_date)->startOfDay() : $start->copy();
 
-            for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-                if ($date->month === $month && $date->year === $year) {
-                    $bookedDates->push([
-                        'date' => $date->format('Y-m-d'),
-                        'status' => $order->status,
-                        'status_label' => match ($order->status) {
-                            'confirmed' => 'Terkonfirmasi (Booked)',
-                            'dp_received' => 'DP Terbayar (Booked)',
-                            'pending' => 'Proses Verifikasi',
-                            default => 'Booked',
-                        },
-                        'package_name' => $packageName,
-                    ]);
+        if ($packageId) {
+            $package = Package::find($packageId);
+            $totalStock = $package ? (int) $package->stock : 1;
+            $packageName = $package?->name ?? 'Layanan Vantara Production';
+
+            // Hitung kuantitas terpakai per tanggal
+            $dailyBookedQty = [];
+            foreach ($orders as $order) {
+                $itemsForPkg = $order->items->where('package_id', $packageId);
+                $orderQty = $itemsForPkg->sum('quantity');
+
+                $start = Carbon::parse($order->event_date)->startOfDay();
+                $end = $order->event_end_date ? Carbon::parse($order->event_end_date)->startOfDay() : $start->copy();
+
+                for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+                    if ($date->month === $month && $date->year === $year) {
+                        $dStr = $date->format('Y-m-d');
+                        $dailyBookedQty[$dStr] = ($dailyBookedQty[$dStr] ?? 0) + $orderQty;
+                    }
                 }
+            }
+
+            foreach ($dailyBookedQty as $dStr => $bookedQty) {
+                $remainingStock = max(0, $totalStock - $bookedQty);
+                $isFullyBooked = ($remainingStock <= 0);
+
+                $bookedDates->push([
+                    'date' => $dStr,
+                    'is_fully_booked' => $isFullyBooked,
+                    'is_booked' => $isFullyBooked,
+                    'remaining_stock' => $remainingStock,
+                    'total_stock' => $totalStock,
+                    'booked_quantity' => $bookedQty,
+                    'status' => $isFullyBooked ? 'confirmed' : 'partially_booked',
+                    'status_label' => $isFullyBooked ? 'Sudah Terisi Penuh (Booked)' : "Masih Tersedia (Sisa {$remainingStock} Unit)",
+                    'package_name' => $packageName,
+                ]);
+            }
+        } else {
+            // Jika filter semua paket dipilih
+            $activePackages = Package::active()->get();
+            $dailyPackageBookings = [];
+
+            foreach ($orders as $order) {
+                $start = Carbon::parse($order->event_date)->startOfDay();
+                $end = $order->event_end_date ? Carbon::parse($order->event_end_date)->startOfDay() : $start->copy();
+
+                for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+                    if ($date->month === $month && $date->year === $year) {
+                        $dStr = $date->format('Y-m-d');
+                        foreach ($order->items as $item) {
+                            if ($item->package_id) {
+                                $dailyPackageBookings[$dStr][$item->package_id] = ($dailyPackageBookings[$dStr][$item->package_id] ?? 0) + $item->quantity;
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ($dailyPackageBookings as $dStr => $pkgBookings) {
+                $allFull = true;
+                foreach ($activePackages as $actPkg) {
+                    $used = $pkgBookings[$actPkg->id] ?? 0;
+                    if ($used < $actPkg->stock) {
+                        $allFull = false;
+                        break;
+                    }
+                }
+
+                $bookedDates->push([
+                    'date' => $dStr,
+                    'is_fully_booked' => $allFull,
+                    'is_booked' => $allFull,
+                    'status' => $allFull ? 'confirmed' : 'partially_booked',
+                    'status_label' => $allFull ? 'Semua Paket Terisi Penuh' : 'Ada Pesanan (Sebagian Masih Tersedia)',
+                    'package_name' => 'Layanan Vantara Production',
+                ]);
             }
         }
 
@@ -100,11 +158,13 @@ class AvailabilityController extends Controller
         $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
             'package_id' => ['nullable', 'integer', 'exists:packages,id'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $dateString = $request->string('date')->toString();
         $targetDate = Carbon::parse($dateString)->startOfDay();
         $today = Carbon::today();
+        $requestedQty = max(1, $request->integer('quantity', 1));
 
         if ($targetDate->lt($today)) {
             return response()->json([
@@ -116,28 +176,72 @@ class AvailabilityController extends Controller
             ]);
         }
 
-        $query = Order::booked()
-            ->whereDate('event_date', '<=', $dateString)
-            ->whereDate(DB::raw('COALESCE(event_end_date, event_date)'), '>=', $dateString);
-
         if ($request->filled('package_id')) {
-            $packageId = $request->integer('package_id');
-            $query->whereHas('items', function ($itemQuery) use ($packageId) {
-                $itemQuery->where('package_id', $packageId);
-            });
+            $package = Package::find($request->integer('package_id'));
+
+            if (! $package) {
+                return response()->json([
+                    'available' => false,
+                    'message' => 'Paket tidak ditemukan.',
+                ], 404);
+            }
+
+            $totalStock = (int) $package->stock;
+            $bookedQuantity = $package->getBookedStockOn($targetDate);
+            $remaining = max(0, $totalStock - $bookedQuantity);
+
+            if ($remaining < $requestedQty) {
+                $statusMsg = $remaining === 0
+                    ? "Jadwal pada tanggal ini telah terisi penuh untuk paket {$package->name} ({$totalStock} unit terpakai). Silakan pilih tanggal alternatif lain atau hubungi kami via WhatsApp."
+                    : "Kapasitas tidak mencukupi. Paket {$package->name} pada tanggal ini hanya tersisa {$remaining} unit (Anda meminta {$requestedQty} unit).";
+
+                return response()->json([
+                    'available' => false,
+                    'is_past' => false,
+                    'date' => $dateString,
+                    'formatted_date' => $targetDate->translatedFormat('l, d F Y'),
+                    'remaining_stock' => $remaining,
+                    'total_stock' => $totalStock,
+                    'booked_quantity' => $bookedQuantity,
+                    'message' => $statusMsg,
+                ]);
+            }
+
+            session()->put('event_date', $dateString);
+
+            $availMsg = $bookedQuantity > 0
+                ? "Selamat! Jadwal pada tanggal ini masih TERSEDIA. Tersisa {$remaining} dari {$totalStock} unit yang dapat dipesan."
+                : "Selamat! Jadwal pada tanggal ini masih TERSEDIA ({$totalStock} unit tersedia). Anda dapat melanjutkan ke pemesanan sekarang.";
+
+            return response()->json([
+                'available' => true,
+                'is_past' => false,
+                'date' => $dateString,
+                'formatted_date' => $targetDate->translatedFormat('l, d F Y'),
+                'remaining_stock' => $remaining,
+                'total_stock' => $totalStock,
+                'booked_quantity' => $bookedQuantity,
+                'message' => $availMsg,
+            ]);
         }
 
-        $existingOrder = $query->with('items.package')->first();
+        // Jika tidak ada package_id yang ditentukan
+        $activePackages = Package::active()->get();
+        $allFull = true;
+        foreach ($activePackages as $actPkg) {
+            if ($actPkg->getAvailableStockOn($targetDate) >= $requestedQty) {
+                $allFull = false;
+                break;
+            }
+        }
 
-        if ($existingOrder) {
-            $packageName = $existingOrder->items->first()?->package_name ?? 'Layanan';
-
+        if ($allFull && $activePackages->isNotEmpty()) {
             return response()->json([
                 'available' => false,
                 'is_past' => false,
                 'date' => $dateString,
                 'formatted_date' => $targetDate->translatedFormat('l, d F Y'),
-                'message' => "Jadwal pada tanggal ini telah terisi ({$packageName}). Silakan pilih tanggal alternatif lain atau hubungi tim konsultan kami via WhatsApp.",
+                'message' => 'Seluruh paket layanan pada tanggal ini telah terisi penuh. Silakan pilih tanggal alternatif lain.',
             ]);
         }
 

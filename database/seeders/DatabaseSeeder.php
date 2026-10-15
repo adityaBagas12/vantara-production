@@ -15,27 +15,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin user for Vantara Production Portal Admin
-        User::updateOrCreate(
-            ['email' => 'admin@vantara.id'],
-            [
-                'name' => 'Admin Vantara Production',
-                'password' => bcrypt('password'),
-                'is_admin' => true,
-            ]
-        );
+        $adminEmail = trim((string) env('ADMIN_EMAIL'));
+        $adminPassword = (string) env('ADMIN_PASSWORD');
+
+        if ($adminEmail === '' || $adminPassword === '') {
+            throw new \RuntimeException('ADMIN_EMAIL dan ADMIN_PASSWORD wajib diisi sebelum menjalankan DatabaseSeeder.');
+        }
 
         User::updateOrCreate(
-            ['email' => 'admin@vantar.id'],
+            ['email' => $adminEmail],
             [
                 'name' => 'Admin Vantara Production',
-                'password' => bcrypt('password'),
+                'password' => bcrypt($adminPassword),
                 'is_admin' => true,
             ]
         );
 
         $this->call([
             PackageSeeder::class,
+            SiteSettingSeeder::class,
         ]);
     }
 }

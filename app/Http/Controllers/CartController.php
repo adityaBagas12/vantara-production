@@ -47,20 +47,29 @@ class CartController extends Controller
 
         $package = Package::where('is_active', true)->findOrFail($request->package_id);
         $quantity = (int) ($request->quantity ?? 1);
+        $packageStock = (int) ($package->stock ?? 1);
 
         $cart = session()->get('cart', []);
 
         if (isset($cart[$package->id])) {
-            $cart[$package->id]['quantity'] += $quantity;
+            $newQuantity = $cart[$package->id]['quantity'] + $quantity;
+            if ($newQuantity > $packageStock) {
+                $newQuantity = $packageStock;
+                session()->flash('warning', "Jumlah paket '{$package->name}' disesuaikan dengan kapasitas maksimal ({$packageStock} unit).");
+            }
+            $cart[$package->id]['quantity'] = $newQuantity;
+            $cart[$package->id]['stock'] = $packageStock;
         } else {
+            $initialQuantity = min($quantity, $packageStock);
             $cart[$package->id] = [
                 'package_id' => $package->id,
                 'name' => $package->name,
                 'slug' => $package->slug,
                 'category' => $package->category,
                 'price' => (int) $package->price,
+                'stock' => $packageStock,
                 'image_path' => $package->image_path,
-                'quantity' => $quantity,
+                'quantity' => $initialQuantity,
                 'items' => $package->items ?? [],
             ];
         }
@@ -83,7 +92,21 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
 
         if (isset($cart[$packageId])) {
-            $cart[$packageId]['quantity'] = (int) $request->quantity;
+            $package = Package::find($packageId);
+            $packageStock = $package ? (int) $package->stock : (int) ($cart[$packageId]['stock'] ?? 1);
+            $requestedQty = (int) $request->quantity;
+
+            if ($requestedQty > $packageStock) {
+                $cart[$packageId]['quantity'] = $packageStock;
+                $cart[$packageId]['stock'] = $packageStock;
+                session()->put('cart', $cart);
+
+                return redirect()->route('cart.index')
+                    ->with('error', "Maksimal pemesanan untuk '{$cart[$packageId]['name']}' adalah {$packageStock} unit.");
+            }
+
+            $cart[$packageId]['quantity'] = $requestedQty;
+            $cart[$packageId]['stock'] = $packageStock;
             session()->put('cart', $cart);
 
             return redirect()->route('cart.index')

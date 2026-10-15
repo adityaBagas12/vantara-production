@@ -1,282 +1,120 @@
 @extends('layouts.app')
 
-@section('title', 'Form Pemesanan & Data Acara — Vantara Production')
-@section('meta_description', 'Lengkapi formulir identitas dan tanggal acara Anda untuk melakukan pemesanan sewa peralatan sound system & hiburan Vantara Production.')
+@section('title', 'Form Booking — Vantara Production')
+@section('meta_description', 'Lengkapi data diri dan rincian acara Anda untuk menyelesaikan pemesanan paket rental Vantara Production.')
 
 @section('content')
+<div style="min-height: 1500px">
+  <section class="wrap" style="padding-top: 56px; padding-bottom: 96px">
+    <span class="eye">Booking</span>
+    <h1 class="d" style="font-size: 52px; line-height: 1.05; font-weight: 800; margin: 8px 0 28px">Form Booking</h1>
 
-    <!-- Page Header -->
-    <section class="relative py-16 bg-[#0c1017] border-b border-[#1b2438]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#c59d5f] block mb-2">Langkah 2 dari 2</span>
-            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-3">Formulir Data Pemesan & Acara</h1>
-            <div class="flex items-center justify-center gap-3 my-3">
-                <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
-                <span class="text-[#c59d5f] text-xs">✦</span>
-                <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
-            </div>
-            <p class="max-w-xl mx-auto text-xs text-gray-300">
-                Lengkapi identitas diri dan detail pelaksanaan acara Anda di bawah ini untuk mengirimkan pengajuan pesanan ke sistem database Vantara Production.
-            </p>
+    <!-- Steps -->
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px">
+      <span class="step ok"><b>✓</b>Pilih produk &amp; tanggal</span><i class="rule"></i>
+      <span class="step on"><b>2</b>Data diri &amp; acara</span><i class="rule"></i>
+      <span class="step"><b>3</b>Invoice &amp; WhatsApp</span>
+    </div>
+
+    @if ($errors->any())
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; background: #FDECEC; border: 1px solid #F3B9B9; color: #8F1D1D; font-size: 14px; margin-bottom: 24px">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="8"/><path d="M10 6v5M10 14v.5"/></svg>
+        <div>
+          <strong>Mohon periksa data Anda:</strong>
+          <ul style="margin: 4px 0 0 16px; padding: 0">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
         </div>
-    </section>
+      </div>
+    @endif
 
-    <!-- Main Checkout Section -->
-    <section class="py-16 bg-[#0a0d14]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+      <!-- Form Input Data -->
+      <form action="{{ route('checkout.store') }}" method="POST" class="card" style="flex: 2 1 580px; padding: 40px; display: flex; flex-direction: column; gap: 22px">
+        @csrf
 
-            @if ($errors->any())
-                <div class="mb-8 p-5 bg-rose-950/70 border border-rose-500/60 rounded-xl text-rose-200 text-xs">
-                    <div class="font-bold text-sm mb-2 flex items-center gap-2">
-                        <span>⚠</span> Silakan periksa kembali data yang Anda masukkan:
-                    </div>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+        <h2 class="d" style="font-size: 24px">Data diri</h2>
+        <div class="row">
+          <div class="fld">
+            <label for="nama">Nama lengkap</label>
+            <input id="nama" name="customer_name" type="text" placeholder="Nama sesuai identitas" required value="{{ old('customer_name') }}">
+          </div>
+          <div class="fld">
+            <label for="telp">Nomor telepon / WhatsApp</label>
+            <input id="telp" name="customer_phone" type="tel" placeholder="08xx xxxx xxxx" required value="{{ old('customer_phone') }}">
+          </div>
+        </div>
+        <div class="row">
+          <div class="fld">
+            <label for="email">Email (opsional)</label>
+            <input id="email" name="customer_email" type="email" placeholder="nama@email.com" value="{{ old('customer_email') }}">
+          </div>
+        </div>
+
+        <h2 class="d" style="font-size: 24px; margin-top: 18px; padding-top: 28px; border-top: 1px solid var(--line)">Data acara</h2>
+        <div class="row">
+          <div class="fld">
+            <label for="tgl">Tanggal acara</label>
+            <input id="tgl" name="event_date" type="date" required min="{{ date('Y-m-d') }}" value="{{ old('event_date', request('event_date') ?? session('event_date') ?? '') }}">
+          </div>
+          <div class="fld">
+            <label for="alamat">Alamat / lokasi acara</label>
+            <input id="alamat" name="event_address" type="text" placeholder="Nama tempat atau alamat lengkap acara" required value="{{ old('event_address') }}">
+          </div>
+        </div>
+
+        <div class="fld">
+          <label for="cat">Catatan (opsional)</label>
+          <textarea id="cat" name="notes" rows="4" placeholder="Jenis acara, jam mulai, kebutuhan khusus…">{{ old('notes') }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px">
+          <button class="btn p" type="submit">Kirim Booking</button>
+          <a class="btn" href="{{ route('cart.index') }}">Kembali ke Keranjang</a>
+        </div>
+      </form>
+
+      <!-- Sidebar Ringkasan Pesanan -->
+      <aside class="card" style="flex: 1 1 340px; padding: 28px; display: flex; flex-direction: column; gap: 20px">
+        <span class="eye">Ringkasan pesanan</span>
+
+        @forelse($cart as $item)
+          <div style="display: flex; gap: 16px; align-items: center">
+            @if(!empty($item['image_path']))
+              <div class="pic" style="width: 92px; height: 92px; border-radius: 16px; flex: none; border: 1px solid var(--line)">
+                <img src="{{ $item['image_path'] }}" alt="{{ $item['name'] }}" style="width: 100%; height: 100%; object-fit: cover">
+              </div>
+            @else
+              <div class="pic" style="width: 92px; height: 92px; border-radius: 16px; flex: none; border: 1px solid var(--line)">
+                <svg width="40" height="40" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+              </div>
             @endif
+            <div>
+              <strong class="d" style="font-size: 18px; line-height: 1.25">{{ $item['name'] }}</strong>
+              <p style="color: var(--mu); font-size: 14px">{{ $item['category'] ?? 'Layanan' }}</p>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Harga / hari</span><span>Rp {{ number_format($item['price'], 0, ',', '.') }}</span></div>
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Jumlah unit</span><span>{{ $item['quantity'] }} unit</span></div>
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Subtotal</span><span style="font-weight: 600">Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span></div>
+          </div>
+        @empty
+          <p style="color: var(--mu)">Keranjang kosong.</p>
+        @endforelse
 
-            <form action="{{ route('checkout.store') }}" method="POST"
-                  x-data="{
-                      rentDuration: {{ $rentDuration }},
-                      startDate: '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}',
-                      get calculatedEndDate() {
-                          if (!this.startDate) return '';
-                          const parts = this.startDate.split('-');
-                          if (parts.length !== 3) return this.startDate;
-                          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-                          d.setDate(d.getDate() + (this.rentDuration - 1));
-                          const year = d.getFullYear();
-                          const month = String(d.getMonth() + 1).padStart(2, '0');
-                          const day = String(d.getDate()).padStart(2, '0');
-                          return `${year}-${month}-${day}`;
-                      },
-                      get formattedEndDateIndo() {
-                          if (!this.calculatedEndDate) return '';
-                          const parts = this.calculatedEndDate.split('-');
-                          if (parts.length !== 3) return '';
-                          return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                      }
-                  }">
-                @csrf
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
-                    <!-- Left: Customer Information Form (7 cols) -->
-                    <div class="lg:col-span-7 space-y-8">
-
-                        <!-- Section 1: Identitas Pemesan -->
-                        <div class="p-6 sm:p-8 rounded-2xl bg-[#111722] border border-[#242f44] space-y-6">
-                            <div class="border-b border-[#1e2538] pb-4">
-                                <span class="text-[11px] uppercase tracking-widest text-[#c59d5f] font-semibold">Bagian 1</span>
-                                <h3 class="font-serif text-xl font-bold text-white">Identitas Pemesan</h3>
-                            </div>
-
-                            <div class="space-y-4">
-                                <!-- Nama Lengkap -->
-                                <div>
-                                    <label for="customer_name" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                        Nama Lengkap <span class="text-rose-400">*</span>
-                                    </label>
-                                    <input type="text"
-                                           id="customer_name"
-                                           name="customer_name"
-                                           value="{{ old('customer_name') }}"
-                                           placeholder="Contoh: Budi Santoso"
-                                           required
-                                           class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <!-- Nomor WhatsApp -->
-                                    <div>
-                                        <label for="customer_phone" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                            Nomor WhatsApp Active <span class="text-rose-400">*</span>
-                                        </label>
-                                        <input type="text"
-                                               id="customer_phone"
-                                               name="customer_phone"
-                                               value="{{ old('customer_phone') }}"
-                                               placeholder="Contoh: 081234567890"
-                                               required
-                                               class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">
-                                        <span class="text-[10px] text-gray-400 mt-1 block">Digunakan untuk konfirmasi & koordinasi tim.</span>
-                                    </div>
-
-                                    <!-- Email (Opsional) -->
-                                    <div>
-                                        <label for="customer_email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                            Alamat Email <span class="text-gray-500 font-normal">(Opsional)</span>
-                                        </label>
-                                        <input type="email"
-                                               id="customer_email"
-                                               name="customer_email"
-                                               value="{{ old('customer_email') }}"
-                                               placeholder="Contoh: budi@gmail.com"
-                                               class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Section 2: Detail Acara -->
-                        <div class="p-6 sm:p-8 rounded-2xl bg-[#111722] border border-[#242f44] space-y-6">
-                            <div class="border-b border-[#1e2538] pb-4">
-                                <span class="text-[11px] uppercase tracking-widest text-[#c59d5f] font-semibold">Bagian 2</span>
-                                <h3 class="font-serif text-xl font-bold text-white">Detail & Tanggal Acara</h3>
-                            </div>
-
-                            <div class="space-y-4">
-                                <!-- Tanggal Acara Grid -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <!-- Tanggal Mulai Acara (Dikunci) -->
-                                    <div>
-                                        <label for="event_date" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                            Tanggal Mulai Acara <span class="text-emerald-400 font-normal">🔒 (Dikunci)</span>
-                                        </label>
-                                        <input type="date"
-                                               id="event_date"
-                                               name="event_date"
-                                               x-model="startDate"
-                                               value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date') ?? date('Y-m-d')) }}"
-                                               min="{{ date('Y-m-d') }}"
-                                               required
-                                               readonly
-                                               class="w-full px-4 py-3 bg-[#0a0d14]/70 border border-[#242f44] text-gray-300 rounded-lg text-sm cursor-not-allowed focus:outline-none select-none opacity-80"
-                                               title="Tanggal mulai acara dikunci sesuai pilihan dari keranjang/halaman cek tanggal.">
-                                        <span class="text-[10px] text-emerald-400/90 mt-1 block font-medium">
-                                            Otomatis terisi dari pilihan keranjang.
-                                        </span>
-                                    </div>
-
-                                    <!-- Tanggal Selesai Acara (Otomatis Dikalkulasi & Dikunci) -->
-                                    <div>
-                                        <label for="event_end_date" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                            Tanggal Selesai Acara <span class="text-emerald-400 font-normal">🔒 (Dikunci)</span>
-                                        </label>
-                                        <input type="date"
-                                               id="event_end_date"
-                                               name="event_end_date"
-                                               :value="calculatedEndDate"
-                                               readonly
-                                               class="w-full px-4 py-3 bg-[#0a0d14]/70 border border-[#242f44] text-gray-300 rounded-lg text-sm cursor-not-allowed focus:outline-none select-none opacity-80"
-                                               title="Tanggal selesai dihitung otomatis dari durasi sewa di keranjang dan dikunci.">
-                                        <span class="text-[10px] text-emerald-400/90 mt-1 block font-medium">
-                                            Otomatis terisi (<span x-text="rentDuration > 1 ? rentDuration + ' Hari Berturut-turut' : 'Selesai di Hari yang Sama'"></span>).
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Multi-day duration banner -->
-                                <div class="p-3.5 rounded-lg bg-[#141b28] border border-[#c59d5f]/40 text-xs text-[#dfc48e] flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span>📅</span>
-                                        <span>Durasi Sewa: <strong x-text="`${rentDuration} Hari`"></strong></span>
-                                        <span class="text-gray-400">•</span>
-                                        <span class="text-gray-300 font-medium" x-text="rentDuration === 1 ? 'Selesai pada hari yang sama' : `Selesai pada tanggal besoknya (${formattedEndDateIndo})`"></span>
-                                    </div>
-                                </div>
-
-                                <!-- Alamat Lengkap Acara -->
-                                <div>
-                                    <label for="event_address" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                        Alamat Lengkap Lokasi Acara <span class="text-rose-400">*</span>
-                                    </label>
-                                    <textarea id="event_address"
-                                              name="event_address"
-                                              rows="3"
-                                              placeholder="Contoh: Gedung Serbaguna H. Nawi, Jl. Raya Pasar Minggu No. 45, Jakarta Selatan"
-                                              required
-                                              class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">{{ old('event_address') }}</textarea>
-                                </div>
-
-                                <!-- Catatan / Request Tambahan -->
-                                <div>
-                                    <label for="notes" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                        Catatan Khusus / Permintaan Tambahan <span class="text-gray-500 font-normal">(Opsional)</span>
-                                    </label>
-                                    <textarea id="notes"
-                                              name="notes"
-                                              rows="3"
-                                              placeholder="Contoh: Membutuhkan genset 50 KVA Tambahan, request warna lighting merah emas, atau jam gladi bersih pukul 08:00 WIB."
-                                              class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">{{ old('notes') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Right: Order Summary Sidebar (5 cols) -->
-                    <div class="lg:col-span-5">
-                        <div class="p-6 sm:p-8 rounded-2xl bg-[#111722] border border-[#c59d5f]/40 shadow-2xl space-y-6 sticky top-24">
-                            <h3 class="font-serif text-xl font-bold text-white border-b border-[#1e2538] pb-4">Ringkasan Pesanan</h3>
-
-                            <!-- Package Items Preview List -->
-                            <div class="space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
-                                @foreach ($cart as $item)
-                                    <div class="p-3 rounded-lg bg-[#090c14] border border-[#1e2538] flex items-center justify-between text-xs">
-                                        <div>
-                                            <div class="font-semibold text-white truncate max-w-[200px]">{{ $item['name'] }}</div>
-                                            <div class="text-[10px] text-gray-400">{{ $item['quantity'] }} Hari · {{ $item['category'] }}</div>
-                                        </div>
-                                        <div class="font-serif font-bold text-[#dfc48e] shrink-0">
-                                            Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <!-- Cost Breakdown -->
-                            <div class="pt-4 border-t border-[#1e2538] space-y-3 text-xs">
-                                <div class="flex items-center justify-between text-gray-300">
-                                    <span>Subtotal Paket ({{ $rentDuration }} Hari):</span>
-                                    <span class="font-semibold text-white">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-gray-400">
-                                    <span>Biaya Pengantaran & Pemasangan:</span>
-                                    <span class="text-emerald-400 font-semibold">Gratis / Termasuk</span>
-                                </div>
-                                <div class="flex items-center justify-between text-gray-400">
-                                    <span>Kru Operational Standby:</span>
-                                    <span class="text-emerald-400 font-semibold">Gratis / Termasuk</span>
-                                </div>
-                            </div>
-
-                            <!-- Total Summary -->
-                            <div class="pt-4 border-t border-[#1e2538]">
-                                <div class="flex items-baseline justify-between mb-2">
-                                    <span class="text-xs font-semibold uppercase text-gray-300">Total Estimasi Transaksi</span>
-                                    <div class="font-serif text-2xl font-bold text-[#dfc48e]">
-                                        Rp {{ number_format($total, 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                <p class="text-[10px] text-gray-400 leading-relaxed mb-6">
-                                    Setelah formulir dikirim, pesanan Anda akan tercatat ke database kami dan Anda akan langsung diarahkan ke WhatsApp Admin untuk proses konfirmasi.
-                                </p>
-
-                                <button type="submit"
-                                        class="w-full py-4 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded shadow-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    Kirim Pemesanan & Lanjut WA
-                                </button>
-                            </div>
-
-                            <!-- Back to cart link -->
-                            <div class="text-center pt-2">
-                                <a href="{{ route('cart.index') }}" class="text-xs text-gray-400 hover:text-white underline">
-                                    &larr; Kembali ke Keranjang
-                                </a>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </form>
-
+        <div style="border-top: 1px solid var(--line); padding-top: 18px; display: flex; align-items: baseline">
+          <strong style="flex-grow: 1">Estimasi total</strong>
+          <strong class="d" style="font-size: 26px; color: var(--ac)">Rp {{ number_format($total ?? 0, 0, ',', '.') }}</strong>
         </div>
-    </section>
 
+        <p style="font-size: 14px; color: var(--mu); background: var(--s2); border-radius: 12px; padding: 12px 14px">
+          Harga akhir disepakati bersama Admin lewat WhatsApp setelah booking terkirim.
+        </p>
+      </aside>
+    </div>
+  </section>
+</div>
 @endsection

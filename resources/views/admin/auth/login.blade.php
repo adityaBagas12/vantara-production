@@ -1,101 +1,68 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
+<!doctype html>
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk Admin — Vantara Production</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Admin — Vantara Production</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#090c14] text-gray-100 font-sans antialiased min-h-screen flex items-center justify-center p-4">
+<body class="admin" style="min-height: 100vh">
 
-    <div class="w-full max-w-md">
-
-        <!-- Logo Header -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c59d5f] via-[#dfc48e] to-[#ab8048] p-[1px] shadow-2xl mb-4">
-                <div class="w-full h-full bg-[#0b0e14] rounded-2xl flex items-center justify-center">
-                    <span class="font-serif text-2xl font-bold text-[#dfc48e]">V</span>
-                </div>
-            </div>
-            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-white">Vantara Production</h1>
-            <p class="text-xs text-[#c59d5f] uppercase tracking-[0.25em] font-semibold mt-1">Portal Otentikasi Admin</p>
-        </div>
-
-        <!-- Login Card -->
-        <div class="p-8 rounded-2xl bg-[#111722] border border-[#c59d5f]/30 shadow-2xl space-y-6">
-
-            @if (session('error'))
-                <div class="p-4 bg-rose-950/70 border border-rose-500/50 rounded-xl text-rose-200 text-xs">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            @if (session('success'))
-                <div class="p-4 bg-emerald-950/70 border border-emerald-500/50 rounded-xl text-emerald-200 text-xs">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form action="{{ route('admin.login.submit') }}" method="POST" class="space-y-5">
-                @csrf
-
-                <!-- Email Input -->
-                <div>
-                    <label for="email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                        Alamat Email Admin
-                    </label>
-                    <input type="email"
-                           id="email"
-                           name="email"
-                           value="{{ old('email') }}"
-                           placeholder="admin@vantara.id"
-                           required
-                           autofocus
-                           class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-colors">
-                    @error('email')
-                        <span class="text-[11px] text-rose-400 mt-1 block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <!-- Password Input -->
-                <div>
-                    <label for="password" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                        Kata Sandi
-                    </label>
-                    <input type="password"
-                           id="password"
-                           name="password"
-                           placeholder="••••••••"
-                           required
-                           class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white focus:outline-none transition-colors">
-                    @error('password')
-                        <span class="text-[11px] text-rose-400 mt-1 block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <!-- Remember Me Checkbox -->
-                <div class="flex items-center justify-between text-xs">
-                    <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-                        <input type="checkbox" name="remember" class="rounded bg-[#090c14] border-[#242f44] text-[#c59d5f] focus:ring-0">
-                        <span>Ingat Sesi Saya</span>
-                    </label>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit"
-                        class="w-full py-3.5 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-xl transition-all hover:scale-[1.02]">
-                    Masuk ke Dashboard Admin &rarr;
-                </button>
-            </form>
-        </div>
-
-        <div class="text-center mt-6">
-            <a href="{{ route('home') }}" class="text-xs text-gray-400 hover:text-white transition-colors">
-                &larr; Kembali ke Website Utama
-            </a>
-        </div>
-
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh">
+  <!-- Left Side: Dark Hero Panel -->
+  <div style="flex: 1 1 520px; background: radial-gradient(90% 70% at 80% 0%, rgba(245,165,36,.30), transparent 60%), linear-gradient(160deg,#1F2330,#0D0E12); color: #F2EFE9; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; gap: 48px">
+    <span class="brand">
+      <span class="mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <rect x="1" y="6" width="2" height="4" rx="1"/>
+          <rect x="5" y="2" width="2" height="12" rx="1"/>
+          <rect x="9" y="4" width="2" height="8" rx="1"/>
+          <rect x="13" y="7" width="2" height="2" rx="1"/>
+        </svg>
+      </span>
+      VANTARA
+    </span>
+    <div>
+      <h1 class="d" style="font-size: 56px; line-height: 1.04; font-weight: 800; max-width: 460px">Kelola rental, tanpa catatan berserakan.</h1>
+      <p style="margin-top: 18px; font-size: 18px; color: #A9ADB9; max-width: 420px">Produk, booking, transaksi, invoice, dan laporan bulanan dalam satu panel.</p>
     </div>
+    <p style="color: #A9ADB9; font-size: 14px">Vantara Production · Kota Bengkulu</p>
+  </div>
+
+  <!-- Right Side: Clean Login Form -->
+  <div style="flex: 1 1 480px; display: grid; place-items: center; padding: 48px 32px; background: #F5F4F0">
+    <form action="{{ route('admin.login.submit') }}" method="POST" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px">
+      @csrf
+      <div>
+        <h2 class="d" style="font-size: 36px; font-weight: 800">Masuk Admin</h2>
+        <p style="color: var(--mu); margin-top: 6px">Gunakan akun admin Vantara Production.</p>
+      </div>
+
+      <div class="fld">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required autofocus value="{{ old('email') }}" placeholder="Masukkan email admin">
+      </div>
+
+      <div class="fld">
+        <label for="pw">Password</label>
+        <input id="pw" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+      </div>
+
+      @if ($errors->any() || session('error'))
+        <div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 12px; background: #FDECEC; border: 1px solid #F3B9B9; color: #8F1D1D; font-size: 14px">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="flex: none"><circle cx="9" cy="9" r="7.5"/><path d="M9 5v5M9 12.5v.5"/></svg>
+          {{ $errors->first() ?? session('error') }}
+        </div>
+      @endif
+
+      <button class="btn p" type="submit" style="width: 100%; font-size: 16px; border-radius: 12px">Masuk</button>
+      <a href="{{ route('home') }}" style="color: var(--mu); text-align: center; text-decoration: underline; min-height: 44px; display: grid; place-items: center">← Kembali ke website</a>
+    </form>
+  </div>
+</div>
 
 </body>
 </html>

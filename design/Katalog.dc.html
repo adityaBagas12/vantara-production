@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Katalog Produk</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D0E12;--s1:#15171D;--s2:#1C1F27;--line:#2A2E38;--tx:#F2EFE9;--mu:#A9ADB9;--ac:#F5A524;--acx:#1A1204}
+*{box-sizing:border-box}
+body{margin:0;background:#0D0E12;color:#F2EFE9;font-family:'Figtree',system-ui,sans-serif;font-size:16px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p{margin:0}
+.d{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.nav{display:flex;align-items:center;gap:32px;padding:18px 56px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;letter-spacing:.06em}
+.mark{width:30px;height:30px;border-radius:9px;background:var(--ac);display:grid;place-items:center;color:var(--acx)}
+.nl{color:var(--mu);font-weight:500}.nl:hover,.nl.on{color:var(--tx)}
+.sp{flex-grow:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 24px;border-radius:999px;border:1px solid #3A3F4C;background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--tx)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:var(--acx)}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:20px}
+.eye{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);font-weight:600}
+.wrap{max-width:1280px;margin:0 auto;padding:0 56px}
+.pic{position:relative;display:grid;place-items:center;overflow:hidden;color:var(--ac);background:radial-gradient(120% 90% at 75% 0%,rgba(245,165,36,.30),transparent 55%),linear-gradient(160deg,#272B38,#12141A)}
+.pic.k2{background:radial-gradient(120% 90% at 20% 0%,rgba(130,160,255,.30),transparent 55%),linear-gradient(160deg,#242838,#12141A)}
+.pic.k3{background:radial-gradient(120% 90% at 80% 10%,rgba(255,120,150,.26),transparent 55%),linear-gradient(160deg,#2A2530,#13121A)}
+.pic.k4{background:radial-gradient(120% 90% at 30% 0%,rgba(80,215,175,.24),transparent 55%),linear-gradient(160deg,#202A2C,#0F1417)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;color:var(--mu);font-size:14px;font-weight:500;min-height:40px}
+.pill.on{background:var(--tx);border-color:var(--tx);color:#0D0E12;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ADE80}
+.badge{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:999px;background:rgba(13,14,18,.82);border:1px solid var(--line);font-size:13px;color:var(--tx);font-weight:600}
+.price{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px}
+.fld{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mu)}
+.fld input[type=text],.fld input[type=date]{background:var(--s2);border:1px solid #3A3F4C;border-radius:12px;padding:12px 14px;color:var(--tx);font:inherit;min-height:46px;color-scheme:dark;width:100%}
+.chk{display:flex;align-items:center;gap:10px;color:var(--tx);font-size:15px;min-height:32px}
+.chk input{width:18px;height:18px;accent-color:#F5A524}
+.pg{display:flex;gap:8px;justify-content:center}
+.pg a{min-width:44px;height:44px;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;color:var(--mu);font-weight:600}
+.pg a.on{background:var(--ac);border-color:var(--ac);color:var(--acx)}
+</style>
+</helmet>
+<div style="min-height: 1700px">
+  <nav class="nav">
+    <a class="brand" href="Main.dc.html"><span class="mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="6" width="2" height="4" rx="1"/><rect x="5" y="2" width="2" height="12" rx="1"/><rect x="9" y="4" width="2" height="8" rx="1"/><rect x="13" y="7" width="2" height="2" rx="1"/></svg></span>VANTARA</a>
+    <span class="sp"></span>
+    <a class="nl" href="Main.dc.html">Beranda</a>
+    <a class="nl on" href="Katalog.dc.html">Katalog</a>
+    <a class="nl" href="Detail.dc.html">Cek Ketersediaan</a>
+    <a class="nl" href="Main.dc.html#kontak">Kontak</a>
+    <a class="btn p" href="Booking.dc.html">Booking Sekarang</a>
+  </nav>
+
+  <section class="wrap" style="padding-top: 56px; padding-bottom: 32px">
+    <span class="eye">Katalog</span>
+    <div style="display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-top: 8px">
+      <h1 class="d" style="font-size: 52px; line-height: 1.05; font-weight: 800; flex-grow: 1">Pilih perlengkapan acara Anda</h1>
+      <span style="color: var(--mu)">Menampilkan 9 produk</span>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px">
+      <a class="pill on" href="Katalog.dc.html">Semua</a>
+      <a class="pill" href="Katalog.dc.html">Sound System</a>
+      <a class="pill" href="Katalog.dc.html">Professional Lighting</a>
+      <a class="pill" href="Katalog.dc.html">Orgen &amp; Entertainment</a>
+      <a class="pill" href="Katalog.dc.html">Videobooth &amp; Photobooth</a>
+      <a class="pill" href="Katalog.dc.html">Special Effect</a>
+    </div>
+  </section>
+
+  <section class="wrap" style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; padding-bottom: 56px">
+    <form class="card" style="flex: 0 0 280px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+      <strong class="d" style="font-size: 20px">Filter</strong>
+      <div class="fld"><label for="cari">Cari produk</label><input id="cari" type="text" placeholder="Nama produk"></div>
+      <div class="fld"><label for="tgl">Tanggal acara</label><input id="tgl" type="date"></div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 13px; color: var(--mu); margin-bottom: 4px">Kategori</span>
+        <label class="chk"><input type="checkbox" checked> Sound System</label>
+        <label class="chk"><input type="checkbox" checked> Professional Lighting</label>
+        <label class="chk"><input type="checkbox" checked> Orgen &amp; Entertainment</label>
+        <label class="chk"><input type="checkbox" checked> Videobooth &amp; Photobooth</label>
+        <label class="chk"><input type="checkbox" checked> Special Effect</label>
+      </div>
+      <label class="chk" style="border-top: 1px solid var(--line); padding-top: 16px"><input type="checkbox"> Hanya yang tersedia</label>
+      <button class="btn p" type="button">Terapkan Filter</button>
+    </form>
+
+    <div style="flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
+      <sc-for list="{{products}}" as="p" hint-placeholder-count="9">
+        <div class="card" style="overflow: hidden; display: flex; flex-direction: column">
+          <div class="pic {{p.k}}" style="height: 200px">
+            <sc-if value="{{p.ok}}" hint-placeholder-val="{{true}}"><span class="badge"><i class="dot"></i>Tersedia</span></sc-if>
+            <sc-if value="{{p.busy}}" hint-placeholder-val="{{false}}"><span class="badge" style="color: var(--mu)">Sedang disewa</span></sc-if>
+            <sc-if value="{{p.speaker}}" hint-placeholder-val="{{true}}"><svg width="60" height="60" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="14" r="3"/></svg></sc-if>
+            <sc-if value="{{p.light}}" hint-placeholder-val="{{false}}"><svg width="60" height="60" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18l6 24M24 18v24"/></svg></sc-if>
+            <sc-if value="{{p.mic}}" hint-placeholder-val="{{false}}"><svg width="60" height="60" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="17" y="4" width="14" height="24" rx="7"/><path d="M9 22a15 15 0 0 0 30 0M24 37v7M16 44h16"/></svg></sc-if>
+            <sc-if value="{{p.mixer}}" hint-placeholder-val="{{false}}"><svg width="60" height="60" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="4"/><path d="M14 18v14M24 18v14M34 18v14"/><circle cx="14" cy="24" r="2.5"/><circle cx="24" cy="30" r="2.5"/><circle cx="34" cy="22" r="2.5"/></svg></sc-if>
+          </div>
+          <div style="padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
+            <span style="color: var(--mu); font-size: 14px">{{p.cat}}</span>
+            <strong class="d" style="font-size: 20px; line-height: 1.25">{{p.name}}</strong>
+            <span class="price" style="margin: 8px 0 14px">{{p.price}} <span style="font-size: 14px; color: var(--mu); font-weight: 500">/ hari</span></span>
+            <div style="display: flex; gap: 10px; margin-top: auto">
+              <a class="btn sm" href="Detail.dc.html" style="flex: 1 1 0">Detail</a>
+              <a class="btn sm p" href="Booking.dc.html" style="flex: 1 1 0">Booking</a>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: 96px">
+    <div class="pg"><a href="Katalog.dc.html" aria-label="Sebelumnya">‹</a><a class="on" href="Katalog.dc.html">1</a><a href="Katalog.dc.html">2</a><a href="Katalog.dc.html">3</a><a href="Katalog.dc.html" aria-label="Berikutnya">›</a></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      products: [
+        { name: 'Paket Sound System Outdoor', cat: 'Sound System', price: 'Rp 1.800.000', k: '', speaker: true, ok: true },
+        { name: 'Lighting Panggung Set', cat: 'Professional Lighting', price: 'Rp 950.000', k: 'k2', light: true, ok: true },
+        { name: 'Wireless Mic Set', cat: 'Sound System', price: 'Rp 250.000', k: 'k3', mic: true, ok: true },
+        { name: 'Mixer Digital 16 Channel', cat: 'Sound System', price: 'Rp 400.000', k: 'k4', mixer: true, ok: true },
+        { name: 'Paket Sound System Indoor', cat: 'Sound System', price: 'Rp 1.200.000', k: 'k2', speaker: true, ok: true },
+        { name: 'Moving Head Light', cat: 'Professional Lighting', price: 'Rp 600.000', k: '', light: true, busy: true },
+        { name: 'Orgen Tunggal & Vokalis', cat: 'Orgen & Entertainment', price: 'Rp 1.500.000', k: 'k4', mic: true, ok: true },
+        { name: 'Videobooth 360°', cat: 'Videobooth 360°', price: 'Rp 1.100.000', k: 'k3', light: true, ok: true },
+        { name: 'Paket Special Effect', cat: 'Special Effect', price: 'Rp 700.000', k: 'k2', mixer: true, ok: true }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

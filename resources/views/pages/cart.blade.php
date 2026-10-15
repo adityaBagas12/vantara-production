@@ -1,232 +1,146 @@
 @extends('layouts.app')
 
 @section('title', 'Keranjang Pemesanan — Vantara Production')
-@section('meta_description', 'Tinjau daftar paket rental sound system dan peralatan hiburan yang telah Anda pilih sebelum melanjutkan ke pengisian data acara.')
+@section('meta_description', 'Tinjau daftar paket rental sound system dan peralatan hiburan Anda.')
 
 @section('content')
+<div style="min-height: 1200px">
+  <section class="wrap" style="padding-top: 56px; padding-bottom: 96px">
+    <span class="eye">Keranjang</span>
+    <h1 class="d" style="font-size: 52px; line-height: 1.05; font-weight: 800; margin: 8px 0 36px">Keranjang Pemesanan</h1>
 
-    <!-- Header Section -->
-    <section class="relative py-16 bg-[#0c1017] border-b border-[#1b2438]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#c59d5f] block mb-2">Langkah 1 dari 2</span>
-            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-3">Keranjang Pemesanan Paket</h1>
-            <div class="flex items-center justify-center gap-3 my-3">
-                <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
-                <span class="text-[#c59d5f] text-xs">✦</span>
-                <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
+    @if (session('success'))
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.35); color: #86EFAC; font-size: 14px; margin-bottom: 24px">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="8"/><path d="m6.5 10.5 2.5 2.5 4.5-5"/></svg>
+        <span>{{ session('success') }}</span>
+      </div>
+    @endif
+
+    @if (session('error'))
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; background: #FDECEC; border: 1px solid #F3B9B9; color: #8F1D1D; font-size: 14px; margin-bottom: 24px">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="8"/><path d="M10 6v5M10 14v.5"/></svg>
+        <span>{{ session('error') }}</span>
+      </div>
+    @endif
+
+    @if (empty($cart))
+      <div class="card" style="padding: 64px 32px; text-align: center; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px">
+        <div class="pic" style="width: 80px; height: 80px; border-radius: 20px; border: 1px solid var(--line)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </div>
+        <h2 class="d" style="font-size: 26px">Keranjang Anda masih kosong</h2>
+        <p style="color: var(--mu); max-width: 420px">Anda belum memilih peralatan atau paket acara. Silakan jelajahi katalog kami.</p>
+        <a class="btn p" href="{{ route('packages.catalog') }}" style="margin-top: 8px">Lihat Katalog Paket</a>
+      </div>
+    @else
+      <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+        <!-- Cart Items List -->
+        <div style="flex: 2 1 580px; display: flex; flex-direction: column; gap: 20px">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px">
+            <span style="color: var(--mu); font-size: 15px">Terdapat <strong style="color: var(--tx)">{{ count($cart) }}</strong> paket di keranjang</span>
+            <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Kosongkan seluruh keranjang?')">
+              @csrf
+              <button type="submit" style="background: transparent; border: 0; color: #FCA5A5; font: inherit; font-size: 14px; cursor: pointer; text-decoration: underline">
+                Kosongkan Keranjang
+              </button>
+            </form>
+          </div>
+
+          @foreach ($cart as $id => $item)
+            <div class="card" style="padding: 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+              @if(!empty($item['image_path']))
+                <div class="pic" style="width: 88px; height: 88px; border-radius: 16px; flex: none; border: 1px solid var(--line)">
+                  <img src="{{ $item['image_path'] }}" alt="{{ $item['name'] }}" style="width: 100%; height: 100%; object-fit: cover">
+                </div>
+              @else
+                <div class="pic" style="width: 88px; height: 88px; border-radius: 16px; flex: none; border: 1px solid var(--line)">
+                  <svg width="40" height="40" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+                </div>
+              @endif
+
+              <div style="flex: 1 1 200px">
+                <span style="color: var(--mu); font-size: 13px">{{ $item['category'] ?? 'Layanan' }}</span>
+                <h3 class="d" style="font-size: 20px">
+                  <a href="{{ route('packages.show', $item['slug']) }}">{{ $item['name'] }}</a>
+                </h3>
+                <span class="price" style="font-size: 17px; margin-top: 4px; display: inline-block">
+                  Rp {{ number_format($item['price'], 0, ',', '.') }} <span style="font-size: 13px; color: var(--mu); font-weight: 500">/ hari</span>
+                </span>
+              </div>
+
+              <!-- Quantity & Subtotal -->
+              <div style="display: flex; align-items: center; gap: 20px; margin-left: auto">
+                <form action="{{ route('cart.update', $id) }}" method="POST" style="display: flex; align-items: center; gap: 8px">
+                  @csrf
+                  @method('PATCH')
+                  <label for="qty_{{ $id }}" style="font-size: 13px; color: var(--mu)">Unit:</label>
+                  <input id="qty_{{ $id }}" type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" max="{{ $item['stock'] ?? 99 }}" onchange="this.form.submit()"
+                         title="Maksimal {{ $item['stock'] ?? 1 }} unit"
+                         style="width: 64px; background: var(--s2); border: 1px solid #3A3F4C; border-radius: 10px; padding: 6px 10px; color: var(--tx); font-family: var(--font-mono); text-align: center">
+                </form>
+
+                <div style="text-align: right; min-width: 120px">
+                  <span style="font-size: 12px; color: var(--mu); text-transform: uppercase">Subtotal</span>
+                  <div style="font-family: var(--font-mono); font-weight: 700; font-size: 17px; color: var(--ac)">
+                    Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
+                  </div>
+                </div>
+
+                <form action="{{ route('cart.destroy', $id) }}" method="POST">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" aria-label="Hapus paket" style="background: transparent; border: 0; color: #8F1D1D; cursor: pointer; padding: 8px; font-size: 18px" title="Hapus">
+                    ✕
+                  </button>
+                </form>
+              </div>
             </div>
-            <p class="max-w-xl mx-auto text-xs text-gray-300">
-                Periksa kembali pilihan paket layanan rental Anda di bawah ini sebelum melanjutkan pengisian data pemesan.
-            </p>
+          @endforeach
+
+          <a href="{{ route('packages.catalog') }}" style="color: var(--mu); font-size: 14px; text-decoration: underline; margin-top: 8px">
+            ← Tambah paket lain dari katalog
+          </a>
         </div>
-    </section>
 
-    <!-- Cart Main Content -->
-    <section class="py-16 bg-[#0a0d14] min-h-[600px]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Summary Aside -->
+        <aside class="card" style="flex: 1 1 340px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+          <span class="eye">Ringkasan Biaya</span>
 
-            @if (session('success'))
-                <div class="mb-6 p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-xl text-emerald-200 text-xs flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base">✓</span>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                </div>
-            @endif
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px">
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Total paket</span><span style="font-family: var(--font-mono)">Rp {{ number_format($total, 0, ',', '.') }}</span></div>
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Kru &amp; Teknisi</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Instalasi &amp; Antar</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
+          </div>
 
-            @if (session('error'))
-                <div class="mb-6 p-4 bg-rose-950/60 border border-rose-500/50 rounded-xl text-rose-200 text-xs flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base">✕</span>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                </div>
-            @endif
+          <!-- Tanggal Acara -->
+          <div style="background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+            <label for="cart_event_date" style="font-size: 13px; color: var(--mu); font-weight: 600">Tanggal Acara:</label>
+            <form action="{{ route('cart.index') }}" method="GET">
+              <input type="date" id="cart_event_date" name="event_date"
+                     value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}"
+                     min="{{ date('Y-m-d') }}" onchange="this.form.submit()"
+                     style="width: 100%; background: var(--s1); border: 1px solid #3A3F4C; border-radius: 10px; padding: 10px 12px; color: var(--tx); font-family: var(--font-mono)">
+            </form>
+            <span style="font-size: 12px; color: var(--mu)">Tanggal ini akan otomatis diisikan pada form booking.</span>
+          </div>
 
-            @if (empty($cart))
-                <!-- Empty Cart State -->
-                <div class="text-center py-20 bg-[#111722] rounded-2xl border border-[#242f44] p-12 max-w-2xl mx-auto">
-                    <div class="w-20 h-20 mx-auto rounded-full bg-[#c59d5f]/10 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] mb-5 text-3xl">
-                        🛒
-                    </div>
-                    <h3 class="font-serif text-2xl font-bold text-white mb-2">Keranjang Anda Masih Kosong</h3>
-                    <p class="text-xs text-gray-400 max-w-md mx-auto mb-8 leading-relaxed">
-                        Anda belum menambahkan paket rental ke dalam keranjang. Jelajahi katalog kami untuk memilih paket sound system, lighting, videobooth, atau band wedding.
-                    </p>
-                    <a href="{{ route('packages.catalog') }}"
-                       class="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] text-black font-bold text-xs uppercase tracking-wider rounded shadow-lg transition-all hover:scale-105">
-                        <span>Pilih Paket Layanan</span>
-                        <span>&rarr;</span>
-                    </a>
-                </div>
-            @else
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div style="border-top: 1px solid var(--line); padding-top: 18px; display: flex; align-items: baseline">
+            <strong style="flex-grow: 1">Estimasi Total</strong>
+            <strong class="d" style="font-size: 26px; color: var(--ac); font-family: var(--font-mono)">
+              Rp {{ number_format($total, 0, ',', '.') }}
+            </strong>
+          </div>
 
-                    <!-- Left: Cart Items List (8 cols) -->
-                    <div class="lg:col-span-8 space-y-6">
+          <a class="btn p" href="{{ route('checkout.index') }}" style="width: 100%; text-align: center">
+            Lanjut ke Form Booking
+          </a>
 
-                        <div class="flex items-center justify-between pb-4 border-b border-[#1e2538]">
-                            <div class="text-xs text-gray-400">
-                                Terdapat <span class="font-bold text-white">{{ count($cart) }}</span> jenis paket dalam keranjang Anda
-                            </div>
-                            <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Kosongkan seluruh keranjang?')">
-                                @csrf
-                                <button type="submit" class="text-xs text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    Kosongkan Keranjang
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Item Rows -->
-                        <div class="space-y-4">
-                            @foreach ($cart as $id => $item)
-                                <div class="p-5 rounded-xl bg-[#111722] border border-[#242f44] hover:border-[#c59d5f]/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-                                    
-                                    <!-- Image & Package Info -->
-                                    <div class="flex items-center gap-4 flex-1">
-                                        <div class="w-20 h-20 rounded-lg overflow-hidden bg-black shrink-0 border border-[#242f44]">
-                                            <img src="{{ $item['image_path'] ?? 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=400&auto=format&fit=crop' }}"
-                                                 alt="{{ $item['name'] }}"
-                                                 class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] uppercase font-semibold text-[#c59d5f] tracking-wider block mb-0.5">{{ $item['category'] }}</span>
-                                            <h4 class="font-serif font-bold text-white text-base">
-                                                <a href="{{ route('packages.show', $item['slug']) }}" class="hover:text-[#c59d5f] transition-colors">
-                                                    {{ $item['name'] }}
-                                                </a>
-                                            </h4>
-                                            <div class="text-xs text-[#dfc48e] font-semibold mt-1">
-                                                Rp {{ number_format($item['price'], 0, ',', '.') }} <span class="text-[10px] text-gray-400 font-normal">/ hari</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Quantity Form & Subtotal -->
-                                    <div class="flex items-center justify-between w-full sm:w-auto gap-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-[#1e2538]">
-                                        <!-- Quantity Form -->
-                                        <form action="{{ route('cart.update', $id) }}" method="POST" class="flex items-center gap-2">
-                                            @csrf
-                                            @method('PATCH')
-                                            <label class="text-[11px] text-gray-400 shrink-0">Durasi (Hari):</label>
-                                            <input type="number"
-                                                   name="quantity"
-                                                   value="{{ $item['quantity'] }}"
-                                                   min="1"
-                                                   onchange="this.form.submit()"
-                                                   class="w-16 px-2 py-1.5 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] text-center rounded text-xs text-white focus:outline-none">
-                                        </form>
-
-                                        <!-- Subtotal -->
-                                        <div class="text-right shrink-0">
-                                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Subtotal</div>
-                                            <div class="font-serif font-bold text-white text-base">
-                                                Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
-                                            </div>
-                                        </div>
-
-                                        <!-- Remove Button -->
-                                        <form action="{{ route('cart.destroy', $id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    title="Hapus paket"
-                                                    class="p-2 text-gray-500 hover:text-rose-400 transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="pt-4 flex items-center justify-between">
-                            <a href="{{ route('packages.catalog') }}" class="text-xs text-[#c59d5f] hover:underline font-semibold flex items-center gap-1">
-                                &larr; Tambah Paket Lain
-                            </a>
-                        </div>
-
-                    </div>
-
-                    <!-- Right: Summary Card (4 cols) -->
-                    <div class="lg:col-span-4">
-                        <div class="p-6 rounded-2xl bg-[#111722] border border-[#c59d5f]/40 shadow-2xl space-y-6 sticky top-24">
-                            <h3 class="font-serif text-lg font-bold text-white border-b border-[#1e2538] pb-3">Ringkasan Biaya</h3>
-
-                            <div class="space-y-3 text-xs">
-                                <div class="flex items-center justify-between text-gray-300">
-                                    <span>Total Estimasi Paket:</span>
-                                    <span class="font-semibold text-white">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-gray-400">
-                                    <span>Pemasangan & Antar:</span>
-                                    <span class="text-emerald-400 font-semibold">Termasuk</span>
-                                </div>
-                                <div class="flex items-center justify-between text-gray-400">
-                                    <span>Kru & Operator:</span>
-                                    <span class="text-emerald-400 font-semibold">Termasuk</span>
-                                </div>
-                            </div>
-
-                            <!-- Event Date Selection Block -->
-                            <div class="p-3.5 rounded-xl bg-[#090c14] border border-[#242f44] space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <label for="cart_event_date" class="text-[11px] font-semibold text-gray-300 uppercase tracking-wider">
-                                        📅 Tanggal Acara Pelaksanaan:
-                                    </label>
-                                    @if(session('event_date') || request('event_date') || request('date'))
-                                        <span class="text-[10px] text-emerald-400 font-semibold lowercase">(terisi)</span>
-                                    @endif
-                                </div>
-                                <form action="{{ route('cart.index') }}" method="GET" class="flex items-center gap-2">
-                                    <input type="date"
-                                           id="cart_event_date"
-                                           name="event_date"
-                                           value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}"
-                                           min="{{ date('Y-m-d') }}"
-                                           onchange="this.form.submit()"
-                                           class="w-full px-3 py-2 bg-[#121824] border border-[#242f44] focus:border-[#c59d5f] rounded text-xs text-white focus:outline-none transition-colors">
-                                </form>
-                                <span class="text-[10px] text-gray-400 block leading-tight">Tanggal ini akan otomatis diisikan pada formulir checkout.</span>
-                            </div>
-
-                            <div class="pt-4 border-t border-[#1e2538]">
-                                <div class="flex items-baseline justify-between mb-1">
-                                    <span class="text-xs font-semibold uppercase text-gray-300">Total Estimasi</span>
-                                    <div class="font-serif text-2xl font-bold text-[#dfc48e]">
-                                        Rp {{ number_format($total, 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                <p class="text-[10px] text-gray-400 leading-relaxed mb-6">
-                                    *Penetapan Uang Muka (DP) dan negosiasi akhir dilakukan setelah data acara diisi dan dikonfirmasi via WhatsApp Admin.
-                                </p>
-
-                                <a href="{{ route('checkout.index') }}"
-                                   class="block w-full text-center py-3.5 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded shadow-lg transition-all hover:scale-[1.02]">
-                                    Lanjut ke Isi Data Acara &rarr;
-                                </a>
-                            </div>
-
-                            <!-- Trust guarantees -->
-                            <div class="pt-4 border-t border-[#1e2538] space-y-2 text-[11px] text-gray-400">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[#c59d5f]">✓</span>
-                                    <span>Tanpa Pembayaran Online Langsung</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[#c59d5f]">✓</span>
-                                    <span>Negosiasi & Pembayaran Transparan via WA</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            @endif
-
-        </div>
-    </section>
-
+          <p style="font-size: 13px; color: var(--mu); text-align: center">
+            Pemesanan tanpa pembayaran langsung. Negosiasi dan pembayaran DP via WhatsApp.
+          </p>
+        </aside>
+      </div>
+    @endif
+  </section>
+</div>
 @endsection

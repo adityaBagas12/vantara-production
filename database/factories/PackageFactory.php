@@ -33,6 +33,7 @@ class PackageFactory extends Factory
                 'Audio System & Clip-on Wireless',
             ],
             'price' => fake()->randomElement([2500000, 4500000, 7500000, 12000000, 15000000]),
+            'stock' => 1,
             'is_featured' => fake()->boolean(30),
             'is_active' => true,
             'image_path' => null,

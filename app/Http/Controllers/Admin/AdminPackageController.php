@@ -60,6 +60,7 @@ class AdminPackageController extends Controller
             'image_path' => 'nullable|string|max:1000',
             'items' => 'required|array|min:1',
             'items.*' => 'required|string|max:255',
+            'stock' => 'nullable|integer|min:1',
             'is_featured' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ], [
@@ -70,6 +71,7 @@ class AdminPackageController extends Controller
             'items.required' => 'Minimal tambahkan 1 item rincian paket.',
             'image_file.image' => 'File harus berupa gambar (JPEG, PNG, JPG, WEBP).',
             'image_file.max' => 'Ukuran gambar maksimal 5 MB.',
+            'stock.min' => 'Stok unit minimal 1.',
         ]);
 
         $imagePath = $validated['image_path'] ?? null;
@@ -86,6 +88,7 @@ class AdminPackageController extends Controller
             'slug' => $slug,
             'category' => $validated['category'],
             'price' => $validated['price'],
+            'stock' => (int) ($validated['stock'] ?? 1),
             'description' => $validated['description'],
             'image_path' => $imagePath,
             'items' => array_values(array_filter($validated['items'])),
@@ -119,6 +122,7 @@ class AdminPackageController extends Controller
             'name' => 'required|string|max:255|unique:packages,name,'.$package->id,
             'category' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:1',
             'description' => 'required|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_path' => 'nullable|string|max:1000',
@@ -129,6 +133,7 @@ class AdminPackageController extends Controller
         ], [
             'image_file.image' => 'File harus berupa gambar (JPEG, PNG, JPG, WEBP).',
             'image_file.max' => 'Ukuran gambar maksimal 5 MB.',
+            'stock.min' => 'Stok unit minimal 1.',
         ]);
 
         $imagePath = $package->image_path;
@@ -145,6 +150,7 @@ class AdminPackageController extends Controller
             'slug' => Str::slug($validated['name']),
             'category' => $validated['category'],
             'price' => $validated['price'],
+            'stock' => (int) ($validated['stock'] ?? 1),
             'description' => $validated['description'],
             'image_path' => $imagePath,
             'items' => array_values(array_filter($validated['items'])),

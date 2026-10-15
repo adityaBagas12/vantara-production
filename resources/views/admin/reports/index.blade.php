@@ -1,232 +1,200 @@
 @extends('layouts.admin')
 
-@section('title', 'Analisis & Laporan Rekapitulasi — Admin Vantara Production')
-@section('header_title', 'Laporan Bulanan & Rekapitulasi Penjualan')
+@section('title', 'Laporan Bulanan — Admin Vantara Production')
 
 @section('content')
-
-    <div class="space-y-8">
-
-        <!-- Toolbar: Period Filter & Action Buttons -->
-        <div class="p-6 rounded-2xl bg-[#111722] border border-[#242f44] flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
-
-            <!-- Filter Form: Date Range Selection -->
-            <form action="{{ route('admin.reports.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-gray-400 font-semibold shrink-0">Dari:</label>
-                    <input type="date" name="start_date" value="{{ request('start_date', $startDate) }}" class="px-3.5 py-2 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-white focus:outline-none [color-scheme:dark]">
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-gray-400 font-semibold shrink-0">Sampai:</label>
-                    <input type="date" name="end_date" value="{{ request('end_date', $endDate) }}" class="px-3.5 py-2 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-white focus:outline-none [color-scheme:dark]">
-                </div>
-
-                <button type="submit" class="px-5 py-2 bg-gradient-to-r from-[#dfc48e] to-[#c59d5f] hover:brightness-110 text-black font-bold text-xs rounded-lg transition-all shrink-0">
-                    Terapkan Tanggal
-                </button>
-
-                @if (request()->filled('start_date') || request()->filled('end_date'))
-                    <a href="{{ route('admin.reports.index') }}" class="text-xs text-gray-400 hover:text-rose-400 underline font-semibold ml-1">
-                        Reset Filter
-                    </a>
-                @endif
-            </form>
-
-            <!-- Export Buttons: PDF & Print -->
-            <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
-                <a href="{{ route('admin.reports.print', ['month' => $month, 'year' => $year, 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
-                   target="_blank"
-                   class="px-4 py-2.5 bg-[#141b28] hover:bg-[#1a2334] text-gray-200 border border-[#242f44] hover:border-[#c59d5f] rounded-lg text-xs font-semibold transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4 text-[#c59d5f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    Print Preview
-                </a>
-
-                <a href="{{ route('admin.reports.pdf', ['month' => $month, 'year' => $year, 'start_date' => request('start_date'), 'end_date' => request('end_date'), 'stream' => 1]) }}"
-                   target="_blank"
-                   class="px-5 py-2.5 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-2 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Buka PDF
-                </a>
-            </div>
-
+<div style="display: flex; flex-direction: column; gap: 28px">
+  <!-- Header & Filter Periode -->
+  <div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+    <div style="flex-grow: 1">
+      <h1 class="d" style="font-size: 36px; font-weight: 800">Laporan Bulanan</h1>
+      <p style="color: var(--admin-mu)">Rekap transaksi yang sudah di-ACC &amp; terlaksana.</p>
+    </div>
+    <form action="{{ route('admin.reports.index') }}" method="GET" style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap">
+      <div class="fld">
+        <label for="bln">Pilih Bulan &amp; Tahun</label>
+        <div style="display: flex; gap: 8px">
+          <select name="month" id="bln" style="background: #fff; border: 1px solid #CFCBC0; border-radius: 12px; padding: 10px 14px; color: var(--admin-tx); min-height: 44px">
+            @for ($m = 1; $m <= 12; $m++)
+              <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
+                {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+              </option>
+            @endfor
+          </select>
+          <select name="year" style="background: #fff; border: 1px solid #CFCBC0; border-radius: 12px; padding: 10px 14px; color: var(--admin-tx); min-height: 44px">
+            @for ($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
+              <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+            @endfor
+          </select>
         </div>
+      </div>
+      <button class="btn p" type="submit">Tampilkan</button>
+    </form>
+  </div>
 
-        <!-- Metric Financial Overview Header -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <!-- Summary Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px">
+    <div class="card" style="display: flex; flex-direction: column; gap: 10px">
+      <span class="lbl">Periode</span>
+      <strong class="d" style="font-size: 30px; line-height: 1">{{ $periodLabel }}</strong>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 10px">
+      <span class="lbl">Total transaksi</span>
+      <strong class="d" style="font-size: 30px; line-height: 1">{{ $totalOrdersCount }}</strong>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 10px; background: #0D0E12; color: #F2EFE9; border-color: #0D0E12">
+      <span class="lbl" style="color: #A9ADB9">Pendapatan kotor</span>
+      <strong class="d" style="font-size: 30px; line-height: 1; color: var(--ac); font-family: var(--font-mono)">
+        Rp {{ number_format($totalRevenue, 0, ',', '.') }}
+      </strong>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 10px">
+      <span class="lbl">Biaya operasional</span>
+      <strong class="d" style="font-size: 30px; line-height: 1; color: #9B1C1C; font-family: var(--font-mono)">
+        Rp {{ number_format($totalOperationalCosts, 0, ',', '.') }}
+      </strong>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 10px; background: #E4F6EA; border-color: #A9DDBB">
+      <span class="lbl">Pendapatan bersih</span>
+      <strong class="d" style="font-size: 30px; line-height: 1; color: #17653A; font-family: var(--font-mono)">
+        Rp {{ number_format($totalNetRevenue, 0, ',', '.') }}
+      </strong>
+    </div>
+  </div>
 
-            <!-- Total Revenue Disetujui -->
-            <div class="p-6 rounded-2xl bg-[#111722] border border-[#c59d5f]/40 shadow-xl">
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Total Omset Acara</div>
-                <div class="font-serif text-2xl font-bold text-[#dfc48e]">
-                    Rp {{ number_format($totalRevenue, 0, ',', '.') }}
-                </div>
-                <div class="text-[10px] text-gray-400 mt-2">Periode {{ $periodLabel }}</div>
-            </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <!-- Tabel Rincian Transaksi -->
+    <div class="card" style="flex: 2 1 480px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <h2 class="d" style="font-size: 22px; flex-grow: 1">Rincian transaksi</h2>
+        <a class="btn" href="{{ route('admin.reports.print', ['month' => $month, 'year' => $year]) }}" target="_blank">
+          Cetak
+        </a>
+        <a class="btn p" href="{{ route('admin.reports.pdf', ['month' => $month, 'year' => $year]) }}">
+          PDF
+        </a>
+      </div>
 
-            <!-- Total DP Diterima -->
-            <div class="p-6 rounded-2xl bg-[#111722] border border-emerald-500/40 shadow-xl">
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Uang Muka (DP) Terkumpul</div>
-                <div class="font-serif text-2xl font-bold text-emerald-400">
-                    Rp {{ number_format($totalDp, 0, ',', '.') }}
-                </div>
-                <div class="text-[10px] text-gray-400 mt-2">Kas Terkonfirmasi</div>
-            </div>
+      <div style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th style="text-align: right">Kotor</th>
+              <th style="text-align: right">Biaya</th>
+              <th style="text-align: right">Bersih</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($orders as $ord)
+              @php
+                $statusClass = match($ord->status) {
+                  'pending' => 'w',
+                  'dp_received' => 'b',
+                  'confirmed' => 'a',
+                  'completed' => 'c',
+                  'cancelled' => 'r',
+                  default => 'w',
+                };
+                $statusLabel = match($ord->status) {
+                  'pending' => 'Pending',
+                  'dp_received' => 'DP Diterima',
+                  'confirmed' => 'Dikonfirmasi',
+                  'completed' => 'Selesai',
+                  'cancelled' => 'Batal',
+                  default => ucfirst($ord->status),
+                };
+              @endphp
+              <tr>
+                <td style="white-space: nowrap">{{ \Carbon\Carbon::parse($ord->event_date)->translatedFormat('d M Y') }}</td>
+                <td style="color: var(--admin-mu); font-family: var(--font-mono)">
+                  <a href="{{ route('admin.orders.show', $ord->id) }}">{{ $ord->order_code }}</a>
+                </td>
+                <td style="font-weight: 600">{{ $ord->customer_name }}</td>
+                <td><span class="tg {{ $statusClass }}">{{ $statusLabel }}</span></td>
+                <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono)">
+                  Rp {{ number_format($ord->total_price, 0, ',', '.') }}
+                </td>
+                <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono); color: #9B1C1C">
+                  Rp {{ number_format($ord->operationalCosts->sum('amount'), 0, ',', '.') }}
+                </td>
+                <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono); font-weight: 700; color: #17653A">
+                  Rp {{ number_format(max(0, $ord->total_price - $ord->operationalCosts->sum('amount')), 0, ',', '.') }}
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--admin-mu); padding: 24px">
+                  Tidak ada transaksi pada periode {{ $periodLabel }}.
+                </td>
+              </tr>
+            @endforelse
 
-            <!-- Sisa Tagihan -->
-            <div class="p-6 rounded-2xl bg-[#111722] border border-amber-500/40 shadow-xl">
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Estimasi Sisa Pelunasan</div>
-                <div class="font-serif text-2xl font-bold text-amber-300">
-                    Rp {{ number_format($totalRemaining, 0, ',', '.') }}
-                </div>
-                <div class="text-[10px] text-gray-400 mt-2">Tagihan Pelunasan di Lokasi</div>
-            </div>
+            @if($orders->isNotEmpty())
+              <tr>
+                <td colspan="4" style="font-weight: 700; border-bottom: 0; padding-top: 16px">
+                  Rekap transaksi ACC ({{ $orders->whereIn('status', ['dp_received', 'confirmed', 'completed'])->count() }} transaksi)
+                </td>
+                <td style="text-align: right; font-weight: 800; border-bottom: 0; white-space: nowrap; font-family: var(--font-mono); padding-top: 16px">
+                  Rp {{ number_format($totalRevenue, 0, ',', '.') }}
+                </td>
+                <td style="text-align: right; font-weight: 800; border-bottom: 0; white-space: nowrap; font-family: var(--font-mono); color: #9B1C1C; padding-top: 16px">
+                  Rp {{ number_format($totalOperationalCosts, 0, ',', '.') }}
+                </td>
+                <td style="text-align: right; font-weight: 800; border-bottom: 0; white-space: nowrap; font-family: var(--font-mono); color: #17653A; padding-top: 16px">
+                  Rp {{ number_format($totalNetRevenue, 0, ',', '.') }}
+                </td>
+              </tr>
+            @endif
+          </tbody>
+        </table>
+      </div>
 
-            <!-- Total Acara -->
-            <div class="p-6 rounded-2xl bg-[#111722] border border-[#242f44] shadow-xl">
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Total Volume Transaksi</div>
-                <div class="font-serif text-3xl font-bold text-white">
-                    {{ $totalOrdersCount }} <span class="text-xs font-normal text-gray-400">pesanan</span>
-                </div>
-                <div class="text-[10px] text-gray-400 mt-2">
-                    Confirmed: {{ $confirmedCount }} · Completed: {{ $completedCount }}
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Breakdown Kategori & Tabel Detail Transaksi -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-            <!-- Category Breakdown Summary (4 cols) -->
-            <div class="lg:col-span-4 bg-[#111722] rounded-2xl border border-[#242f44] p-6 shadow-xl space-y-4">
-                <div class="border-b border-[#1e2538] pb-3">
-                    <h3 class="font-serif text-lg font-bold text-white">Pendapatan per Kategori</h3>
-                    <p class="text-[11px] text-gray-400">Kontribusi penjualan tiap kelompok layanan.</p>
-                </div>
-
-                <div class="space-y-3">
-                    @forelse ($categoryBreakdown as $cat)
-                        <div class="p-4 rounded-xl bg-[#090c14] border border-[#1e2538]">
-                            <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="font-bold text-white">{{ $cat->category }}</span>
-                                <span class="text-gray-400">{{ $cat->total_items }} item dipesan</span>
-                            </div>
-                            <div class="font-serif font-bold text-[#dfc48e] text-base">
-                                Rp {{ number_format($cat->total_amount, 0, ',', '.') }}
-                            </div>
-                        </div>
-                    @empty
-                        <div class="py-6 text-center text-xs text-gray-500">
-                            Belum ada transaksi terkonfirmasi di periode ini.
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Detailed Transactions Table (8 cols) -->
-            <div class="lg:col-span-8 bg-[#111722] rounded-2xl border border-[#242f44] p-6 shadow-xl space-y-4">
-                <div class="border-b border-[#1e2538] pb-3 flex items-center justify-between">
-                    <div>
-                        <h3 class="font-serif text-lg font-bold text-white">Rincian Transaksi Periode {{ $periodLabel }}</h3>
-                        <p class="text-[11px] text-gray-400">Daftar lengkap acara dan nilai pembayaran.</p>
-                    </div>
-                    <span class="text-xs text-gray-400">{{ count($orders) }} data</span>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-gray-300">
-                        <thead class="bg-[#141b28] text-gray-400 uppercase tracking-wider text-[10px] border-b border-[#1e2538]">
-                            <tr>
-                                <th class="py-3 px-4">Kode & Tanggal</th>
-                                <th class="py-3 px-4">Pelanggan</th>
-                                <th class="py-3 px-4">Nilai Total</th>
-                                <th class="py-3 px-4">DP Diterima</th>
-                                <th class="py-3 px-4 text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[#1e2538]">
-                            @forelse ($orders as $ord)
-                                <tr class="hover:bg-[#141b28]/50">
-                                    <td class="py-3 px-4 whitespace-nowrap">
-                                        <a href="{{ route('admin.orders.show', $ord->id) }}" class="font-mono font-bold text-[#dfc48e] hover:underline">
-                                            {{ $ord->order_code }}
-                                        </a>
-                                        <div class="text-[10px] text-emerald-400 font-semibold mt-0.5">
-                                            {{ \Carbon\Carbon::parse($ord->event_date)->translatedFormat('d/m/Y') }}
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-4">
-                                        <div class="font-semibold text-white">{{ $ord->customer_name }}</div>
-                                        <div class="text-[10px] text-gray-400">{{ $ord->customer_phone }}</div>
-                                    </td>
-                                    <td class="py-3 px-4 whitespace-nowrap font-serif font-bold text-white">
-                                        Rp {{ number_format($ord->total_price, 0, ',', '.') }}
-                                    </td>
-                                    <td class="py-3 px-4 whitespace-nowrap text-emerald-400 font-semibold">
-                                        Rp {{ number_format($ord->down_payment, 0, ',', '.') }}
-                                    </td>
-                                    <td class="py-3 px-4 text-center whitespace-nowrap">
-                                        @if ($ord->status === 'pending')
-                                            <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-semibold">Pending</span>
-                                        @elseif ($ord->status === 'dp_received')
-                                            <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px] font-semibold">DP Received</span>
-                                        @elseif ($ord->status === 'confirmed')
-                                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10px] font-semibold">Confirmed</span>
-                                        @elseif ($ord->status === 'completed')
-                                            <span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px] font-semibold">Completed</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px] font-semibold">Cancelled</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-8 text-center text-xs text-gray-500">
-                                        Tidak ada pesanan pada periode ini.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- History Archive Section -->
-        <div class="bg-[#111722] rounded-2xl border border-[#242f44] p-6 shadow-xl space-y-4">
-            <div class="border-b border-[#1e2538] pb-3">
-                <h3 class="font-serif text-lg font-bold text-white">Arsip Riwayat Laporan Bulanan</h3>
-                <p class="text-[11px] text-gray-400">Ringkasan performa penjualan 12 bulan terakhir.</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                @foreach ($historyMonthly as $h)
-                    @php
-                        $hMonthName = \Carbon\Carbon::createFromDate($h->year_val, $h->month_val, 1)->translatedFormat('F Y');
-                    @endphp
-                    <div class="p-4 rounded-xl bg-[#090c14] border border-[#1e2538] space-y-2 hover:border-[#c59d5f]/40 transition-all">
-                        <div class="flex items-center justify-between text-xs font-bold text-white">
-                            <span>{{ $hMonthName }}</span>
-                            <span class="text-[10px] text-gray-400 font-normal">{{ $h->total_orders }} acara</span>
-                        </div>
-                        <div class="font-serif text-base font-bold text-[#dfc48e]">
-                            Rp {{ number_format($h->revenue, 0, ',', '.') }}
-                        </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-[#1e2538] text-[10px]">
-                            <a href="{{ route('admin.reports.index', ['month' => $h->month_val, 'year' => $h->year_val]) }}" class="text-[#c59d5f] hover:underline font-semibold">
-                                Lihat Laporan &rarr;
-                            </a>
-                            <a href="{{ route('admin.reports.pdf', ['month' => $h->month_val, 'year' => $h->year_val, 'stream' => 1]) }}" target="_blank" class="text-gray-400 hover:text-white font-semibold">
-                                👁️ Buka PDF
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
+      <p style="font-size: 13px; color: var(--admin-mu)">
+        Menampilkan {{ $orders->count() }} transaksi untuk periode {{ $periodLabel }}.
+      </p>
     </div>
 
+    <!-- Grafik Pendapatan Per Minggu -->
+    <div class="card" style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 14px">
+      <h2 class="d" style="font-size: 22px">Pendapatan bersih per minggu</h2>
+      @php
+        $weeklyRevenues = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        foreach($orders as $ord) {
+          if(in_array($ord->status, ['dp_received', 'confirmed', 'completed'])) {
+            $day = (int) \Carbon\Carbon::parse($ord->event_date)->format('j');
+            $w = min(5, (int) ceil($day / 7));
+            $weeklyRevenues[$w] += max(0, $ord->total_price - $ord->operationalCosts->sum('amount'));
+          }
+        }
+        $maxW = max(collect($weeklyRevenues)->max(), 1);
+      @endphp
+      <svg viewBox="0 0 340 200" width="100%" role="img" aria-label="Grafik batang pendapatan per minggu {{ $periodLabel }} dalam juta rupiah">
+        <line x1="0" y1="165" x2="340" y2="165" stroke="#E4E1D9"/>
+        @foreach($weeklyRevenues as $wNum => $wVal)
+          @php
+            $barH = $wVal > 0 ? max(10, round(($wVal / $maxW) * 110)) : 4;
+            $bx = ($wNum - 1) * 64 + 20;
+            $btx = ($wNum - 1) * 64 + 42;
+            $by = 165 - $barH;
+            $bvy = 165 - $barH - 8;
+            $fill = ($wVal === max($weeklyRevenues) && $wVal > 0) ? '#F5A524' : '#D9D5CA';
+            $millions = round($wVal / 1000000, 1);
+          @endphp
+          <rect x="{{ $bx }}" y="{{ $by }}" width="44" height="{{ $barH }}" rx="7" fill="{{ $fill }}">
+            <title>Minggu {{ $wNum }}: Rp {{ number_format($wVal, 0, ',', '.') }}</title>
+          </rect>
+          @if($wVal > 0)
+            <text x="{{ $btx }}" y="{{ $bvy }}" font-size="12" font-weight="700" text-anchor="middle" fill="#17181C">{{ $millions }}</text>
+          @endif
+          <text x="{{ $btx }}" y="188" font-size="12" text-anchor="middle" fill="#62656F">M{{ $wNum }}</text>
+        @endforeach
+      </svg>
+      <p style="font-size: 13px; color: var(--admin-mu)">Dalam juta rupiah setelah biaya operasional. Hanya transaksi yang sudah di-ACC dihitung.</p>
+    </div>
+  </div>
+</div>
 @endsection

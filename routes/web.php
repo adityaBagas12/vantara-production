@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminPackageController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LandingPageController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -43,7 +44,9 @@ Route::get('/pesanan/{order_code}', [CheckoutController::class, 'show'])->name('
 // Phase 3 & 4: Portal Admin, Operasional & Pelaporan
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+    Route::post('/login', [AdminAuthController::class, 'login'])
+        ->middleware('throttle:admin-login')
+        ->name('login.submit');
 
     Route::middleware([AdminMiddleware::class])->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
@@ -53,10 +56,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('packages', AdminPackageController::class)->except(['show']);
         Route::patch('packages/{package}/toggle-active', [AdminPackageController::class, 'toggleActive'])->name('packages.toggleActive');
 
+        Route::get('/landing-page', [LandingPageController::class, 'edit'])->name('landing-page.edit');
+        Route::put('/landing-page', [LandingPageController::class, 'update'])->name('landing-page.update');
+        Route::delete('/landing-page/{type}', [LandingPageController::class, 'destroy'])
+            ->whereIn('type', ['hero', 'about'])
+            ->name('landing-page.destroy');
+
         // Kelola Status Transaksi
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+        Route::post('/orders/{order}/operational-costs', [AdminOrderController::class, 'storeOperationalCost'])->name('orders.operational-costs.store');
+        Route::patch('/orders/{order}/operational-costs/{costId}', [AdminOrderController::class, 'updateOperationalCost'])->name('orders.operational-costs.update');
+        Route::delete('/orders/{order}/operational-costs/{costId}', [AdminOrderController::class, 'destroyOperationalCost'])->name('orders.operational-costs.destroy');
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
 
         // Phase 4: Analisis & Pelaporan Bulanan (PDF & Print)

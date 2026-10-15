@@ -195,21 +195,29 @@
     <!-- Ringkasan Finansial -->
     <table class="summary-grid">
         <tr>
-            <td class="summary-box" width="25%">
+            <td class="summary-box" width="16.66%">
                 <div class="label">Total Volume Acara</div>
                 <div class="value">{{ $totalOrdersCount }} Order</div>
             </td>
-            <td class="summary-box" width="25%">
+            <td class="summary-box" width="16.66%">
                 <div class="label">Total Omset Disetujui</div>
                 <div class="value">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
             </td>
-            <td class="summary-box" width="25%">
+            <td class="summary-box" width="16.66%">
                 <div class="label">Total DP Diterima</div>
                 <div class="value" style="color: #155724;">Rp {{ number_format($totalDp, 0, ',', '.') }}</div>
             </td>
-            <td class="summary-box" width="25%">
+            <td class="summary-box" width="16.66%">
                 <div class="label">Estimasi Pelunasan</div>
                 <div class="value" style="color: #856404;">Rp {{ number_format($totalRemaining, 0, ',', '.') }}</div>
+            </td>
+            <td class="summary-box" width="16.66%">
+                <div class="label">Biaya Operasional</div>
+                <div class="value" style="color: #9B1C1C;">Rp {{ number_format($totalOperationalCosts, 0, ',', '.') }}</div>
+            </td>
+            <td class="summary-box" width="16.66%">
+                <div class="label">Pendapatan Bersih</div>
+                <div class="value" style="color: #155724;">Rp {{ number_format($totalNetRevenue, 0, ',', '.') }}</div>
             </td>
         </tr>
     </table>
@@ -219,12 +227,14 @@
         <thead>
             <tr>
                 <th width="4%">No</th>
-                <th width="15%">Kode Transaksi</th>
-                <th width="14%">Tanggal Acara</th>
-                <th width="22%">Nama Pemesan & Kontak</th>
-                <th width="23%">Paket Layanan</th>
-                <th width="12%" class="text-right">Total (Rp)</th>
-                <th width="10%" class="text-center">Status</th>
+                <th width="13%">Kode Transaksi</th>
+                <th width="12%">Tanggal Acara</th>
+                <th width="18%">Nama Pemesan & Kontak</th>
+                <th width="18%">Paket Layanan</th>
+                <th width="10%" class="text-right">Kotor (Rp)</th>
+                <th width="9%" class="text-right">Biaya (Rp)</th>
+                <th width="9%" class="text-right">Bersih (Rp)</th>
+                <th width="7%" class="text-center">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -248,6 +258,8 @@
                             <div style="font-size: 8px; color: #155724;">DP: {{ number_format($ord->down_payment, 0, ',', '.') }}</div>
                         @endif
                     </td>
+                    <td class="text-right" style="color: #9B1C1C;">{{ number_format($ord->operationalCosts->sum('amount'), 0, ',', '.') }}</td>
+                    <td class="text-right font-bold" style="color: #155724;">{{ number_format(max(0, $ord->total_price - $ord->operationalCosts->sum('amount')), 0, ',', '.') }}</td>
                     <td class="text-center">
                         @if ($ord->status === 'pending')
                             <span class="badge badge-pending">Pending</span>
@@ -264,7 +276,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center" style="padding: 20px;">
+                    <td colspan="9" class="text-center" style="padding: 20px;">
                         Tidak ada transaksi tercatat pada periode ini.
                     </td>
                 </tr>

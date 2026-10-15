@@ -49,6 +49,38 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function operationalCosts(): HasMany
+    {
+        return $this->hasMany(OperationalCost::class);
+    }
+
+    /**
+     * Subtotal tampilan yang mengikuti total kesepakatan terbaru.
+     *
+     * @return array<int, int>
+     */
+    public function getNegotiatedSubtotalsAttribute(): array
+    {
+        $items = $this->orderItems;
+        $originalTotal = (int) $items->sum('subtotal');
+        $remainingTotal = (int) $this->total_price;
+        $lastIndex = $items->keys()->last();
+        $subtotals = [];
+
+        foreach ($items as $index => $item) {
+            $subtotal = $index === $lastIndex
+                ? max(0, $remainingTotal)
+                : ($originalTotal > 0
+                    ? (int) round($item->subtotal / $originalTotal * $this->total_price)
+                    : 0);
+
+            $subtotals[$item->id] = $subtotal;
+            $remainingTotal -= $subtotal;
+        }
+
+        return $subtotals;
+    }
+
     public function scopeBooked(Builder $query): Builder
     {
         return $query->whereNotIn('status', ['cancelled']);

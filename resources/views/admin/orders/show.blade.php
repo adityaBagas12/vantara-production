@@ -1,209 +1,397 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Pesanan ' . $order->order_code)
-@section('header_title', 'Detail & Pengelolaan Status Transaksi')
+@section('title', 'Detail Booking ' . $order->order_code . ' — Admin Vantara Production')
+
+@push('styles')
+<style>
+@media print {
+  body.admin aside.side,
+  body.admin .no-print,
+  body.admin .btn,
+  body.admin nav,
+  body.admin footer {
+    display: none !important;
+  }
+  body.admin main {
+    padding: 0 !important;
+  }
+  body.admin {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  #printable-invoice {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .card:not(#printable-invoice) {
+    display: none !important;
+  }
+}
+</style>
+@endpush
 
 @section('content')
+@php
+  $statusClass = match($order->status) {
+    'pending' => 'w',
+    'dp_received' => 'b',
+    'confirmed' => 'a',
+    'completed' => 'c',
+    'cancelled' => 'r',
+    default => 'w',
+  };
+  $statusLabel = match($order->status) {
+    'pending' => 'Pending',
+    'dp_received' => 'DP Diterima',
+    'confirmed' => 'Dikonfirmasi',
+    'completed' => 'Selesai',
+    'cancelled' => 'Dibatalkan',
+    default => ucfirst($order->status),
+  };
+  $phoneDigits = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $order->customer_phone));
+  $operationalCostsTotal = $order->operationalCosts->sum('amount');
+  $netRevenue = max(0, $order->total_price - $operationalCostsTotal);
+@endphp
 
-    <div class="space-y-8">
+<div style="display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px">
+    <div>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <h1 class="d" style="font-size: 32px; font-weight: 800">{{ $order->order_code }}</h1>
+        <span class="tg {{ $statusClass }}">{{ $statusLabel }}</span>
+      </div>
+      <p style="color: var(--admin-mu)">Dibuat pada {{ $order->created_at->translatedFormat('d F Y, H:i') }} WIB</p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+      <a class="btn" href="{{ route('admin.orders.index') }}">← Kembali ke Daftar</a>
+      <a class="btn" href="#printable-invoice" style="background: #fff; border-color: #CFCBC0; color: var(--admin-tx); display: inline-flex; align-items: center; gap: 8px">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h8v12l-2-1-2 1-2-1-2 1zM6 6h4M6 9h4"/></svg>
+        Lihat Invoice
+      </a>
+      <button type="button" onclick="window.print()" class="btn" style="background: #fff; border-color: #CFCBC0; color: var(--admin-tx); display: inline-flex; align-items: center; gap: 8px" title="Cetak Lembar Invoice">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5V2h8v3M4 12H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2M4 9h8v5H4z"/></svg>
+        Cetak Invoice
+      </button>
+      <a class="btn wa" href="https://wa.me/{{ $phoneDigits }}?text=Halo%20{{ urlencode($order->customer_name) }},%20kami%20dari%20Vantara%20Production%20terkait%20pesanan%20{{ $order->order_code }}." target="_blank">
+        Chat via WhatsApp
+      </a>
+      <div x-data="{ confirming: false }" style="display: inline-flex; align-items: center">
+        <button type="button" x-show="!confirming" @click="confirming = true" class="btn dg" title="Hapus pesanan ini">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>
+          Hapus Pesanan
+        </button>
+        <div x-show="confirming" style="display: flex; gap: 8px; align-items: center">
+          <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button class="btn dg" type="submit" style="background: #E02424; color: #fff; border-color: #C81E1E">
+              Ya, Hapus Sekarang
+            </button>
+          </form>
+          <button type="button" @click="confirming = false" class="btn">Batal</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Top Navigation -->
-        <div class="flex items-center justify-between">
-            <a href="{{ route('admin.orders.index') }}" class="text-xs text-gray-400 hover:text-white transition-colors">
-                &larr; Kembali ke Daftar Pesanan
-            </a>
-            <span class="font-mono text-xs text-[#dfc48e] bg-[#111722] border border-[#242f44] px-3 py-1 rounded-full font-bold">
-                {{ $order->order_code }}
-            </span>
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+    <!-- Left: Order Details & Items Card -->
+    <div style="flex: 2 1 480px; display: flex; flex-direction: column; gap: 24px">
+      <div class="card" style="display: flex; flex-direction: column; gap: 18px">
+        <h2 class="d" style="font-size: 22px">Data Pemesan &amp; Acara</h2>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="kv"><span>Customer</span><strong style="color: var(--admin-tx)">{{ $order->customer_name }}</strong></div>
+          <div class="kv"><span>Telepon / WA</span><span>{{ $order->customer_phone }}</span></div>
+          <div class="kv"><span>Email</span><span>{{ $order->customer_email ?? '-' }}</span></div>
+          <div class="kv"><span>Tanggal Acara</span><strong>{{ \Carbon\Carbon::parse($order->event_date)->translatedFormat('l, d F Y') }}</strong></div>
+          <div class="kv"><span>Lokasi / Alamat</span><span>{{ $order->event_address }}</span></div>
+          <div class="kv"><span>Catatan Klien</span><span>{{ $order->notes ?? 'Tidak ada catatan khusus.' }}</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="display: flex; flex-direction: column; gap: 16px">
+        <h2 class="d" style="font-size: 22px">Rincian Paket &amp; Peralatan Disewa</h2>
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Paket Layanan</th>
+                <th>Durasi</th>
+                <th>Harga / hari</th>
+                <th style="text-align: right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($order->orderItems as $item)
+                <tr>
+                  <td style="font-weight: 600">{{ $item->package_name }}</td>
+                  <td>{{ $item->quantity }} Hari</td>
+                  <td style="font-family: var(--font-mono)">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                  <td style="text-align: right; font-family: var(--font-mono); font-weight: 700">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div style="align-self: flex-end; width: 320px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--admin-line); padding-top: 14px">
+          <div style="display: flex; color: var(--admin-mu)"><span style="flex-grow: 1">Total Nilai Sewa</span><span style="font-family: var(--font-mono)">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span></div>
+          <div style="display: flex; color: #17653A"><span style="flex-grow: 1">DP Diterima</span><span style="font-family: var(--font-mono)">- Rp {{ number_format($order->down_payment, 0, ',', '.') }}</span></div>
+          <div style="display: flex; align-items: baseline; border-top: 2px solid var(--admin-tx); padding-top: 8px">
+            <strong style="flex-grow: 1">Sisa Tagihan</strong>
+            <strong class="d" style="font-size: 22px; font-family: var(--font-mono)">Rp {{ number_format(max(0, $order->total_price - $order->down_payment), 0, ',', '.') }}</strong>
+          </div>
+        </div>
+      </div>
 
-            <!-- Left Column: Customer & Order Items Info (7 cols) -->
-            <div class="lg:col-span-7 space-y-6">
-
-                <!-- Order Header Card -->
-                <div class="p-6 rounded-2xl bg-[#111722] border border-[#242f44] shadow-xl space-y-4">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-[#1e2538] gap-3">
-                        <div>
-                            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Informasi Pemesan</div>
-                            <h3 class="font-serif text-2xl font-bold text-white mt-0.5">{{ $order->customer_name }}</h3>
-                            <div class="text-xs text-gray-400">Dibuat pada {{ $order->created_at->translatedFormat('d F Y, H:i') }} WIB</div>
-                        </div>
-
-                        <!-- Direct WhatsApp Contact Button -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $order->customer_phone) }}?text=Halo%20Kak%20{{ urlencode($order->customer_name) }},%20kami%20dari%20Vantara%20Production%20menindaklanjuti%20pesanan%20{{ $order->order_code }}."
-                           target="_blank"
-                           class="px-4 py-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs rounded-xl shadow flex items-center gap-2 transition-all">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                            Hubungi via WhatsApp
-                        </a>
-                    </div>
-
-                    <!-- Customer Detail Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <span class="text-gray-400 block font-medium mb-1">Nomor WhatsApp:</span>
-                            <span class="font-bold text-[#c59d5f] text-sm">{{ $order->customer_phone }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block font-medium mb-1">Alamat Email:</span>
-                            <span class="text-gray-200">{{ $order->customer_email ?? '— Tidak diisi' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block font-medium mb-1">Tanggal Pelaksanaan Acara:</span>
-                            <span class="font-bold text-emerald-400 text-sm">
-                                {{ \Carbon\Carbon::parse($order->event_date)->translatedFormat('l, d F Y') }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block font-medium mb-1">Lokasi Tempat Acara:</span>
-                            <span class="text-gray-200 leading-relaxed block">{{ $order->event_address }}</span>
-                        </div>
-                    </div>
-
-                    @if ($order->notes)
-                        <div class="pt-3 border-t border-[#1e2538] text-xs">
-                            <span class="text-gray-400 font-medium block mb-1">Catatan Khusus Pelanggan:</span>
-                            <div class="p-3 rounded-lg bg-[#090c14] border border-[#1e2538] text-gray-300 italic">
-                                "{{ $order->notes }}"
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Order Items Card -->
-                <div class="p-6 rounded-2xl bg-[#111722] border border-[#242f44] shadow-xl space-y-4">
-                    <h4 class="font-serif font-bold text-white text-base border-b border-[#1e2538] pb-3">Daftar Paket yang Dipesan</h4>
-
-                    <div class="space-y-3">
-                        @foreach ($order->orderItems as $item)
-                            <div class="p-4 rounded-xl bg-[#090c14] border border-[#1e2538] flex items-center justify-between text-xs">
-                                <div>
-                                    <div class="font-bold text-white text-sm">{{ $item->package_name }}</div>
-                                    <div class="text-[11px] text-gray-400 mt-0.5">
-                                        {{ $item->quantity }}x unit · Rp {{ number_format($item->unit_price, 0, ',', '.') }} / unit
-                                    </div>
-                                    @if ($item->package)
-                                        <div class="text-[10px] text-[#c59d5f] mt-1">Kategori: {{ $item->package->category }}</div>
-                                    @endif
-                                </div>
-                                <div class="font-serif font-bold text-[#dfc48e] text-base">
-                                    Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="pt-3 border-t border-[#1e2538] flex items-center justify-between text-xs">
-                        <span class="text-gray-400 font-semibold uppercase">Total Nilai Pesanan:</span>
-                        <span class="font-serif text-2xl font-bold text-[#dfc48e]">
-                            Rp {{ number_format($order->total_price, 0, ',', '.') }}
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Right Column: Order Management & Status Update Form (5 cols) -->
-            <div class="lg:col-span-5 space-y-6">
-
-                <!-- Status Update Form -->
-                <div class="p-6 rounded-2xl bg-[#111722] border border-[#c59d5f]/40 shadow-2xl space-y-6 sticky top-24">
-                    <div class="border-b border-[#1e2538] pb-3">
-                        <span class="text-[11px] uppercase tracking-widest text-[#c59d5f] font-semibold">Tindakan Admin</span>
-                        <h3 class="font-serif text-xl font-bold text-white">Kelola Status Transaksi</h3>
-                    </div>
-
-                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="space-y-5">
-                        @csrf
-                        @method('PATCH')
-
-                        <!-- Status Select -->
-                        <div>
-                            <label for="status" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                Status Pesanan <span class="text-rose-400">*</span>
-                            </label>
-                            <select id="status"
-                                    name="status"
-                                    required
-                                    class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-white font-semibold focus:outline-none transition-colors">
-                                <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>● Pending (Menunggu WA)</option>
-                                <option value="dp_received" {{ $order->status === 'dp_received' ? 'selected' : '' }}>● DP Received (Uang Muka Diterima)</option>
-                                <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>✓ Confirmed (Jadwal Terkunci)</option>
-                                <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>✓ Completed (Acara Selesai)</option>
-                                <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>✕ Cancelled (Pesanan Dibatalkan)</option>
-                            </select>
-                        </div>
-
-                        <!-- Catat DP (Down Payment) -->
-                        <div>
-                            <label for="down_payment" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                Jumlah DP Diterima (Rp)
-                            </label>
-                            <input type="number"
-                                   id="down_payment"
-                                   name="down_payment"
-                                   value="{{ old('down_payment', $order->down_payment) }}"
-                                   placeholder="0"
-                                   min="0"
-                                   class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white focus:outline-none transition-colors">
-                            <span class="text-[10px] text-gray-400 mt-1 block">Sisa pembayaran: <strong>Rp {{ number_format(max(0, $order->total_price - $order->down_payment), 0, ',', '.') }}</strong></span>
-                        </div>
-
-                        <!-- Adjust Total Price -->
-                        <div>
-                            <label for="total_price" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                Penyesuaian Total Biaya (Rp)
-                            </label>
-                            <input type="number"
-                                   id="total_price"
-                                   name="total_price"
-                                   value="{{ old('total_price', $order->total_price) }}"
-                                   min="0"
-                                   class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-sm text-white focus:outline-none transition-colors">
-                            <span class="text-[10px] text-gray-400 mt-1 block">Ubah nilai jika ada kesepakatan diskon / penambahan add-on.</span>
-                        </div>
-
-                        <!-- Admin Notes -->
-                        <div>
-                            <label for="admin_notes" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                                Catatan Operasional Admin
-                            </label>
-                            <textarea id="admin_notes"
-                                      name="admin_notes"
-                                      rows="3"
-                                      placeholder="Catat nomor rekening transfer DP, kru bertugas, atau catatan penting..."
-                                      class="w-full px-4 py-3 bg-[#090c14] border border-[#242f44] focus:border-[#c59d5f] rounded-lg text-xs text-white focus:outline-none transition-colors">{{ old('admin_notes', $order->admin_notes) }}</textarea>
-                        </div>
-
-                        <!-- Submit Update -->
-                        <button type="submit"
-                                class="w-full py-3.5 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-xl transition-all hover:scale-[1.01]">
-                            Simpan Perubahan Status
-                        </button>
-                    </form>
-
-                    <!-- Delete Order Option -->
-                    <div class="pt-4 border-t border-[#1e2538] flex items-center justify-between text-xs">
-                        <span class="text-gray-500">Hapus pesanan ini?</span>
-                        <form action="{{ route('admin.orders.destroy', $order->id) }}"
-                              method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus pesanan {{ $order->order_code }}?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-rose-400 hover:text-rose-300 hover:underline">
-                                Hapus Pesanan
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-
-            </div>
-
+      <!-- Card 3: Lembar Invoice Resmi Pesanan -->
+      <div id="printable-invoice" class="paper" style="border: 1px solid var(--admin-line); box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 24px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px">
+          <div>
+            <span class="d" style="font-weight: 800; font-size: 20px; letter-spacing: .06em; color: #17181C">VANTARA PRODUCTION</span>
+            <p style="color: #6A6D77; font-size: 13px; margin-top: 4px; line-height: 1.4">
+              Jl. Merapi Ujung No.31, Kel. Panorama,<br>Kec. Singaran Pati, Kota Bengkulu · 0822-8242-2317
+            </p>
+          </div>
+          <div style="text-align: right">
+            <h2 class="d" style="font-size: 32px; font-weight: 800; letter-spacing: .02em; color: #17181C">INVOICE</h2>
+            <p style="color: #17181C; font-size: 15px; font-weight: 700; font-family: var(--font-mono)">{{ $order->order_code }}</p>
+            <p style="color: #6A6D77; font-size: 13px">Diterbitkan {{ $order->created_at->translatedFormat('d F Y') }}</p>
+          </div>
         </div>
 
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; border-top: 1px solid #E4E1D9; border-bottom: 1px solid #E4E1D9; padding: 18px 0">
+          <div style="flex: 1 1 180px">
+            <span class="lb">Ditagihkan Kepada</span>
+            <p style="margin-top: 4px; font-weight: 700; color: #17181C">{{ $order->customer_name }}</p>
+            <p style="color: #6A6D77; font-size: 13px">{{ $order->customer_phone }}</p>
+            @if($order->customer_email)
+              <p style="color: #6A6D77; font-size: 13px">{{ $order->customer_email }}</p>
+            @endif
+          </div>
+          <div style="flex: 1 1 160px">
+            <span class="lb">Tanggal Acara</span>
+            <p style="margin-top: 4px; font-weight: 700; color: #17181C">{{ \Carbon\Carbon::parse($order->event_date)->translatedFormat('l, d F Y') }}</p>
+            <p style="color: #6A6D77; font-size: 13px">{{ $order->event_address }}</p>
+          </div>
+          <div style="flex: 1 1 140px">
+            <span class="lb">Status Booking</span>
+            <p style="margin-top: 4px">
+              <span class="tg {{ $statusClass }}">{{ $statusLabel }}</span>
+            </p>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Item Layanan</th>
+                <th>Durasi</th>
+                <th>Harga Satuan</th>
+                <th style="text-align: right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($order->orderItems as $item)
+                <tr>
+                  <td style="font-weight: 600; color: #17181C">{{ $item->package_name }}</td>
+                  <td style="color: #6A6D77">Sewa {{ $item->quantity }} Hari</td>
+                  <td style="font-family: var(--font-mono); color: #6A6D77">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                  <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #17181C">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+
+        <div style="align-self: flex-end; width: 320px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #E4E1D9; padding-top: 14px">
+          <div style="display: flex; color: #6A6D77"><span style="flex-grow: 1">Total Nilai Sewa</span><span style="font-family: var(--font-mono)">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span></div>
+          <div style="display: flex; color: #17653A"><span style="flex-grow: 1">DP Diterima (Uang Muka)</span><span style="font-family: var(--font-mono)">- Rp {{ number_format($order->down_payment, 0, ',', '.') }}</span></div>
+          <div style="display: flex; align-items: baseline; border-top: 2px solid #17181C; padding-top: 8px">
+            <strong style="flex-grow: 1; color: #17181C">Sisa Tagihan</strong>
+            <strong class="d" style="font-size: 22px; font-family: var(--font-mono); color: #17181C">Rp {{ number_format(max(0, $order->total_price - $order->down_payment), 0, ',', '.') }}</strong>
+          </div>
+        </div>
+
+        <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E4E1D9; padding-top: 16px; flex-wrap: wrap; gap: 12px">
+          <span style="font-size: 13px; color: #6A6D77">Bukti invoice resmi pesanan Vantara Production Bengkulu.</span>
+          <button type="button" onclick="window.print()" class="btn p sm" style="font-size: 13px">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5V2h8v3M4 12H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2M4 9h8v5H4z"/></svg>
+            Cetak Invoice Ini
+          </button>
+        </div>
+      </div>
     </div>
 
+    <!-- Right: Status & Transaction Management Card -->
+    <div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 20px">
+      <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="card" style="display: flex; flex-direction: column; gap: 18px">
+        @csrf
+        @method('PATCH')
+
+        <h2 class="d" style="font-size: 22px">Perbarui Status &amp; Transaksi</h2>
+
+        <div class="fld">
+          <label style="font-weight: 700; color: var(--admin-tx); margin-bottom: 8px; display: block">Status Pesanan (5 Tahap)</label>
+          <div class="seg">
+            <label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input type="radio" name="status" value="pending" {{ $order->status === 'pending' ? 'checked' : '' }}>
+                <span>Menunggu Konfirmasi</span>
+              </div>
+              <span class="tg w">Pending</span>
+            </label>
+            <label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input type="radio" name="status" value="dp_received" {{ $order->status === 'dp_received' ? 'checked' : '' }}>
+                <span>DP Diterima (Uang Muka)</span>
+              </div>
+              <span class="tg b">DP Masuk</span>
+            </label>
+            <label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input type="radio" name="status" value="confirmed" {{ $order->status === 'confirmed' ? 'checked' : '' }}>
+                <span>Dikonfirmasi (ACC &amp; Jadwal)</span>
+              </div>
+              <span class="tg a">Dikonfirmasi</span>
+            </label>
+            <label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input type="radio" name="status" value="completed" {{ $order->status === 'completed' ? 'checked' : '' }}>
+                <span>Selesai (Acara Berakhir)</span>
+              </div>
+              <span class="tg c">Selesai</span>
+            </label>
+            <label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input type="radio" name="status" value="cancelled" {{ $order->status === 'cancelled' ? 'checked' : '' }}>
+                <span>Dibatalkan</span>
+              </div>
+              <span class="tg r">Batal</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label for="total_price_display">Total Kesepakatan (Rp)</label>
+          <input id="total_price_display" name="total_price_display" value="{{ number_format((int) old('total_price', $order->total_price), 0, ',', '.') }}" data-money-input data-money-target="total-price-value" inputmode="numeric">
+          <input id="total-price-value" type="hidden" name="total_price" value="{{ old('total_price', $order->total_price) }}">
+        </div>
+
+        <div class="fld">
+          <label for="down_payment_display">Uang Muka / DP Masuk (Rp)</label>
+          <input id="down_payment_display" name="down_payment_display" value="{{ number_format((int) old('down_payment', $order->down_payment), 0, ',', '.') }}" data-money-input data-money-target="down-payment-value" inputmode="numeric">
+          <input id="down-payment-value" type="hidden" name="down_payment" value="{{ old('down_payment', $order->down_payment) }}">
+          <span style="font-size: 12px; color: var(--admin-mu)">Mengisi DP > 0 akan otomatis menandai transaksi masuk.</span>
+        </div>
+
+        <div class="fld">
+          <label for="admin_notes">Catatan Internal Admin</label>
+          <textarea id="admin_notes" name="admin_notes" rows="3" placeholder="Contoh: DP ditransfer via BCA, pelunasan saat loading in.">{{ old('admin_notes', $order->admin_notes) }}</textarea>
+        </div>
+
+        <button class="btn p" type="submit" style="width: 100%">Simpan Perubahan</button>
+      </form>
+
+      <div class="card" style="display: flex; flex-direction: column; gap: 16px">
+        <div>
+          <h2 class="d" style="font-size: 22px">Biaya Operasional</h2>
+          <p style="font-size: 13px; color: var(--admin-mu); margin-top: 6px">Data internal admin, tidak ditampilkan pada invoice customer.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          @forelse($order->operationalCosts as $cost)
+            <div style="border: 1px solid var(--admin-line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px">
+              <form action="{{ route('admin.orders.operational-costs.update', [$order->id, $cost->id]) }}" method="POST" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                @csrf
+                @method('PATCH')
+                <input name="name" value="{{ $cost->name }}" aria-label="Nama biaya" required style="flex: 1 1 140px; min-width: 0">
+                <input name="amount_display" value="{{ number_format($cost->amount, 0, ',', '.') }}" data-money-input data-money-target="cost-amount-{{ $cost->id }}" inputmode="numeric" aria-label="Nominal biaya" required style="flex: 0 1 140px; min-width: 0">
+                <input id="cost-amount-{{ $cost->id }}" type="hidden" name="amount" value="{{ $cost->amount }}">
+                <button class="btn sm" type="submit">Simpan</button>
+              </form>
+              <form action="{{ route('admin.orders.operational-costs.destroy', [$order->id, $cost->id]) }}" method="POST" onsubmit="return confirm('Hapus biaya operasional ini?')">
+                @csrf
+                @method('DELETE')
+                <button class="btn dg sm" type="submit">Hapus</button>
+              </form>
+            </div>
+          @empty
+            <span style="font-size: 13px; color: var(--admin-mu)">Belum ada biaya operasional.</span>
+          @endforelse
+        </div>
+
+        <form action="{{ route('admin.orders.operational-costs.store', $order->id) }}" method="POST" style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--admin-line); padding-top: 14px">
+          @csrf
+          <strong style="font-size: 14px">Tambah biaya</strong>
+          <input name="name" placeholder="Contoh: Transportasi" required>
+          <input name="amount_display" data-money-input data-money-target="new-cost-amount" inputmode="numeric" placeholder="Nominal (Rp)" required>
+          <input id="new-cost-amount" type="hidden" name="amount">
+          <button class="btn" type="submit">Tambah Biaya</button>
+        </form>
+
+        <div style="border-top: 1px solid var(--admin-line); padding-top: 12px; display: flex; flex-direction: column; gap: 7px">
+          <div style="display: flex; justify-content: space-between; color: var(--admin-mu)">
+            <span>Pendapatan kotor</span>
+            <span style="font-family: var(--font-mono)">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: #9B1C1C">
+            <span>Total biaya</span>
+            <span style="font-family: var(--font-mono)">- Rp {{ number_format($operationalCostsTotal, 0, ',', '.') }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid var(--admin-line); padding-top: 8px">
+            <span>Pendapatan bersih</span>
+            <span style="font-family: var(--font-mono); color: #17653A">Rp {{ number_format($netRevenue, 0, ',', '.') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Delete Form -->
+      <div class="card" style="border-color: #F8B4B4; background: #FFF5F5; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#9B1C1C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>
+          <strong style="color: #9B1C1C">Hapus Pesanan Ini?</strong>
+        </div>
+        <p style="font-size: 13px; color: #771D1D; line-height: 1.4">Pesanan <strong>{{ $order->order_code }}</strong> akan dihapus dari sistem. Gunakan opsi ini jika ada pesanan fiktif atau kesalahan data.</p>
+        <div x-data="{ confirming: false }">
+          <button type="button" x-show="!confirming" @click="confirming = true" class="btn dg" style="width: 100%; justify-content: center">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>
+            Hapus Pesanan Secara Permanen
+          </button>
+          <div x-show="confirming" style="display: flex; gap: 10px; align-items: center">
+            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" style="flex: 1">
+              @csrf
+              @method('DELETE')
+              <button class="btn dg" type="submit" style="width: 100%; justify-content: center; background: #E02424; color: #fff; border-color: #C81E1E">
+                Konfirmasi Hapus Sekarang
+              </button>
+            </form>
+            <button type="button" @click="confirming = false" class="btn" style="flex: 1; justify-content: center">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+  document.querySelectorAll('[data-money-input]').forEach((input) => {
+    const hiddenInput = document.getElementById(input.dataset.moneyTarget);
+
+    const syncMoney = () => {
+      const digits = input.value.replace(/\D/g, '');
+      hiddenInput.value = digits;
+      input.value = digits ? new Intl.NumberFormat('id-ID').format(Number(digits)) : '';
+    };
+
+    input.addEventListener('input', syncMoney);
+  });
+</script>
+@endpush

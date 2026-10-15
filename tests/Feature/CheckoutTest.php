@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Order;
 use App\Models\Package;
+use Carbon\Carbon;
 use Database\Seeders\PackageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -81,6 +82,7 @@ class CheckoutTest extends TestCase
     public function test_cannot_checkout_if_date_is_already_booked(): void
     {
         $package = Package::first();
+        $package->update(['stock' => 1]);
         $eventDate = now()->addDays(7)->format('Y-m-d');
 
         $order = Order::create([
@@ -246,5 +248,159 @@ class CheckoutTest extends TestCase
         // 2 days * package price
         $this->assertEquals($package->price * 2, $order->total_price);
         $response->assertRedirect(route('checkout.show', $order->order_code));
+    }
+
+    public function test_same_package_can_be_booked_more_than_once_on_same_date_if_stock_available(): void
+    {
+        $package = Package::first();
+        $package->update(['stock' => 3]);
+        $dateStr = now()->addDays(12)->format('Y-m-d');
+
+        // Order 1 (1 unit)
+        $order1 = Order::create([
+            'order_code' => Order::generateOrderCode(),
+            'customer_name' => 'Pemesan Pertama',
+            'customer_phone' => '08111111111',
+            'event_address' => 'Venue A',
+            'event_date' => $dateStr,
+            'total_price' => $package->price,
+            'status' => 'confirmed',
+        ]);
+        $order1->items()->create([
+            'package_id' => $package->id,
+            'package_name' => $package->name,
+            'unit_price' => $package->price,
+            'quantity' => 1,
+            'subtotal' => $package->price,
+        ]);
+
+        // Cek API ketersediaan: harus masih TERSEDIA dengan sisa 2 unit
+        $checkRes1 = $this->postJson('/api/availability/check', [
+            'date' => $dateStr,
+            'package_id' => $package->id,
+        ]);
+        $checkRes1->assertStatus(200);
+        $checkRes1->assertJson([
+            'available' => true,
+            'remaining_stock' => 2,
+            'total_stock' => 3,
+        ]);
+
+        // Calendar API juga harus menganggap tanggal ini belum penuh (is_fully_booked: false)
+        $targetDate = Carbon::parse($dateStr);
+        $calRes = $this->getJson("/api/availability/calendar?year={$targetDate->year}&month={$targetDate->month}&package_id={$package->id}");
+        $calRes->assertStatus(200);
+        $bookedList = collect($calRes->json('booked_dates'));
+        $dayEntry = $bookedList->firstWhere('date', $dateStr);
+        $this->assertNotNull($dayEntry);
+        $this->assertFalse($dayEntry['is_fully_booked']);
+        $this->assertEquals(2, $dayEntry['remaining_stock']);
+
+        // Order 2 (1 unit) di tanggal yang sama oleh customer lain harus BERHASIL
+        $response2 = $this->withSession([
+            '_token' => 'test-token',
+            'cart' => [
+                $package->id => [
+                    'package_id' => $package->id,
+                    'name' => $package->name,
+                    'slug' => $package->slug,
+                    'category' => $package->category,
+                    'price' => $package->price,
+                    'quantity' => 1,
+                ],
+            ],
+        ])->post(route('checkout.store'), [
+            '_token' => 'test-token',
+            'customer_name' => 'Pemesan Kedua',
+            'customer_phone' => '08222222222',
+            'event_address' => 'Venue B',
+            'event_date' => $dateStr,
+        ]);
+
+        $response2->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('orders', ['customer_name' => 'Pemesan Kedua']);
+
+        // Sekarang sisa stok tinggal 1
+        $this->assertEquals(1, $package->getAvailableStockOn($dateStr));
+    }
+
+    public function test_can_book_multiple_quantity_in_single_order_within_stock(): void
+    {
+        $package = Package::first();
+        $package->update(['stock' => 3]);
+        $dateStr = now()->addDays(16)->format('Y-m-d');
+
+        // Pesan 2 unit sekaligus dalam 1 checkout
+        $response = $this->withSession([
+            '_token' => 'test-token',
+            'cart' => [
+                $package->id => [
+                    'package_id' => $package->id,
+                    'name' => $package->name,
+                    'slug' => $package->slug,
+                    'category' => $package->category,
+                    'price' => $package->price,
+                    'quantity' => 2,
+                ],
+            ],
+        ])->post(route('checkout.store'), [
+            '_token' => 'test-token',
+            'customer_name' => 'Pemesan 2 Unit',
+            'customer_phone' => '08333333333',
+            'event_address' => 'Venue Akbar',
+            'event_date' => $dateStr,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('orders', ['customer_name' => 'Pemesan 2 Unit']);
+        $this->assertEquals(1, $package->getAvailableStockOn($dateStr));
+    }
+
+    public function test_cannot_book_when_daily_stock_exceeded(): void
+    {
+        $package = Package::first();
+        $package->update(['stock' => 2]);
+        $dateStr = now()->addDays(18)->format('Y-m-d');
+
+        // Buat pesanan awal yang menghabiskan seluruh 2 unit stok
+        $order = Order::create([
+            'order_code' => Order::generateOrderCode(),
+            'customer_name' => 'Pemesan Borong',
+            'customer_phone' => '08444444444',
+            'event_address' => 'Gedung Penuh',
+            'event_date' => $dateStr,
+            'total_price' => $package->price * 2,
+            'status' => 'confirmed',
+        ]);
+        $order->items()->create([
+            'package_id' => $package->id,
+            'package_name' => $package->name,
+            'unit_price' => $package->price,
+            'quantity' => 2,
+            'subtotal' => $package->price * 2,
+        ]);
+
+        // Percobaan checkout berikutnya harus ditolak
+        $response = $this->withSession([
+            '_token' => 'test-token',
+            'cart' => [
+                $package->id => [
+                    'package_id' => $package->id,
+                    'name' => $package->name,
+                    'slug' => $package->slug,
+                    'category' => $package->category,
+                    'price' => $package->price,
+                    'quantity' => 1,
+                ],
+            ],
+        ])->post(route('checkout.store'), [
+            '_token' => 'test-token',
+            'customer_name' => 'Pemesan Tertolak',
+            'customer_phone' => '08555555555',
+            'event_address' => 'Gedung Alternatif',
+            'event_date' => $dateStr,
+        ]);
+
+        $response->assertSessionHasErrors('event_date');
     }
 }

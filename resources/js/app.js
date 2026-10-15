@@ -12,7 +12,7 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ],
-    dayNames: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+    dayNames: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
     calendarDays: [],
     bookedDates: [],
     isLoading: false,
@@ -84,14 +84,15 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
 
     generateCalendarDays() {
         const days = [];
-        const firstDayOfMonth = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
+        const jsDay = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
+        const firstDayOffset = (jsDay + 6) % 7; // Monday = 0, ..., Sunday = 6
         const daysInMonth = new Date(this.currentYear, this.currentMonth, 0).getDate();
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         // Previous month padding
         const prevMonthDays = new Date(this.currentYear, this.currentMonth - 1, 0).getDate();
-        for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+        for (let i = firstDayOffset - 1; i >= 0; i--) {
             days.push({
                 day: prevMonthDays - i,
                 dateString: '',
@@ -108,13 +109,16 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
             const dateString = `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             const isPast = dateObj < today;
             const booking = this.bookedDates.find(b => b.date === dateString);
+            const isFullyBooked = Boolean(booking && (booking.is_fully_booked ?? true));
+            const isPartiallyBooked = Boolean(booking && !booking.is_fully_booked);
 
             days.push({
                 day: d,
                 dateString: dateString,
                 isCurrentMonth: true,
                 isPast: isPast,
-                isBooked: Boolean(booking),
+                isBooked: isFullyBooked,
+                isPartiallyBooked: isPartiallyBooked,
                 bookingInfo: booking || null,
             });
         }
@@ -129,15 +133,43 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
                 isCurrentMonth: false,
                 isPast: true,
                 isBooked: false,
+                isPartiallyBooked: false,
                 bookingInfo: null,
             });
         }
 
         this.calendarDays = days;
+
+        // Jika tanggal yang sedang dipilih ternyata sudah penuh (fully booked), batalkan pilihan
+        if (this.selectedDate && this.isDateBooked(this.selectedDate)) {
+            this.selectedDate = '';
+            this.checkResult = {
+                available: false,
+                message: 'Tanggal ini sudah terisi penuh dan tidak dapat dipilih.',
+            };
+        }
+    },
+
+    isDateBooked(dateStr) {
+        if (!dateStr) return false;
+        const booking = this.bookedDates.find(b => b.date === dateStr);
+        return Boolean(booking && (booking.is_fully_booked ?? true));
+    },
+
+    isDatePartiallyBooked(dateStr) {
+        if (!dateStr) return false;
+        const booking = this.bookedDates.find(b => b.date === dateStr);
+        return Boolean(booking && !booking.is_fully_booked);
+    },
+
+    getBookingInfo(dateStr) {
+        if (!dateStr) return null;
+        return this.bookedDates.find(b => b.date === dateStr) || null;
     },
 
     onDayClick(dayObj) {
-        if (!dayObj.isCurrentMonth || dayObj.isPast) return;
+        // Jangan izinkan klik jika bukan bulan aktif, sudah lewat, atau SUDAH TERISI PENUH
+        if (!dayObj.isCurrentMonth || dayObj.isPast || dayObj.isBooked) return;
         this.selectedDate = dayObj.dateString;
         this.checkSpecificDate(dayObj.dateString);
     },

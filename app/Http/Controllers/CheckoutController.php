@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Package;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -54,7 +55,7 @@ class CheckoutController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:30',
+            'customer_phone' => ['required', 'regex:/^[0-9]+$/', 'max:20'],
             'customer_email' => 'nullable|email|max:255',
             'event_address' => 'required|string|max:1000',
             'event_date' => 'required|date|after_or_equal:today',
@@ -62,50 +63,56 @@ class CheckoutController extends Controller
         ], [
             'customer_name.required' => 'Silakan masukkan nama lengkap Anda.',
             'customer_phone.required' => 'Silakan masukkan nomor WhatsApp aktif Anda.',
+            'customer_phone.regex' => 'Nomor WhatsApp hanya boleh berisi angka.',
             'event_address.required' => 'Silakan masukkan alamat lengkap tempat acara.',
             'event_date.required' => 'Silakan pilih tanggal pelaksanaan acara.',
             'event_date.after_or_equal' => 'Tanggal acara tidak boleh di masa lalu.',
         ]);
 
-        $rentDuration = 1;
         $totalPrice = 0;
         foreach ($cart as $item) {
             $totalPrice += $item['price'] * $item['quantity'];
-            $rentDuration = max($rentDuration, (int) ($item['quantity'] ?? 1));
         }
 
         $startDate = Carbon::parse($validated['event_date'])->startOfDay();
-        $endDate = $startDate->copy()->addDays($rentDuration - 1);
+        $endDate = $request->filled('event_end_date')
+            ? Carbon::parse($request->input('event_end_date'))->startOfDay()
+            : $startDate->copy();
 
-        $cartPackageIds = array_filter(array_column($cart, 'package_id'));
+        if ($endDate->lt($startDate)) {
+            $endDate = $startDate->copy();
+        }
 
-        // Cek ketersediaan tanggal per paket layanan dalam keranjang (mencegah double booking untuk paket yang sama)
-        $isBooked = Order::booked()
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereDate('event_date', '<=', $endDate->format('Y-m-d'))
-                    ->whereDate(DB::raw('COALESCE(event_end_date, event_date)'), '>=', $startDate->format('Y-m-d'));
-            })
-            ->whereHas('items', function ($itemQuery) use ($cartPackageIds) {
-                $itemQuery->whereIn('package_id', $cartPackageIds);
-            })
-            ->exists();
+        // Cek kapasitas stok per paket layanan dalam keranjang untuk setiap hari pelaksanaan acara
+        foreach ($cart as $item) {
+            $package = Package::find($item['package_id']);
+            $stock = $package ? (int) $package->stock : 1;
+            $requestedQty = (int) ($item['quantity'] ?? 1);
 
-        if ($isBooked) {
-            $formattedDate = $startDate->translatedFormat('d M Y');
-            if ($rentDuration > 1) {
-                $formattedDate .= ' s/d '.$endDate->translatedFormat('d M Y');
+            for ($curr = $startDate->copy(); $curr->lte($endDate); $curr->addDay()) {
+                $bookedOnDay = $package ? $package->getBookedStockOn($curr) : 0;
+                $remainingOnDay = max(0, $stock - $bookedOnDay);
+
+                if ($requestedQty > $remainingOnDay) {
+                    $formattedDay = $curr->translatedFormat('d M Y');
+                    if ($remainingOnDay === 0) {
+                        $errorMsg = "Maaf, paket '{$item['name']}' pada tanggal {$formattedDay} sudah terisi penuh (kapasitas {$stock} unit telah terpakai). Silakan tentukan tanggal alternatif.";
+                    } else {
+                        $errorMsg = "Maaf, paket '{$item['name']}' pada tanggal {$formattedDay} hanya tersisa {$remainingOnDay} unit (Anda meminta {$requestedQty} unit). Silakan sesuaikan jumlah unit atau pilih tanggal lain.";
+                    }
+
+                    return back()->withInput()->withErrors([
+                        'event_date' => $errorMsg,
+                    ]);
+                }
             }
-
-            return back()->withInput()->withErrors([
-                'event_date' => "Maaf, paket layanan yang Anda pilih pada tanggal {$formattedDate} sudah terisi oleh pemesan lain. Silakan tentukan tanggal alternatif.",
-            ]);
         }
 
         // Generate Order Code via model helper
         $orderCode = Order::generateOrderCode();
 
         // Save order and items in DB Transaction
-        $order = DB::transaction(function () use ($validated, $cart, $totalPrice, $orderCode, $startDate, $endDate, $rentDuration) {
+        $order = DB::transaction(function () use ($validated, $cart, $totalPrice, $orderCode, $startDate, $endDate) {
             $order = Order::create([
                 'order_code' => $orderCode,
                 'customer_name' => $validated['customer_name'],
@@ -113,7 +120,7 @@ class CheckoutController extends Controller
                 'customer_email' => $validated['customer_email'] ?? null,
                 'event_address' => $validated['event_address'],
                 'event_date' => $startDate->format('Y-m-d'),
-                'event_end_date' => $rentDuration > 1 ? $endDate->format('Y-m-d') : $startDate->format('Y-m-d'),
+                'event_end_date' => $endDate->format('Y-m-d'),
                 'notes' => $validated['notes'] ?? null,
                 'total_price' => $totalPrice,
                 'down_payment' => 0,
@@ -172,7 +179,7 @@ class CheckoutController extends Controller
         $waText .= "\n📦 *PAKET YANG DIPESAN:*\n";
 
         foreach ($order->orderItems as $item) {
-            $subtotalFormatted = number_format($item->subtotal, 0, ',', '.');
+            $subtotalFormatted = number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.');
             $waText .= "• {$item->package_name} ({$item->quantity}x) — Rp {$subtotalFormatted}\n";
         }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -53,9 +54,53 @@ class AdminOrderController extends Controller
      */
     public function show(int $id): View
     {
-        $order = Order::with('orderItems.package')->findOrFail($id);
+        $order = Order::with(['orderItems.package', 'operationalCosts'])->findOrFail($id);
 
         return view('admin.orders.show', compact('order'));
+    }
+
+    public function storeOperationalCost(Request $request, int $id): RedirectResponse
+    {
+        $order = Order::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        $order->operationalCosts()->create([
+            'name' => $validated['name'],
+            'amount' => (int) $validated['amount'],
+        ]);
+
+        return redirect()->route('admin.orders.show', $order->id)
+            ->with('success', 'Biaya operasional berhasil ditambahkan.');
+    }
+
+    public function updateOperationalCost(Request $request, int $id, int $costId): RedirectResponse
+    {
+        $order = Order::findOrFail($id);
+        $cost = $order->operationalCosts()->findOrFail($costId);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        $cost->update([
+            'name' => $validated['name'],
+            'amount' => (int) $validated['amount'],
+        ]);
+
+        return redirect()->route('admin.orders.show', $order->id)
+            ->with('success', 'Biaya operasional berhasil diperbarui.');
+    }
+
+    public function destroyOperationalCost(int $id, int $costId): RedirectResponse
+    {
+        $order = Order::findOrFail($id);
+        $order->operationalCosts()->findOrFail($costId)->delete();
+
+        return redirect()->route('admin.orders.show', $order->id)
+            ->with('success', 'Biaya operasional berhasil dihapus.');
     }
 
     /**
@@ -96,8 +141,35 @@ class AdminOrderController extends Controller
 
         $order->save();
 
+        if (isset($validated['total_price'])) {
+            $this->syncItemSubtotals($order);
+        }
+
         return redirect()->route('admin.orders.show', $order->id)
             ->with('success', 'Status & data transaksi pesanan '.$order->order_code.' berhasil diperbarui.');
+    }
+
+    /**
+     * Sesuaikan subtotal item agar jumlah rincian mengikuti total kesepakatan.
+     */
+    private function syncItemSubtotals(Order $order): void
+    {
+        /** @var Collection<int, \App\Models\OrderItem> $items */
+        $items = $order->orderItems()->get();
+        $originalTotal = (int) $items->sum('subtotal');
+        $remainingTotal = (int) $order->total_price;
+        $lastIndex = $items->keys()->last();
+
+        foreach ($items as $index => $item) {
+            $subtotal = $index === $lastIndex
+                ? max(0, $remainingTotal)
+                : ($originalTotal > 0
+                    ? (int) round($item->subtotal / $originalTotal * $order->total_price)
+                    : 0);
+
+            $item->update(['subtotal' => $subtotal]);
+            $remainingTotal -= $subtotal;
+        }
     }
 
     /**

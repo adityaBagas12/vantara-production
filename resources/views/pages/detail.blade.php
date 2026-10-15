@@ -4,281 +4,157 @@
 @section('meta_description', $package->description)
 
 @section('content')
+<div style="min-height: 1900px"
+     x-data="calendarWidget({{ $package->id }})"
+     x-init="selectedDate = '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}'">
 
-    <!-- Breadcrumb & Header Bar -->
-    <div class="bg-[#090c14] border-b border-[#1b2438] py-4 text-xs text-gray-400">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2">
-            <a href="{{ route('home') }}" class="hover:text-white transition-colors">Beranda</a>
-            <span>/</span>
-            <a href="{{ route('packages.catalog') }}" class="hover:text-white transition-colors">Katalog Paket</a>
-            <span>/</span>
-            <span class="text-[#c59d5f] font-semibold truncate">{{ $package->name }}</span>
+  <!-- Detail Header & Summary -->
+  <section class="wrap" style="padding-top: 40px; padding-bottom: 72px">
+    <p style="color: var(--mu); font-size: 14px; margin-bottom: 28px">
+      <a href="{{ route('packages.catalog') }}" style="text-decoration: underline">Katalog</a> / {{ $package->category }} / {{ $package->name }}
+    </p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 56px">
+      <!-- Media preview -->
+      <div style="flex: 1 1 480px; display: flex; flex-direction: column; gap: 14px">
+        <div class="pic" style="height: 440px; border-radius: 28px; border: 1px solid var(--line)">
+          @if($package->image_path)
+            <img src="{{ $package->image_path }}" alt="{{ $package->name }}" style="width: 100%; height: 100%; object-fit: cover">
+          @else
+            @php $catLower = strtolower($package->category); @endphp
+            @if(str_contains($catLower, 'sound'))
+              <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+            @elseif(str_contains($catLower, 'light'))
+              <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18l6 24M24 18v24"/></svg>
+            @elseif(str_contains($catLower, 'mic') || str_contains($catLower, 'orgen') || str_contains($catLower, 'band'))
+              <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="17" y="4" width="14" height="24" rx="7"/><path d="M9 22a15 15 0 0 0 30 0M24 37v7M16 44h16"/></svg>
+            @else
+              <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="4"/><path d="M14 18v14M24 18v14M34 18v14"/><circle cx="14" cy="24" r="2.5"/><circle cx="24" cy="30" r="2.5"/><circle cx="34" cy="22" r="2.5"/></svg>
+            @endif
+          @endif
         </div>
+        <div style="display: flex; gap: 14px">
+          <div class="pic k2" style="flex: 1 1 0; height: 96px; border-radius: 16px; border: 1px solid var(--line)"></div>
+          <div class="pic k3" style="flex: 1 1 0; height: 96px; border-radius: 16px; border: 1px solid var(--line)"></div>
+          <div class="pic" style="flex: 1 1 0; height: 96px; border-radius: 16px; border: 1px solid var(--line)"></div>
+        </div>
+      </div>
+
+      <!-- Specs & Details -->
+      <div style="flex: 1 1 400px; display: flex; flex-direction: column; gap: 22px">
+        <span class="badge inline"><i class="dot"></i>Tersedia (Stok: {{ $package->stock ?? 1 }} Unit/Hari)</span>
+        <h1 class="d" style="font-size: 52px; line-height: 1.04; font-weight: 800">{{ $package->name }}</h1>
+        <p class="price" style="font-size: 32px">Rp {{ number_format($package->price, 0, ',', '.') }} <span style="font-size: 16px; color: var(--mu); font-weight: 500; font-family: 'Figtree', sans-serif">/ hari</span></p>
+        <p style="color: var(--mu); font-size: 17px">{{ $package->description }}</p>
+
+        <div class="card" style="padding: 22px 24px; display: flex; flex-direction: column; gap: 10px">
+          <strong class="d" style="font-size: 18px">Isi paket</strong>
+          @forelse($package->items ?? [] as $item)
+            <span style="color: var(--mu)">• {{ $item }}</span>
+          @empty
+            <span style="color: var(--mu)">• Standar peralatan panggung Vantara</span>
+          @endforelse
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+          <a class="btn p" href="#cek-tanggal-acara" @click.prevent="document.getElementById('cek-tanggal-acara')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Booking Produk Ini</a>
+          <a class="btn" href="{{ route('packages.catalog') }}">Kembali ke Katalog</a>
+          <a class="btn wa" href="https://wa.me/6282282422317?text={{ urlencode('Halo Admin Vantara Production, saya ingin konsultasi mengenai paket ' . $package->name) }}" target="_blank" rel="noopener" title="Konsultasi cepat paket ini via WhatsApp Admin">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.62C9.33 7.62 9 7.7 8.71 8.01C8.42 8.32 7.6 9.09 7.6 10.65C7.6 12.21 8.74 13.72 8.9 13.93C9.06 14.14 11.14 17.34 14.32 18.72C15.08 19.04 15.67 19.24 16.14 19.38C16.9 19.63 17.59 19.59 18.14 19.51C18.75 19.42 20.03 18.73 20.29 17.98C20.56 17.23 20.56 16.59 20.48 16.45C20.4 16.32 20.19 16.24 19.89 16.09C19.58 15.93 18.08 15.2 17.8 15.1C17.52 15 17.32 14.95 17.11 15.25C16.91 15.56 16.34 16.24 16.17 16.44C16 16.65 15.83 16.67 15.52 16.52C15.22 16.37 14.24 16.05 13.08 15.01C12.18 14.2 11.57 13.2 11.41 12.92C11.25 12.65 11.39 12.5 11.55 12.35C11.69 12.21 11.86 11.99 12.01 11.81C12.16 11.64 12.22 11.51 12.32 11.31C12.42 11.1 12.37 10.92 12.29 10.77C12.21 10.62 11.6 9.12 11.35 8.5C11.1 7.9 10.85 7.98 10.66 7.97C10.48 7.97 10.27 7.96 10.07 7.96C9.86 7.96 9.53 7.62 9.53 7.62Z"/>
+            </svg>
+            <span>Konsultasi Paket Ini</span>
+          </a>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Main Detail Section -->
-    <section class="py-12 bg-[#0b0e14]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                
-                <!-- Left Column (Package Specs & Details) - 7 cols -->
-                <div class="lg:col-span-7 space-y-10">
-                    
-                    <!-- Main Image Preview with Luxury Badge -->
-                    <div class="relative rounded-2xl overflow-hidden border border-[#242f44] shadow-2xl bg-black">
-                        <img src="{{ $package->image_path ?? 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1200&auto=format&fit=crop' }}" 
-                             alt="{{ $package->name }}" 
-                             class="w-full h-[380px] sm:h-[460px] object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0b0e14] via-transparent to-transparent"></div>
-                        
-                        <div class="absolute top-6 left-6 flex items-center gap-3">
-                            <span class="px-3.5 py-1.5 bg-black/80 backdrop-blur-md border border-[#c59d5f]/50 text-[#dfc48e] text-xs font-semibold uppercase tracking-wider rounded">
-                                {{ $package->category }}
-                            </span>
-                            @if ($package->is_featured)
-                                <span class="px-3 py-1 bg-gradient-to-r from-[#dfc48e] to-[#c59d5f] text-black text-xs font-bold uppercase tracking-wider rounded shadow">
-                                    Paket Unggulan
-                                </span>
-                            @endif
-                        </div>
-                    </div>
+  <!-- Ketersediaan & Kalender Section -->
+  <section id="cek-tanggal-acara" class="wrap" style="padding-bottom: 96px; scroll-margin-top: 24px">
+    <div class="card" style="padding: 40px; display: flex; flex-wrap: wrap; gap: 48px">
+      <!-- Calendar Area -->
+      <div style="flex: 2 1 480px">
+        <span class="eye">Ketersediaan</span>
+        <h2 class="d" style="font-size: 34px; margin: 8px 0 24px">Cek tanggal acara</h2>
 
-                    <!-- Title & Overview -->
-                    <div class="space-y-4">
-                        <div class="text-xs uppercase tracking-[0.25em] text-[#c59d5f] font-semibold">Spesifikasi Layanan Rental</div>
-                        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">
-                            {{ $package->name }}
-                        </h1>
-                        <div class="flex items-center gap-3 py-2">
-                            <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
-                            <span class="text-[#c59d5f] text-xs">✦</span>
-                            <span class="h-[1px] w-12 bg-[#c59d5f]"></span>
-                        </div>
-                        <p class="text-sm text-gray-300 leading-relaxed font-light">
-                            {{ $package->description }}
-                        </p>
-                    </div>
-
-                    <!-- Itemized Inclusions (PRD: Item / Layanan yang Didapat) -->
-                    <div class="space-y-4">
-                        <h3 class="font-serif text-xl font-bold text-white flex items-center gap-2">
-                            <span class="text-[#c59d5f]">❖</span>
-                            Peralatan & Layanan yang Termasuk
-                        </h3>
-                        <p class="text-xs text-gray-400">Seluruh peralatan diantar, dipasang, dan diuji langsung oleh kru berpengalaman Vantara Production.</p>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            @foreach ($package->items ?? [] as $item)
-                                <div class="p-4 rounded-xl bg-[#121824] border border-[#242f44] flex items-start gap-3">
-                                    <div class="w-6 h-6 rounded-full bg-[#c59d5f]/15 border border-[#c59d5f]/40 flex items-center justify-center text-[#c59d5f] shrink-0 mt-0.5">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </div>
-                                    <div class="text-xs font-medium text-gray-200 leading-snug">
-                                        {{ $item }}
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- SOP & Quality Guarantee -->
-                    <div class="p-6 rounded-xl bg-[#121824] border border-[#c59d5f]/30 space-y-4">
-                        <h3 class="font-serif text-lg font-bold text-[#dfc48e] flex items-center gap-2">
-                            <span>🛡</span> Jaminan Layanan Vantara Production
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                            <div class="space-y-1">
-                                <strong class="text-white block">Pemasangan Tepat Waktu:</strong>
-                                <span class="text-gray-400">Kru tiba dan siap memasang peralatan minimal 2–3 jam sebelum acara dimulai.</span>
-                            </div>
-                            <div class="space-y-1">
-                                <strong class="text-white block">Peralatan High-End:</strong>
-                                <span class="text-gray-400">Audio & lighting profesional yang terawat dan siap pakai tanpa kendala teknis.</span>
-                            </div>
-                            <div class="space-y-1">
-                                <strong class="text-white block">Teknisi Standby:</strong>
-                                <span class="text-gray-400">Kru operator audio/lighting bertugas penuh selama acara berlangsung hingga selesai.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Terms & Conditions (PRD: Batasan serta Harga) -->
-                    <div class="space-y-3 border-t border-[#1e2538] pt-6">
-                        <h4 class="font-serif text-base font-bold text-white">Ketentuan & Syarat Pemesanan</h4>
-                        <ul class="space-y-2 text-xs text-gray-400 list-disc list-inside leading-relaxed">
-                            <li>Harga di atas berlaku untuk penggunaan 1 (satu) hari acara / sesi event.</li>
-                            <li>Pemasangan & pengantaran peralatan dilakukan langsung oleh kru Vantara Production.</li>
-                            <li>Pemesanan dan penetapan tanggal final dilakukan melalui konfirmasi Admin via WhatsApp.</li>
-                            <li>Untuk pemesanan Genset, biaya sewa belum termasuk bahan bakar (BBM).</li>
-                        </ul>
-                    </div>
-
-                </div>
-
-                <!-- Right Column (Sticky Booking & Calendar) - 5 cols -->
-                <div class="lg:col-span-5" id="kalender">
-                    <div class="sticky top-24 space-y-5">
-                        
-                        <!-- Pricing & Booking Card with Calendar -->
-                        <div class="rounded-2xl bg-gradient-to-b from-[#141b28] to-[#0e131d] border border-[#c59d5f]/40 shadow-2xl overflow-hidden"
-                             x-data="calendarWidget({{ $package->id }})"
-                             x-init="selectedDate = '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}'">
-
-                            <div class="p-5">
-                                <!-- Pricing Header -->
-                                <div class="flex items-baseline justify-between mb-4">
-                                    <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Harga Sewa</span>
-                                    <div class="text-right">
-                                        <div class="font-serif text-3xl font-bold text-[#dfc48e]">
-                                            Rp {{ number_format($package->price, 0, ',', '.') }}
-                                        </div>
-                                        <div class="text-[11px] text-gray-400">Per Acara</div>
-                                    </div>
-                                </div>
-
-                                <!-- Status Paket -->
-                                <div class="p-3 rounded-lg bg-[#0a0d14] border border-[#1e2538] text-xs text-gray-300 flex items-center justify-between">
-                                    <span>Status Paket:</span>
-                                    <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                        Tersedia & Siap Dipesan
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Calendar Section (Below Status Paket) -->
-                            <div class="border-t border-[#1e2538]">
-                                
-                                <!-- Calendar Header -->
-                                <div class="px-5 py-3 bg-[#0c1017] flex items-center justify-between">
-                                    <div>
-                                        <div class="text-[9px] uppercase tracking-widest text-[#c59d5f] font-semibold">Cek Tanggal</div>
-                                        <div class="font-serif text-sm font-bold text-white"
-                                             x-text="`${monthNames[currentMonth - 1]} ${currentYear}`"></div>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <button @click="prevMonth()" type="button"
-                                                class="p-1.5 rounded bg-[#141b28] hover:bg-[#c59d5f] hover:text-black text-gray-400 transition-colors border border-[#242f44]">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                                        </button>
-                                        <button @click="currentMonth = new Date().getMonth() + 1; currentYear = new Date().getFullYear(); fetchMonthData()"
-                                                type="button"
-                                                class="px-2 py-1 rounded bg-[#141b28] hover:bg-[#1e2538] text-gray-400 text-[9px] uppercase font-semibold tracking-wider transition-colors border border-[#242f44]">
-                                            Bulan Ini
-                                        </button>
-                                        <button @click="nextMonth()" type="button"
-                                                class="p-1.5 rounded bg-[#141b28] hover:bg-[#c59d5f] hover:text-black text-gray-400 transition-colors border border-[#242f44]">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Note Petunjuk Tanggal -->
-                                <div class="px-5 py-2.5 bg-[#090c14] border-b border-[#1e2538] text-xs text-[#dfc48e] flex items-center justify-between font-medium">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-amber-400 text-sm">💡</span>
-                                        <span><strong>Catatan:</strong> Pilih tanggal lalu checkout</span>
-                                    </div>
-                                    <template x-if="selectedDate">
-                                        <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40" x-text="`Terpilih: ${selectedDate.split('-').reverse().join('/')}`"></span>
-                                    </template>
-                                </div>
-
-                                <!-- Loading -->
-                                <div x-show="isLoading" class="py-10 flex items-center justify-center text-[#c59d5f]" style="display: none;">
-                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-                                </div>
-
-                                <!-- Calendar Grid -->
-                                <div x-show="!isLoading" class="px-4 py-3">
-                                    <!-- Day Names -->
-                                    <div class="grid grid-cols-7 gap-1 mb-1">
-                                        <template x-for="day in dayNames" :key="day">
-                                            <div class="text-center text-[9px] uppercase tracking-wider font-bold text-gray-500 py-1" x-text="day"></div>
-                                        </template>
-                                    </div>
-
-                                    <!-- Date Cells -->
-                                    <div class="grid grid-cols-7 gap-1">
-                                        <template x-for="(d, index) in calendarDays" :key="index">
-                                            <button type="button"
-                                                    @click="onDayClick(d)"
-                                                    :disabled="!d.isCurrentMonth || d.isPast"
-                                                    :title="d.isBooked ? `Terisi: ${d.bookingInfo?.package_name ?? 'Jadwal Terisi'}` : (d.isPast ? 'Tanggal Telah Berlalu' : `Pilih tanggal ${d.dateString}`)"
-                                                    class="relative h-9 rounded flex flex-col items-center justify-center font-medium text-[11px] transition-all"
-                                                    :class="{
-                                                        'opacity-15 cursor-not-allowed': !d.isCurrentMonth,
-                                                        'opacity-25 cursor-not-allowed text-gray-600 bg-transparent': d.isCurrentMonth && d.isPast,
-                                                        'bg-rose-950/50 border border-rose-500/40 text-rose-300 hover:bg-rose-900/70 cursor-pointer': d.isCurrentMonth && !d.isPast && d.isBooked,
-                                                        'bg-transparent text-gray-300 hover:bg-[#1a2334] cursor-pointer': d.isCurrentMonth && !d.isPast && !d.isBooked && selectedDate !== d.dateString,
-                                                        'bg-[#1e2538] border border-[#c59d5f] text-white font-bold ring-1 ring-[#c59d5f]/40': d.isCurrentMonth && selectedDate === d.dateString
-                                                    }">
-                                                <span x-text="d.day"></span>
-                                                <!-- Dot Indicator -->
-                                                <span x-show="d.isCurrentMonth && !d.isPast && d.isBooked"
-                                                      class="absolute bottom-0.5 w-1 h-1 rounded-full bg-rose-400"></span>
-                                                <span x-show="d.isCurrentMonth && !d.isPast && !d.isBooked && selectedDate !== d.dateString"
-                                                      class="absolute bottom-0.5 w-1 h-1 rounded-full bg-emerald-400"></span>
-                                                <span x-show="d.isCurrentMonth && selectedDate === d.dateString"
-                                                      class="absolute bottom-0.5 w-1 h-1 rounded-full bg-emerald-400"></span>
-                                            </button>
-                                        </template>
-                                    </div>
-
-                                    <!-- Legend -->
-                                    <div class="flex items-center justify-center gap-4 mt-2 pt-2 border-t border-[#1e2538]/50 text-[9px] text-gray-500">
-                                        <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Tersedia</div>
-                                        <div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Terisi</div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                            <!-- CTA Buttons -->
-                            <div class="p-5 border-t border-[#1e2538] space-y-3">
-                                <form action="{{ route('cart.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
-                                    <input type="hidden" name="event_date" :value="selectedDate">
-                                    <button type="submit"
-                                            class="w-full py-3.5 px-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] hover:brightness-110 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01]">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                        Tambah ke Keranjang
-                                    </button>
-                                </form>
-
-                                <a :href="`https://wa.me/6282282422317?text=Halo%20Vantara%20Production,%20saya%20tertarik%20dengan%20paket%20${encodeURIComponent('{{ $package->name }}')}${selectedDate ? '%20untuk%20tanggal%20' + selectedDate : ''}.%20Mohon%20info%20ketersediaan%20dan%20pemesanan.`"
-                                   target="_blank"
-                                   class="w-full py-3 px-4 bg-[#141b28] hover:bg-[#1a2334] text-[#dfc48e] border border-[#c59d5f]/50 hover:border-[#c59d5f] font-semibold text-xs uppercase tracking-wider rounded-lg text-center block transition-all">
-                                    Tanya via WA Langsung
-                                </a>
-
-                                <a href="{{ route('availability.index', ['package_id' => $package->id]) }}"
-                                   class="block w-full text-center py-2 px-4 bg-transparent text-gray-400 hover:text-white text-xs font-medium uppercase tracking-wider transition-all">
-                                    Buka Kalender Penuh &rarr;
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Direct Help Card -->
-                        <div class="p-5 rounded-xl bg-[#111722] border border-[#242f44] text-xs space-y-2">
-                            <h4 class="font-serif font-bold text-white text-sm">Konsultasi Custom Request?</h4>
-                            <p class="text-gray-400 text-[11px] leading-relaxed">
-                                Butuh kombinasi sound system + lighting + videobooth atau peralatan tambahan seperti Genset/Videotron? Konsultasikan langsung dengan tim Vantara Production.
-                            </p>
-                            <a href="https://wa.me/6282282422317?text=Halo%20Vantara%20Production,%20saya%20ingin%20request%20paket%20custom." 
-                               target="_blank"
-                               class="inline-block text-[#c59d5f] font-semibold hover:underline pt-1">
-                                Tanya Admin via WA &rarr;
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px">
+          <button class="btn ic" type="button" @click="prevMonth()" aria-label="Bulan sebelumnya">‹</button>
+          <strong class="d" style="flex-grow: 1; text-align: center; font-size: 22px" x-text="`${monthNames[currentMonth - 1]} ${currentYear}`"></strong>
+          <button class="btn ic" type="button" @click="nextMonth()" aria-label="Bulan berikutnya">›</button>
         </div>
-    </section>
 
+        <div class="cal">
+          <template x-for="h in ['Sen','Sel','Rab','Kam','Jum','Sab','Min']" :key="h">
+            <span class="h" x-text="h"></span>
+          </template>
+
+          <template x-for="(c, idx) in calendarDays" :key="idx">
+            <div>
+              <span x-show="!c.isCurrentMonth"></span>
+              <span x-show="c.isCurrentMonth && c.isPast" class="c x" x-text="c.day" title="Tanggal telah berlalu"></span>
+              <span x-show="c.isCurrentMonth && !c.isPast && c.isBooked" class="c b" x-text="c.day" title="Sudah dibooking (Terkunci)"></span>
+              <span x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && selectedDate === c.dateString" class="c s" x-text="c.day"></span>
+              <button x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && selectedDate !== c.dateString" class="c" type="button" @click="onDayClick(c)" x-text="c.day" style="width: 100%"></button>
+            </div>
+          </template>
+        </div>
+
+        <div style="display: flex; gap: 28px; margin-top: 20px; font-size: 14px; color: var(--mu); flex-wrap: wrap">
+          <span><i class="sw"></i>Tersedia</span>
+          <span><i class="sw" style="background: repeating-linear-gradient(135deg,#1C1F27,#1C1F27 3px,#14161B 3px,#14161B 6px)"></i>Sudah dibooking</span>
+          <span><i class="sw" style="background: var(--ac); border-color: var(--ac)"></i>Dipilih</span>
+        </div>
+      </div>
+
+        <!-- Hasil Pengecekan Sidebar -->
+      <div style="flex: 1 1 300px; align-self: flex-start; background: var(--s2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+        <span class="eye">Hasil pengecekan</span>
+        <p style="color: var(--mu)">Tanggal dipilih</p>
+        <strong class="d" style="font-size: 28px; margin-top: -10px" x-text="selectedDate ? selectedDate.split('-').reverse().join(' / ') : 'Belum dipilih'"></strong>
+
+        <template x-if="selectedDate && !isDateBooked(selectedDate)">
+          <div>
+            <span class="badge inline"><i class="dot"></i>Tersedia</span>
+            <span style="display: inline-block; margin-left: 6px; font-size: 12px; color: var(--mu)" x-show="checkResult?.remaining_stock !== undefined">
+              (Sisa <strong style="color: var(--ac)" x-text="checkResult?.remaining_stock"></strong> unit)
+            </span>
+          </div>
+        </template>
+        <template x-if="selectedDate && isDateBooked(selectedDate)">
+          <span class="badge inline" style="background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.35); color: #FCA5A5">Sudah Terisi Penuh</span>
+        </template>
+
+        <p style="color: var(--mu); font-size: 14px" x-text="checkResult?.message ?? 'Lanjutkan booking untuk mengamankan tanggal ini. Harga akhir disepakati bersama Admin lewat WhatsApp.'"></p>
+
+        <form action="{{ route('cart.store') }}" method="POST" @submit="if(!selectedDate || isDateBooked(selectedDate)){ $event.preventDefault(); return false; }">
+          @csrf
+          <input type="hidden" name="package_id" value="{{ $package->id }}">
+          <input type="hidden" name="event_date" :value="selectedDate">
+
+          <div style="margin-bottom: 14px; background: var(--s1); border: 1px solid var(--line); border-radius: 12px; padding: 12px">
+            <label for="detail_qty" style="display: block; font-size: 12px; color: var(--mu); margin-bottom: 6px; font-weight: 600">Jumlah Unit Dipesan:</label>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <input id="detail_qty" type="number" name="quantity" value="1" min="1" :max="checkResult?.remaining_stock ?? {{ $package->stock ?? 1 }}"
+                     style="width: 70px; background: var(--s2); border: 1px solid #3A3F4C; border-radius: 8px; padding: 6px 10px; color: var(--tx); font-family: var(--font-mono); text-align: center" required>
+              <span style="font-size: 13px; color: var(--mu)">Unit (Stok: {{ $package->stock ?? 1 }})</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <button class="btn p" type="submit" :disabled="!selectedDate || isDateBooked(selectedDate)" style="width: 100%">
+              <span x-text="!selectedDate ? 'Pilih Tanggal Dahulu' : (isDateBooked(selectedDate) ? 'Tanggal Terisi Penuh' : 'Lanjut Booking')"></span>
+            </button>
+            <a class="btn wa" href="https://wa.me/6282282422317?text={{ urlencode('Halo Admin Vantara Production, saya ingin konsultasi ketersediaan dan sewa paket ' . $package->name) }}" target="_blank" rel="noopener" style="width: 100%; text-align: center">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.62C9.33 7.62 9 7.7 8.71 8.01C8.42 8.32 7.6 9.09 7.6 10.65C7.6 12.21 8.74 13.72 8.9 13.93C9.06 14.14 11.14 17.34 14.32 18.72C15.08 19.04 15.67 19.24 16.14 19.38C16.9 19.63 17.59 19.59 18.14 19.51C18.75 19.42 20.03 18.73 20.29 17.98C20.56 17.23 20.56 16.59 20.48 16.45C20.4 16.32 20.19 16.24 19.89 16.09C19.58 15.93 18.08 15.2 17.8 15.1C17.52 15 17.32 14.95 17.11 15.25C16.91 15.56 16.34 16.24 16.17 16.44C16 16.65 15.83 16.67 15.52 16.52C15.22 16.37 14.24 16.05 13.08 15.01C12.18 14.2 11.57 13.2 11.41 12.92C11.25 12.65 11.39 12.5 11.55 12.35C11.69 12.21 11.86 11.99 12.01 11.81C12.16 11.64 12.22 11.51 12.32 11.31C12.42 11.1 12.37 10.92 12.29 10.77C12.21 10.62 11.6 9.12 11.35 8.5C11.1 7.9 10.85 7.98 10.66 7.97C10.48 7.97 10.27 7.96 10.07 7.96C9.86 7.96 9.53 7.62 9.53 7.62Z"/>
+              </svg>
+              <span>Konsultasi Cepat via WhatsApp</span>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
 @endsection

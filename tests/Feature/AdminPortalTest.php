@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Order;
+use App\Models\Package;
 use App\Models\User;
 use Database\Seeders\PackageSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,6 +59,7 @@ class AdminPortalTest extends TestCase
                 'name' => 'Paket Special Event Custom',
                 'category' => 'Sound System',
                 'price' => 4500000,
+                'stock' => 5,
                 'description' => 'Paket kustom acara besar.',
                 'items' => ['Speaker 10.000 Watt', 'Mixer 32 Channel'],
                 'is_featured' => '1',
@@ -68,7 +70,31 @@ class AdminPortalTest extends TestCase
         $this->assertDatabaseHas('packages', [
             'name' => 'Paket Special Event Custom',
             'price' => 4500000,
+            'stock' => 5,
         ]);
+    }
+
+    public function test_admin_can_update_package_stock(): void
+    {
+        $package = Package::first();
+
+        $response = $this->actingAs($this->admin)
+            ->withSession(['_token' => 'test-token'])
+            ->put(route('admin.packages.update', $package->id), [
+                '_token' => 'test-token',
+                'name' => $package->name,
+                'category' => $package->category,
+                'price' => $package->price,
+                'stock' => 7,
+                'description' => $package->description,
+                'items' => $package->items,
+                'is_featured' => '1',
+                'is_active' => '1',
+            ]);
+
+        $response->assertRedirect(route('admin.packages.index'));
+        $package->refresh();
+        $this->assertEquals(7, $package->stock);
     }
 
     public function test_admin_can_update_order_status_and_dp(): void
@@ -83,6 +109,14 @@ class AdminPortalTest extends TestCase
             'down_payment' => 0,
             'status' => 'pending',
         ]);
+        $package = Package::first();
+        $order->items()->create([
+            'package_id' => $package->id,
+            'package_name' => $package->name,
+            'unit_price' => $package->price,
+            'quantity' => 1,
+            'subtotal' => $package->price,
+        ]);
 
         $response = $this->actingAs($this->admin)
             ->withSession(['_token' => 'test-token'])
@@ -90,7 +124,7 @@ class AdminPortalTest extends TestCase
                 '_token' => 'test-token',
                 'status' => 'dp_received',
                 'down_payment' => 2000000,
-                'total_price' => 5000000,
+                'total_price' => 2350000,
                 'admin_notes' => 'DP sudah masuk via BCA Admin.',
             ]);
 
@@ -100,5 +134,48 @@ class AdminPortalTest extends TestCase
         $this->assertEquals('dp_received', $order->status);
         $this->assertEquals(2000000, $order->down_payment);
         $this->assertEquals('DP sudah masuk via BCA Admin.', $order->admin_notes);
+        $this->assertEquals(2350000, $order->orderItems()->first()->subtotal);
+    }
+
+    public function test_admin_can_delete_order(): void
+    {
+        $order = Order::create([
+            'order_code' => Order::generateOrderCode(),
+            'customer_name' => 'Budi Testing Hapus',
+            'customer_phone' => '08123456789',
+            'event_address' => 'Gedung Serbaguna',
+            'event_date' => now()->addDays(15)->format('Y-m-d'),
+            'total_price' => 3000000,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->withSession(['_token' => 'test-token'])
+            ->delete(route('admin.orders.destroy', $order->id), [
+                '_token' => 'test-token',
+            ]);
+
+        $response->assertRedirect(route('admin.orders.index'));
+        $this->assertSoftDeleted('orders', ['id' => $order->id]);
+    }
+
+    public function test_admin_can_view_order_show_page(): void
+    {
+        $order = Order::create([
+            'order_code' => Order::generateOrderCode(),
+            'customer_name' => 'Budi Testing Show',
+            'customer_phone' => '08123456789',
+            'event_address' => 'Gedung Serbaguna',
+            'event_date' => now()->addDays(15)->format('Y-m-d'),
+            'total_price' => 3000000,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.orders.show', $order->id));
+
+        $response->assertOk();
+        $response->assertSee(route('admin.orders.destroy', $order->id));
+        $response->assertSee('Hapus Pesanan');
     }
 }

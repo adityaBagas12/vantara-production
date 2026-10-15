@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Beranda Vantara Production</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D0E12;--s1:#15171D;--s2:#1C1F27;--line:#2A2E38;--tx:#F2EFE9;--mu:#A9ADB9;--ac:#F5A524;--acx:#1A1204}
+*{box-sizing:border-box}
+body{margin:0;background:#0D0E12;color:#F2EFE9;font-family:'Figtree',system-ui,sans-serif;font-size:16px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p{margin:0}
+.d{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.nav{display:flex;align-items:center;gap:32px;padding:18px 56px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;letter-spacing:.06em}
+.mark{width:30px;height:30px;border-radius:9px;background:var(--ac);display:grid;place-items:center;color:var(--acx)}
+.nl{color:var(--mu);font-weight:500}.nl:hover,.nl.on{color:var(--tx)}
+.sp{flex-grow:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 24px;border-radius:999px;border:1px solid #3A3F4C;background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--tx)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:var(--acx)}
+.btn.p:hover{filter:brightness(1.08)}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:20px}
+.eye{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);font-weight:600}
+.wrap{max-width:1280px;margin:0 auto;padding:0 56px}
+.pic{position:relative;display:grid;place-items:center;overflow:hidden;color:var(--ac);background:radial-gradient(120% 90% at 75% 0%,rgba(245,165,36,.30),transparent 55%),linear-gradient(160deg,#272B38,#12141A)}
+.pic.k2{background:radial-gradient(120% 90% at 20% 0%,rgba(130,160,255,.30),transparent 55%),linear-gradient(160deg,#242838,#12141A)}
+.pic.k3{background:radial-gradient(120% 90% at 80% 10%,rgba(255,120,150,.26),transparent 55%),linear-gradient(160deg,#2A2530,#13121A)}
+.pic.k4{background:radial-gradient(120% 90% at 30% 0%,rgba(80,215,175,.24),transparent 55%),linear-gradient(160deg,#202A2C,#0F1417)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--mu);font-size:14px;background:rgba(21,23,29,.7)}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ADE80}
+.price{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px}
+.fld{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mu)}
+.fld input{background:var(--s2);border:1px solid #3A3F4C;border-radius:12px;padding:12px 14px;color:var(--tx);font:inherit;min-height:46px;color-scheme:dark}
+</style>
+</helmet>
+<div style="min-height: 2700px">
+  <nav class="nav">
+    <a class="brand" href="Main.dc.html"><span class="mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="6" width="2" height="4" rx="1"/><rect x="5" y="2" width="2" height="12" rx="1"/><rect x="9" y="4" width="2" height="8" rx="1"/><rect x="13" y="7" width="2" height="2" rx="1"/></svg></span>VANTARA</a>
+    <span class="sp"></span>
+    <a class="nl on" href="Main.dc.html">Beranda</a>
+    <a class="nl" href="Katalog.dc.html">Katalog</a>
+    <a class="nl" href="Detail.dc.html">Cek Ketersediaan</a>
+    <a class="nl" href="#kontak">Kontak</a>
+    <a class="btn p" href="Booking.dc.html">Booking Sekarang</a>
+  </nav>
+
+  <section class="wrap" style="padding-top: 72px; padding-bottom: 88px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+    <div style="flex: 1 1 460px; display: flex; flex-direction: column; gap: 26px">
+      <span class="eye">Rental sound system &amp; entertainment · Bengkulu</span>
+      <h1 class="d" style="font-size: 68px; line-height: 1.02; font-weight: 800">Suara jernih,<br>panggung yang hidup.</h1>
+      <p style="font-size: 19px; color: var(--mu); max-width: 480px">Sewa sound system, lighting, dan perlengkapan hiburan untuk acara Anda. Cek tanggal, kirim booking, lalu selesaikan lewat WhatsApp.</p>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap">
+        <a class="btn p" href="Katalog.dc.html">Lihat Katalog</a>
+        <a class="btn" href="Detail.dc.html">Cek Tanggal Acara</a>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <span class="pill"><i class="dot"></i>Cek ketersediaan online</span>
+        <span class="pill">Invoice otomatis</span>
+        <span class="pill">Negosiasi via WhatsApp</span>
+      </div>
+    </div>
+    <div style="flex: 1 1 460px; position: relative">
+      <div class="pic" style="height: 520px; border-radius: 28px; border: 1px solid var(--line)">
+        <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+      </div>
+      <form class="card" style="position: absolute; left: -28px; bottom: 32px; width: 320px; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: rgba(21,23,29,.94)">
+        <strong class="d" style="font-size: 18px">Cek tanggal acara</strong>
+        <div class="fld"><label for="hd">Tanggal</label><input id="hd" type="date"></div>
+        <a class="btn p" href="Detail.dc.html">Cek Ketersediaan</a>
+      </form>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; flex-wrap: wrap">
+      <div style="flex-grow: 1"><span class="eye">Layanan</span><h2 class="d" style="font-size: 40px; margin-top: 8px">Satu tim untuk seluruh kebutuhan acara</h2></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line)">
+      <sc-for list="{{services}}" as="s" hint-placeholder-count="10">
+        <a href="Katalog.dc.html" style="padding: 26px 24px 30px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; min-height: 140px">
+          <span style="color: var(--ac); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">{{s.no}}</span>
+          <strong class="d" style="font-size: 20px; line-height: 1.2">{{s.name}}</strong>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; flex-wrap: wrap">
+      <div style="flex-grow: 1"><span class="eye">Produk unggulan</span><h2 class="d" style="font-size: 40px; margin-top: 8px">Siap naik panggung</h2></div>
+      <a class="btn" href="Katalog.dc.html">Lihat semua produk →</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px">
+      <sc-for list="{{products}}" as="p" hint-placeholder-count="4">
+        <a class="card" href="Detail.dc.html" style="overflow: hidden; display: flex; flex-direction: column">
+          <div class="pic {{p.k}}" style="height: 210px">
+            <sc-if value="{{p.speaker}}" hint-placeholder-val="{{true}}"><svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="14" r="3"/></svg></sc-if>
+            <sc-if value="{{p.light}}" hint-placeholder-val="{{false}}"><svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18l6 24M24 18v24"/></svg></sc-if>
+            <sc-if value="{{p.mic}}" hint-placeholder-val="{{false}}"><svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="17" y="4" width="14" height="24" rx="7"/><path d="M9 22a15 15 0 0 0 30 0M24 37v7M16 44h16"/></svg></sc-if>
+            <sc-if value="{{p.mixer}}" hint-placeholder-val="{{false}}"><svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="4"/><path d="M14 18v14M24 18v14M34 18v14"/><circle cx="14" cy="24" r="2.5"/><circle cx="24" cy="30" r="2.5"/><circle cx="34" cy="22" r="2.5"/></svg></sc-if>
+          </div>
+          <div style="padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 6px">
+            <span style="color: var(--mu); font-size: 14px">{{p.cat}}</span>
+            <strong class="d" style="font-size: 20px; line-height: 1.25">{{p.name}}</strong>
+            <span class="price" style="margin-top: 8px">{{p.price}} <span style="font-size: 14px; color: var(--mu); font-weight: 500">/ hari</span></span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background: var(--s1); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)">
+    <div class="wrap" style="padding-top: 80px; padding-bottom: 88px">
+      <span class="eye">Cara booking</span>
+      <h2 class="d" style="font-size: 40px; margin: 8px 0 40px">Empat langkah, tanpa ribet</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px">
+        <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 2px solid var(--ac)">
+            <span class="d" style="font-size: 44px; font-weight: 800; color: var(--ac); line-height: 1">{{st.n}}</span>
+            <strong class="d" style="font-size: 22px">{{st.t}}</strong>
+            <span style="color: var(--mu)">{{st.d}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-top: 96px; padding-bottom: 96px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+    <div class="pic k2" style="flex: 1 1 420px; height: 380px; border-radius: 24px; border: 1px solid var(--line)">
+      <svg width="110" height="110" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18l6 24M24 18v24"/></svg>
+    </div>
+    <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 18px">
+      <span class="eye">Tentang kami</span>
+      <h2 class="d" style="font-size: 40px; line-height: 1.1">Dari orgen tunggal, kini tim produksi acara lengkap</h2>
+      <p style="color: var(--mu); font-size: 18px">Vantara Production berawal dari usaha orgen tunggal yang melayani acara masyarakat. Dari pengalaman menangani beragam acara, layanan kami berkembang mencakup sound system, lighting, hiburan, hingga produksi event.</p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="background: var(--ac); color: var(--acx); border-radius: 28px; padding: 56px; display: flex; flex-wrap: wrap; gap: 32px; align-items: center">
+      <div style="flex: 1 1 400px"><h2 class="d" style="font-size: 44px; line-height: 1.05; font-weight: 800">Punya acara dalam waktu dekat?</h2><p style="margin-top: 10px; font-size: 18px">Cek tanggal sekarang, tim kami siap membantu lewat WhatsApp.</p></div>
+      <a class="btn" href="Booking.dc.html" style="background: var(--acx); border-color: var(--acx); color: #fff">Booking Sekarang</a>
+    </div>
+  </section>
+
+  <footer id="kontak" style="border-top: 1px solid var(--line)">
+    <div class="wrap" style="padding-top: 48px; padding-bottom: 48px; display: flex; flex-wrap: wrap; gap: 40px">
+      <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 12px">
+        <span class="brand"><span class="mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="6" width="2" height="4" rx="1"/><rect x="5" y="2" width="2" height="12" rx="1"/><rect x="9" y="4" width="2" height="8" rx="1"/><rect x="13" y="7" width="2" height="2" rx="1"/></svg></span>VANTARA</span>
+        <p style="color: var(--mu); max-width: 360px">Jl. Merapi Ujung No.31, Kel. Panorama, Kec. Singaran Pati, Kota Bengkulu</p>
+      </div>
+      <div style="flex: 1 1 180px; display: flex; flex-direction: column; gap: 8px"><strong>Menu</strong><a class="nl" href="Katalog.dc.html">Katalog</a><a class="nl" href="Detail.dc.html">Cek Ketersediaan</a><a class="nl" href="Booking.dc.html">Booking</a></div>
+      <div style="flex: 1 1 180px; display: flex; flex-direction: column; gap: 8px"><strong>Hubungi Admin</strong><span style="color: var(--mu)">WhatsApp: [nomor admin]</span></div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const names = ['Sound System','Orgen & Entertainment','Band','Professional Lighting','Special Effect','Videobooth 360°','Photobooth','Event Production','Videotron','Blower Kipas'];
+    return {
+      services: names.map((name, i) => ({ name, no: String(i + 1).padStart(2, '0') })),
+      products: [
+        { name: 'Paket Sound System Outdoor', cat: 'Sound System', price: 'Rp 1.800.000', k: '', speaker: true },
+        { name: 'Lighting Panggung Set', cat: 'Professional Lighting', price: 'Rp 950.000', k: 'k2', light: true },
+        { name: 'Wireless Mic Set', cat: 'Sound System', price: 'Rp 250.000', k: 'k3', mic: true },
+        { name: 'Mixer Digital 16 Channel', cat: 'Sound System', price: 'Rp 400.000', k: 'k4', mixer: true }
+      ],
+      steps: [
+        { n: '01', t: 'Pilih produk', d: 'Jelajahi katalog sound system dan peralatan hiburan.' },
+        { n: '02', t: 'Cek tanggal', d: 'Pilih tanggal acara dan lihat ketersediaan produk.' },
+        { n: '03', t: 'Isi form booking', d: 'Kirim data diri dan kebutuhan acara Anda.' },
+        { n: '04', t: 'Lanjut ke WhatsApp', d: 'Sepakati kebutuhan, harga, dan pembayaran bersama Admin.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

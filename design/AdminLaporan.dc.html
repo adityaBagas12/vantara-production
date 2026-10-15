@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Laporan Bulanan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F4F0;--line:#E4E1D9;--tx:#17181C;--mu:#62656F;--ac:#F5A524;--acx:#1A1204}
+*{box-sizing:border-box}
+body{margin:0;background:#F5F4F0;color:#17181C;font-family:'Figtree',system-ui,sans-serif;font-size:15px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p{margin:0}
+.d{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:.06em;color:#F2EFE9}
+.mark{width:30px;height:30px;border-radius:9px;background:var(--ac);display:grid;place-items:center;color:var(--acx)}
+.side{flex:0 0 252px;background:#0D0E12;padding:24px 16px;display:flex;flex-direction:column;gap:4px}
+.sa{display:flex;align-items:center;gap:12px;padding:0 14px;min-height:44px;border-radius:12px;color:#A9ADB9;font-weight:500}
+.sa:hover{color:#fff;background:#181B22}
+.sa.on{background:var(--ac);color:var(--acx);font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:12px;border:1px solid #CFCBC0;background:#fff;color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.btn.p{background:var(--ac);border-color:var(--ac);color:var(--acx)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.lbl{font-size:13px;color:var(--mu);font-weight:500}
+.tg{display:inline-flex;align-items:center;padding:2px 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid}
+.tg.a{background:#E4F6EA;color:#17653A;border-color:#A9DDBB}
+table{border-collapse:collapse;width:100%}
+th{text-align:left;font-size:13px;color:var(--mu);font-weight:500}
+th,td{padding:13px 10px;border-bottom:1px solid var(--line)}
+.fld{display:flex;flex-direction:column;gap:7px;font-size:14px;color:var(--mu);font-weight:500}
+.fld input{background:#fff;border:1px solid #CFCBC0;border-radius:12px;padding:10px 14px;color:var(--tx);font:inherit;min-height:44px}
+.fld input:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:var(--ac)}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 1000px">
+  <nav class="side" aria-label="Menu admin">
+    <a class="brand" href="Main.dc.html" style="padding: 4px 14px 24px"><span class="mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="6" width="2" height="4" rx="1"/><rect x="5" y="2" width="2" height="12" rx="1"/><rect x="9" y="4" width="2" height="8" rx="1"/><rect x="13" y="7" width="2" height="2" rx="1"/></svg></span>VANTARA</a>
+    <sc-for list="{{menu}}" as="m" hint-placeholder-count="7">
+      <a class="sa {{m.cls}}" href="{{m.href}}"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{m.d}}"/></svg>{{m.label}}</a>
+    </sc-for>
+    <a class="sa" href="AdminLogin.dc.html" style="margin-top: auto"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2H3v12h3M10 5l3 3-3 3M13 8H6"/></svg>Keluar</a>
+  </nav>
+
+  <main style="flex: 999 1 600px; min-width: 0; padding: 36px 44px; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+      <div style="flex-grow: 1"><h1 class="d" style="font-size: 36px; font-weight: 800">Laporan Bulanan</h1><p style="color: var(--mu)">Rekap transaksi yang sudah di-ACC.</p></div>
+      <div class="fld"><label for="bln">Periode</label><input id="bln" type="month" value="2026-10"></div>
+      <button class="btn p" type="button">Tampilkan</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px">
+      <div class="card" style="display: flex; flex-direction: column; gap: 10px"><span class="lbl">Periode</span><strong class="d" style="font-size: 30px; line-height: 1">Oktober 2026</strong></div>
+      <div class="card" style="display: flex; flex-direction: column; gap: 10px"><span class="lbl">Total transaksi</span><strong class="d" style="font-size: 30px; line-height: 1">12</strong></div>
+      <div class="card" style="display: flex; flex-direction: column; gap: 10px; background: #0D0E12; color: #F2EFE9; border-color: #0D0E12"><span class="lbl" style="color: #A9ADB9">Total pendapatan</span><strong class="d" style="font-size: 30px; line-height: 1; color: var(--ac)">Rp 18.400.000</strong></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div class="card" style="flex: 2 1 480px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+          <h2 class="d" style="font-size: 22px; flex-grow: 1">Rincian transaksi</h2>
+          <button class="btn" type="button">CSV</button><button class="btn" type="button">XLSX</button><button class="btn p" type="button">PDF</button>
+        </div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead><tr><th>Tanggal</th><th>ID</th><th>Customer</th><th>Status</th><th style="text-align: right">Total</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+                <tr><td style="white-space: nowrap">{{r.tgl}}</td><td style="color: var(--mu)">{{r.id}}</td><td style="font-weight: 600">{{r.nama}}</td><td><span class="tg a">Selesai</span></td><td style="text-align: right; white-space: nowrap">{{r.total}}</td></tr>
+              </sc-for>
+              <tr><td colspan="4" style="font-weight: 700; border-bottom: 0">Total pendapatan (12 transaksi)</td><td style="text-align: right; font-weight: 800; border-bottom: 0; white-space: nowrap">Rp 18.400.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size: 13px; color: var(--mu)">Menampilkan 7 dari 12 transaksi. Data contoh.</p>
+      </div>
+
+      <div class="card" style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 14px">
+        <h2 class="d" style="font-size: 22px">Pendapatan per minggu</h2>
+        <svg viewBox="0 0 340 200" width="100%" role="img" aria-label="Grafik batang pendapatan per minggu Oktober 2026 dalam juta rupiah">
+          <line x1="0" y1="165" x2="340" y2="165" stroke="#E4E1D9"/>
+          <sc-for list="{{bars}}" as="b" hint-placeholder-count="5">
+            <rect x="{{b.x}}" y="{{b.y}}" width="44" height="{{b.h}}" rx="7" fill="{{b.f}}"/>
+            <text x="{{b.tx}}" y="{{b.vy}}" font-size="12" font-weight="700" text-anchor="middle" fill="#17181C">{{b.v}}</text>
+            <text x="{{b.tx}}" y="188" font-size="12" text-anchor="middle" fill="#62656F">{{b.m}}</text>
+          </sc-for>
+        </svg>
+        <p style="font-size: 13px; color: var(--mu)">Dalam juta rupiah. Hanya transaksi yang sudah di-ACC dihitung.</p>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = [
+      ['Dashboard','AdminDashboard.dc.html','M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'],
+      ['Produk','AdminProduk.dc.html','M2 5l6-3 6 3v6l-6 3-6-3zM2 5l6 3 6-3M8 8v6'],
+      ['Booking','AdminBooking.dc.html','M3 3h10a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 7h12M5 1.5v3M11 1.5v3'],
+      ['Transaksi','AdminTransaksi.dc.html','M2 5h10l-2.5-2.5M14 11H4l2.5 2.5'],
+      ['Invoice','AdminTransaksi.dc.html','M4 2h8v12l-2-1-2 1-2-1-2 1zM6 6h4M6 9h4'],
+      ['Laporan Bulanan','AdminLaporan.dc.html','M2 14V8M6 14V4M10 14V9M14 14V2'],
+      ['Profil Admin','AdminDashboard.dc.html','M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2.5 14c.6-3 3-4 5.5-4s4.9 1 5.5 4']
+    ];
+    const weeks = [['M1', 3.2], ['M2', 5.1], ['M3', 4.4], ['M4', 3.9], ['M5', 1.8]];
+    return {
+      menu: items.map(([label, href, d]) => ({ label, href, d, cls: label === 'Laporan Bulanan' ? 'on' : '' })),
+      rows: [
+        { tgl: '12 Okt 2026', id: 'T-031', nama: 'Dedi Saputra', total: 'Rp 950.000' },
+        { tgl: '09 Okt 2026', id: 'T-029', nama: 'Putri Anggraini', total: 'Rp 700.000' },
+        { tgl: '07 Okt 2026', id: 'T-028', nama: 'Hendra Kusuma', total: 'Rp 2.400.000' },
+        { tgl: '03 Okt 2026', id: 'T-026', nama: 'Fajar Nugraha', total: 'Rp 1.800.000' },
+        { tgl: '02 Okt 2026', id: 'T-025', nama: 'Yuni Astuti', total: 'Rp 1.250.000' },
+        { tgl: '01 Okt 2026', id: 'T-024', nama: 'Rizky Maulana', total: 'Rp 600.000' },
+        { tgl: '01 Okt 2026', id: 'T-023', nama: 'Nadia Safitri', total: 'Rp 1.100.000' }
+      ],
+      bars: weeks.map(([m, v], i) => { const h = Math.round(v * 24); return { m, v: v.toFixed(1), x: i * 64 + 20, tx: i * 64 + 42, h, y: 165 - h, vy: 165 - h - 8, f: v === 5.1 ? '#F5A524' : '#D9D5CA' }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

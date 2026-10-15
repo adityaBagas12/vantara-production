@@ -1,447 +1,181 @@
 @extends('layouts.app')
 
-@section('title', 'Vantara Production — Rental Sound System, Lighting & Hiburan Entertainment')
-@section('meta_description', 'Sewa sound system, lighting, videobooth 360, band wedding, dan orgen tunggal untuk pernikahan, khitanan, gathering, dan berbagai acara spesial Anda.')
+@section('title', 'Beranda Vantara Production — Rental Sound System Bengkulu')
+@section('meta_description', 'Rental sound system, lighting, dan perlengkapan hiburan di Bengkulu. Suara jernih, panggung yang hidup.')
 
 @section('content')
+<div style="min-height: 2000px">
+  <!-- Hero Section -->
+  <section class="wrap" style="padding-top: 72px; padding-bottom: 88px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+    <div style="flex: 1 1 460px; display: flex; flex-direction: column; gap: 26px">
+      <span class="eye">Rental sound system &amp; entertainment · Bengkulu</span>
+      <h1 class="d" style="font-size: 68px; line-height: 1.02; font-weight: 800">Suara jernih,<br>panggung yang hidup.</h1>
+      <p style="font-size: 19px; color: var(--mu); max-width: 480px">Sewa sound system, lighting, dan perlengkapan hiburan untuk acara Anda. Cek tanggal, kirim booking, lalu selesaikan lewat WhatsApp.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+        <a class="btn p lg" href="{{ route('packages.catalog') }}">Lihat Katalog</a>
+        <a class="btn lg" href="{{ route('availability.index') }}">Cek Tanggal Acara</a>
+        <a class="btn wa lg" href="https://wa.me/6282282422317?text=Halo%20Admin%20Vantara%20Production%2C%20saya%20ingin%20konsultasi%20mengenai%20sewa%20sound%20system%20dan%20perlengkapan%20event." target="_blank" rel="noopener" title="Konsultasi cepat langsung via WhatsApp Admin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.62C9.33 7.62 9 7.7 8.71 8.01C8.42 8.32 7.6 9.09 7.6 10.65C7.6 12.21 8.74 13.72 8.9 13.93C9.06 14.14 11.14 17.34 14.32 18.72C15.08 19.04 15.67 19.24 16.14 19.38C16.9 19.63 17.59 19.59 18.14 19.51C18.75 19.42 20.03 18.73 20.29 17.98C20.56 17.23 20.56 16.59 20.48 16.45C20.4 16.32 20.19 16.24 19.89 16.09C19.58 15.93 18.08 15.2 17.8 15.1C17.52 15 17.32 14.95 17.11 15.25C16.91 15.56 16.34 16.24 16.17 16.44C16 16.65 15.83 16.67 15.52 16.52C15.22 16.37 14.24 16.05 13.08 15.01C12.18 14.2 11.57 13.2 11.41 12.92C11.25 12.65 11.39 12.5 11.55 12.35C11.69 12.21 11.86 11.99 12.01 11.81C12.16 11.64 12.22 11.51 12.32 11.31C12.42 11.1 12.37 10.92 12.29 10.77C12.21 10.62 11.6 9.12 11.35 8.5C11.1 7.9 10.85 7.98 10.66 7.97C10.48 7.97 10.27 7.96 10.07 7.96C9.86 7.96 9.53 7.62 9.53 7.62Z"/>
+          </svg>
+          <span>Konsultasi Cepat</span>
+        </a>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <span class="pill"><i class="dot"></i>Cek ketersediaan online</span>
+        <span class="pill">Invoice otomatis</span>
+        <span class="pill">Negosiasi via WhatsApp</span>
+      </div>
+    </div>
+    <div style="flex: 1 1 460px">
+      <div class="pic" style="height: 520px; border-radius: 28px; border: 1px solid var(--line)">
+        @if($siteSetting?->hero_image_path)
+          <img src="{{ $siteSetting->hero_image_path }}" alt="Vantara Production" style="width: 100%; height: 100%; object-fit: cover">
+        @else
+          <svg width="150" height="150" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+        @endif
+      </div>
+    </div>
+  </section>
 
-    <!-- HERO SECTION -->
-    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#0a0d14]">
-        <!-- Background Image -->
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1920&auto=format&fit=crop"
-                 alt="Vantara Production — Event Entertainment Stage"
-                 class="w-full h-full object-cover object-center filter brightness-[0.30]">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0b0e14] via-[#0b0e14]/60 to-transparent"></div>
+  <!-- Layanan Section -->
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; flex-wrap: wrap">
+      <div style="flex-grow: 1"><span class="eye">Layanan</span><h2 class="d" style="font-size: 40px; margin-top: 8px">Satu tim untuk seluruh kebutuhan acara</h2></div>
+    </div>
+    @php
+      $services = [
+        ['no' => '01', 'name' => 'Sound System', 'cat' => 'Sound System'],
+        ['no' => '02', 'name' => 'Orgen & Entertainment', 'cat' => 'Orgen & Entertainment'],
+        ['no' => '03', 'name' => 'Band', 'cat' => 'Band'],
+        ['no' => '04', 'name' => 'Professional Lighting', 'cat' => 'Professional Lighting'],
+        ['no' => '05', 'name' => 'Special Effect', 'cat' => 'Special Effect'],
+        ['no' => '06', 'name' => 'Videobooth 360°', 'cat' => 'Videobooth & Photobooth'],
+        ['no' => '07', 'name' => 'Photobooth', 'cat' => 'Videobooth & Photobooth'],
+        ['no' => '08', 'name' => 'Event Production', 'cat' => 'Event Production'],
+        ['no' => '09', 'name' => 'Videotron', 'cat' => 'Videotron'],
+        ['no' => '10', 'name' => 'Blower Kipas', 'cat' => 'Blower Kipas'],
+      ];
+    @endphp
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line)">
+      @foreach($services as $s)
+        <a href="{{ route('packages.catalog', ['category' => $s['cat']]) }}" style="padding: 26px 24px 30px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; min-height: 140px; transition: background .15s" onmouseover="this.style.background='var(--s1)'" onmouseout="this.style.background='transparent'">
+          <span style="color: var(--ac); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">{{ $s['no'] }}</span>
+          <strong class="d" style="font-size: 20px; line-height: 1.2">{{ $s['name'] }}</strong>
+        </a>
+      @endforeach
+    </div>
+  </section>
+
+  <!-- Produk Unggulan Section -->
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; flex-wrap: wrap">
+      <div style="flex-grow: 1"><span class="eye">Produk unggulan</span><h2 class="d" style="font-size: 40px; margin-top: 8px">Siap naik panggung</h2></div>
+      <a class="btn" href="{{ route('packages.catalog') }}">Lihat semua produk →</a>
+    </div>
+    @php
+      $displayFeatured = $featuredPackages->isNotEmpty() ? $featuredPackages : $allPackages->take(4);
+      $kStyles = ['', 'k2', 'k3', 'k4'];
+    @endphp
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px">
+      @forelse($displayFeatured as $index => $p)
+        @php
+          $kClass = $kStyles[$index % count($kStyles)];
+          $catLower = strtolower($p->category);
+        @endphp
+        <a class="card" href="{{ route('packages.show', $p->slug) }}" style="overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, border-color .2s" onmouseover="this.style.borderColor='var(--ac)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--line)'; this.style.transform='none'">
+          @if($p->image_path)
+            <div class="pic" style="height: 210px">
+              <img src="{{ $p->image_path }}" alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover">
+            </div>
+          @else
+            <div class="pic {{ $kClass }}" style="height: 210px">
+              @if(str_contains($catLower, 'sound'))
+                <svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="12" y="4" width="24" height="40" rx="4"/><circle cx="24" cy="30" r="7"/><circle cx="24" cy="30" r="3"/><circle cx="24" cy="14" r="3"/></svg>
+              @elseif(str_contains($catLower, 'light'))
+                <svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18l6 24M24 18v24"/></svg>
+              @elseif(str_contains($catLower, 'mic') || str_contains($catLower, 'orgen') || str_contains($catLower, 'band'))
+                <svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="17" y="4" width="14" height="24" rx="7"/><path d="M9 22a15 15 0 0 0 30 0M24 37v7M16 44h16"/></svg>
+              @else
+                <svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="4"/><path d="M14 18v14M24 18v14M34 18v14"/><circle cx="14" cy="24" r="2.5"/><circle cx="24" cy="30" r="2.5"/><circle cx="34" cy="22" r="2.5"/></svg>
+              @endif
+            </div>
+          @endif
+          <div style="padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 6px">
+            <span style="color: var(--mu); font-size: 14px">{{ $p->category }}</span>
+            <strong class="d" style="font-size: 20px; line-height: 1.25">{{ $p->name }}</strong>
+            <span class="price" style="margin-top: 8px">Rp {{ number_format($p->price, 0, ',', '.') }} <span style="font-size: 14px; color: var(--mu); font-weight: 500">/ hari</span></span>
+          </div>
+        </a>
+      @empty
+        <p style="color: var(--mu)">Belum ada produk unggulan.</p>
+      @endforelse
+    </div>
+  </section>
+
+  <!-- Cara Booking Section -->
+  <section style="background: var(--s1); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)">
+    <div class="wrap" style="padding-top: 80px; padding-bottom: 88px">
+      <span class="eye">Cara booking</span>
+      <h2 class="d" style="font-size: 40px; margin: 8px 0 40px">Empat langkah, tanpa ribet</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 2px solid var(--ac)">
+          <span class="d" style="font-size: 44px; font-weight: 800; color: var(--ac); line-height: 1">01</span>
+          <strong class="d" style="font-size: 22px">Pilih produk</strong>
+          <span style="color: var(--mu)">Jelajahi katalog sound system dan peralatan hiburan.</span>
         </div>
-
-        <!-- Content -->
-        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-
-            <!-- Top Tag -->
-            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#c59d5f]/15 border border-[#c59d5f]/40 backdrop-blur-md mb-8">
-                <span class="w-2 h-2 rounded-full bg-[#c59d5f] animate-ping"></span>
-                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#dfc48e]">
-                    Rental Sound System & Entertainment Terpercaya
-                </span>
-            </div>
-
-            <!-- Headline -->
-            <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.15]">
-                Hadirkan Suasana <br class="hidden sm:inline">
-                <span class="italic font-normal bg-gradient-to-r from-[#ebdcb9] via-[#c59d5f] to-[#dfc48e] bg-clip-text text-transparent">
-                    Acara yang Tak Terlupakan
-                </span>
-            </h1>
-
-            <!-- Divider -->
-            <div class="flex items-center justify-center gap-3 my-6">
-                <span class="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#c59d5f]"></span>
-                <span class="text-[#c59d5f] text-sm">✦</span>
-                <span class="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#c59d5f]"></span>
-            </div>
-
-            <!-- Subtitle -->
-            <p class="max-w-2xl mx-auto text-base sm:text-lg text-gray-300 font-light leading-relaxed mb-10">
-                Vantara Production menyediakan rental <strong class="text-white">sound system</strong>, <strong class="text-white">lighting & special effect</strong>, <strong class="text-white">videobooth 360°</strong>, dan <strong class="text-white">band wedding</strong> untuk pernikahan, khitanan, gathering, konser, dan berbagai acara spesial lainnya.
-            </p>
-
-            <!-- CTAs -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                <a href="{{ route('packages.catalog') }}"
-                   class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#dfc48e] via-[#c59d5f] to-[#b88c4b] text-black font-semibold text-xs uppercase tracking-[0.2em] rounded shadow-xl shadow-[#c59d5f]/25 hover:shadow-[#c59d5f]/40 hover:scale-[1.02] transition-all">
-                    Lihat Katalog Paket & Harga
-                </a>
-                <a href="{{ route('availability.index') }}"
-                   class="w-full sm:w-auto px-8 py-4 bg-[#141b28]/80 hover:bg-[#1a2334] text-white border border-[#c59d5f]/50 hover:border-[#c59d5f] font-semibold text-xs uppercase tracking-[0.2em] rounded backdrop-blur-sm transition-all flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 text-[#c59d5f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Cek Ketersediaan Tanggal
-                </a>
-            </div>
-
-            <!-- Trust Points -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 pt-8 border-t border-white/10 text-left">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#c59d5f]/10 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">Sound System</div>
-                        <div class="text-[11px] text-gray-400">600 Watt — 5000 Watt</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#c59d5f]/10 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">Lighting & Efek</div>
-                        <div class="text-[11px] text-gray-400">Moving Beam, Dry Ice, Firework</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#c59d5f]/10 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">Videobooth 360°</div>
-                        <div class="text-[11px] text-gray-400">Hiburan Interaktif Tamu</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#c59d5f]/10 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">Band Wedding</div>
-                        <div class="text-[11px] text-gray-400">4–6 Personil Musisi Live</div>
-                    </div>
-                </div>
-            </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 2px solid var(--ac)">
+          <span class="d" style="font-size: 44px; font-weight: 800; color: var(--ac); line-height: 1">02</span>
+          <strong class="d" style="font-size: 22px">Cek tanggal</strong>
+          <span style="color: var(--mu)">Pilih tanggal acara dan lihat ketersediaan produk.</span>
         </div>
-    </section>
-
-    <!-- QUICK DATE CHECKER -->
-    <section class="relative z-20 -mt-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div x-data="calendarWidget()" class="bg-[#121824] border border-[#c59d5f]/30 rounded-xl p-6 shadow-2xl backdrop-blur-xl">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="text-center md:text-left">
-                    <div class="text-[11px] uppercase tracking-widest text-[#c59d5f] font-semibold mb-1">Cek Ketersediaan Cepat</div>
-                    <h3 class="font-serif text-lg font-bold text-white">Tanggal Acara Anda Sudah Tersedia?</h3>
-                </div>
-                <div class="w-full md:w-auto flex-1 flex flex-col sm:flex-row items-center gap-3">
-                    <input type="date"
-                           x-model="selectedDate"
-                           min="{{ date('Y-m-d') }}"
-                           class="w-full sm:w-auto flex-1 px-4 py-3 bg-[#0a0d14] border border-[#242f44] focus:border-[#c59d5f] rounded text-sm text-gray-200 focus:outline-none transition-colors">
-                    <button @click="checkSpecificDate(selectedDate)"
-                            :disabled="!selectedDate || isCheckingDate"
-                            type="button"
-                            class="w-full sm:w-auto px-6 py-3 bg-[#c59d5f] hover:bg-[#d4ab63] text-black font-semibold text-xs uppercase tracking-wider rounded transition-all disabled:opacity-50 shrink-0">
-                        <span x-show="!isCheckingDate">Cek Sekarang</span>
-                        <span x-show="isCheckingDate" style="display:none;">Memeriksa...</span>
-                    </button>
-                </div>
-            </div>
-            <div x-show="checkResult"
-                 x-transition
-                 class="mt-4 p-4 rounded-lg text-xs flex items-start gap-3 border"
-                 :class="checkResult?.available ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border-rose-500/40 text-rose-200'"
-                 style="display:none;">
-                <div class="text-base" x-text="checkResult?.available ? '✓' : '⚠'"></div>
-                <div class="flex-1">
-                    <div class="font-semibold text-sm mb-0.5" x-text="checkResult?.formatted_date"></div>
-                    <p x-text="checkResult?.message"></p>
-                    <div x-show="checkResult?.available" class="mt-2">
-                        <a :href="'{{ route('packages.catalog') }}?event_date=' + selectedDate" class="underline font-semibold text-white">Lihat Paket & Mulai Pemesanan &rarr;</a>
-                    </div>
-                </div>
-            </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 2px solid var(--ac)">
+          <span class="d" style="font-size: 44px; font-weight: 800; color: var(--ac); line-height: 1">03</span>
+          <strong class="d" style="font-size: 22px">Isi form booking</strong>
+          <span style="color: var(--mu)">Kirim data diri dan kebutuhan acara Anda.</span>
         </div>
-    </section>
-
-    <!-- STATS SECTION -->
-    <section class="py-20 bg-[#0a0d14] border-b border-[#1b2438]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-[#1e2538]">
-                <div class="p-4">
-                    <div class="font-serif text-4xl sm:text-5xl font-bold text-[#dfc48e] mb-2">300+</div>
-                    <div class="text-xs uppercase tracking-widest text-gray-400 font-medium">Acara Sukses Ditangani</div>
-                </div>
-                <div class="p-4">
-                    <div class="font-serif text-4xl sm:text-5xl font-bold text-[#dfc48e] mb-2">4</div>
-                    <div class="text-xs uppercase tracking-widest text-gray-400 font-medium">Kategori Layanan Lengkap</div>
-                </div>
-                <div class="p-4">
-                    <div class="font-serif text-4xl sm:text-5xl font-bold text-[#dfc48e] mb-2">100%</div>
-                    <div class="text-xs uppercase tracking-widest text-gray-400 font-medium">Kepuasan Pelanggan</div>
-                </div>
-                <div class="p-4">
-                    <div class="font-serif text-4xl sm:text-5xl font-bold text-[#dfc48e] mb-2">Siap</div>
-                    <div class="text-xs uppercase tracking-widest text-gray-400 font-medium">Antar-Pasang di Lokasi Acara</div>
-                </div>
-            </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 2px solid var(--ac)">
+          <span class="d" style="font-size: 44px; font-weight: 800; color: var(--ac); line-height: 1">04</span>
+          <strong class="d" style="font-size: 22px">Lanjut ke WhatsApp</strong>
+          <span style="color: var(--mu)">Sepakati kebutuhan, harga, dan pembayaran bersama Admin.</span>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- PROFIL USAHA SECTION -->
-    <section id="profil" class="py-24 bg-[#0e131d] relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+  <!-- Tentang Kami Section -->
+  <section class="wrap" style="padding-top: 96px; padding-bottom: 96px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+    <div class="pic k2" style="flex: 1 1 420px; height: 380px; border-radius: 24px; border: 1px solid var(--line)">
+      @if($siteSetting?->about_image_path)
+        <img src="{{ $siteSetting->about_image_path }}" alt="Tim Vantara Production" style="width: 100%; height: 100%; object-fit: cover">
+      @else
+        <svg width="110" height="110" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 6h16l4 12H12z"/><path d="M12 18 6 42M36 18v24"/></svg>
+      @endif
+    </div>
+    <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 18px">
+      <span class="eye">Tentang kami</span>
+      <h2 class="d" style="font-size: 40px; line-height: 1.1">Dari orgen tunggal, kini tim produksi acara lengkap</h2>
+      <p style="color: var(--mu); font-size: 18px">Vantara Production berawal dari usaha orgen tunggal yang melayani acara masyarakat. Dari pengalaman menangani beragam acara, layanan kami berkembang mencakup sound system, lighting, hiburan, hingga produksi event.</p>
+    </div>
+  </section>
 
-                <!-- Left Image -->
-                <div class="lg:col-span-6 relative">
-                    <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-[#242f44]">
-                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1200&auto=format&fit=crop"
-                             alt="Vantara Production — Pernikahan Mewah"
-                             class="w-full h-[460px] object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-
-                        <!-- Top-Right Feature Badge -->
-                        <div class="absolute top-4 right-4 bg-[#0a0d14]/90 border border-[#c59d5f]/60 p-4 rounded-xl shadow-2xl backdrop-blur-md max-w-xs flex items-start gap-3 z-10">
-                            <div class="w-9 h-9 rounded-lg bg-[#c59d5f]/20 border border-[#c59d5f]/50 flex items-center justify-center text-[#c59d5f] shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="font-serif text-sm font-bold text-[#dfc48e]">Layanan Antar & Pasang</div>
-                                <div class="text-[11px] text-gray-300 leading-relaxed mt-0.5">Semua peralatan kami antarkan, pasangkan, dan operasikan langsung di lokasi acara Anda.</div>
-                            </div>
-                        </div>
-
-                        <!-- Bottom Title Overlay -->
-                        <div class="absolute bottom-6 left-6 right-6 z-10">
-                            <span class="text-xs uppercase tracking-widest text-[#c59d5f] font-semibold">Dokumentasi Acara Pelanggan</span>
-                            <h4 class="font-serif text-xl sm:text-2xl font-bold text-white mt-1">Wedding Reception — Ballroom Premium</h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Text -->
-                <div class="lg:col-span-6 space-y-6">
-                    <div class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold text-[#c59d5f]">
-                        <span class="w-6 h-[1px] bg-[#c59d5f]"></span>
-                        Tentang Vantara Production
-                    </div>
-                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">
-                        Mitra Hiburan Terpercaya untuk Setiap Acara Spesial Anda
-                    </h2>
-                    <p class="text-sm text-gray-300 leading-relaxed font-light">
-                        Vantara Production adalah usaha rental sound system dan peralatan entertainment yang telah melayani ratusan acara pernikahan, khitanan, gathering, konser, dan acara korporat. Kami hadir untuk memastikan setiap momen berharga Anda diiringi suara dan cahaya terbaik.
-                    </p>
-                    <p class="text-sm text-gray-300 leading-relaxed font-light">
-                        Proses pemesanan kami sederhana: pilih paket di website ini, isi data acara, lalu tim kami akan segera menghubungi Anda melalui WhatsApp untuk diskusi kebutuhan, negosiasi, dan pembayaran. Semua peralatan kami antarkan dan pasangkan di lokasi acara.
-                    </p>
-                    <div class="space-y-4 pt-2">
-                        <div class="p-4 rounded-lg bg-[#141b28] border border-[#242f44] flex items-start gap-4">
-                            <div class="w-10 h-10 rounded bg-[#c59d5f]/10 text-[#c59d5f] flex items-center justify-center shrink-0 font-serif font-bold text-lg">01</div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Pilih Paket & Isi Data Acara</h4>
-                                <p class="text-xs text-gray-400 mt-1">Browsing katalog paket, pilih sesuai kebutuhan, lalu isi formulir data diri dan informasi acara Anda melalui website ini.</p>
-                            </div>
-                        </div>
-                        <div class="p-4 rounded-lg bg-[#141b28] border border-[#242f44] flex items-start gap-4">
-                            <div class="w-10 h-10 rounded bg-[#c59d5f]/10 text-[#c59d5f] flex items-center justify-center shrink-0 font-serif font-bold text-lg">02</div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Konfirmasi & Negosiasi via WhatsApp</h4>
-                                <p class="text-xs text-gray-400 mt-1">Tim admin Vantara Production akan menghubungi Anda via WhatsApp untuk konfirmasi detail, diskusi kebutuhan tambahan, dan proses pembayaran.</p>
-                            </div>
-                        </div>
-                        <div class="p-4 rounded-lg bg-[#141b28] border border-[#242f44] flex items-start gap-4">
-                            <div class="w-10 h-10 rounded bg-[#c59d5f]/10 text-[#c59d5f] flex items-center justify-center shrink-0 font-serif font-bold text-lg">03</div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Kami Hadir di Hari Acara Anda</h4>
-                                <p class="text-xs text-gray-400 mt-1">Kru kami datang, memasang, mengoperasikan seluruh peralatan, dan memastikan acara Anda berjalan dengan sempurna dari awal hingga selesai.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PAKET UNGGULAN SECTION -->
-    <section class="py-24 bg-[#0a0d14]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <!-- Section Header -->
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#c59d5f] block mb-2">Paling Banyak Dipesan</span>
-                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-white mb-4">Paket Unggulan Kami</h2>
-                <div class="flex items-center justify-center gap-3 my-4">
-                    <span class="h-[1px] w-10 bg-[#c59d5f]"></span>
-                    <span class="text-[#c59d5f] text-xs">✦</span>
-                    <span class="h-[1px] w-10 bg-[#c59d5f]"></span>
-                </div>
-                <p class="text-sm text-gray-400">Paket rental paling populer yang menjadi pilihan utama pelanggan Vantara Production untuk berbagai jenis acara.</p>
-            </div>
-
-            <!-- 3-Column Card Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach ($featuredPackages as $package)
-                    <div class="group bg-[#111722] rounded-xl overflow-hidden border border-[#242f44] hover:border-[#c59d5f]/60 transition-all duration-300 shadow-xl flex flex-col hover:-translate-y-1">
-
-                        <!-- Card Image -->
-                        <div class="relative h-56 overflow-hidden bg-black">
-                            <img src="{{ $package->image_path ?? 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop' }}"
-                                 alt="{{ $package->name }}"
-                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-90">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#111722] via-transparent to-transparent"></div>
-                            <div class="absolute top-4 left-4">
-                                <span class="px-3 py-1 bg-black/70 backdrop-blur-md border border-[#c59d5f]/40 text-[#dfc48e] text-[10px] font-semibold uppercase tracking-wider rounded">
-                                    {{ $package->category }}
-                                </span>
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <span class="px-2.5 py-0.5 bg-gradient-to-r from-[#dfc48e] to-[#c59d5f] text-black text-[10px] font-bold uppercase tracking-wider rounded shadow">
-                                    Unggulan
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Card Body -->
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-serif text-lg font-bold text-white group-hover:text-[#c59d5f] transition-colors mb-2">
-                                    {{ $package->name }}
-                                </h3>
-                                <p class="text-xs text-gray-400 line-clamp-2 mb-4 leading-relaxed">
-                                    {{ $package->description }}
-                                </p>
-                                <div class="space-y-1.5 mb-5 border-t border-[#1e2538] pt-4">
-                                    <div class="text-[11px] uppercase tracking-wider text-[#c59d5f] font-semibold mb-2">Termasuk dalam paket:</div>
-                                    @foreach (array_slice($package->items ?? [], 0, 4) as $item)
-                                        <div class="flex items-center gap-2 text-xs text-gray-300">
-                                            <svg class="w-3.5 h-3.5 text-[#c59d5f] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                            <span class="truncate">{{ $item }}</span>
-                                        </div>
-                                    @endforeach
-                                    @if (count($package->items ?? []) > 4)
-                                        <div class="text-[11px] text-[#c59d5f] italic">+ {{ count($package->items) - 4 }} item lainnya</div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="pt-4 border-t border-[#1e2538]">
-                                <div class="flex items-baseline justify-between mb-4">
-                                    <span class="text-xs text-gray-400">Harga Mulai Dari:</span>
-                                    <div class="font-serif text-xl font-bold text-[#dfc48e]">
-                                        Rp {{ number_format($package->price, 0, ',', '.') }}
-                                        <span class="text-[10px] font-sans text-gray-400 font-normal">/ acara</span>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <a href="{{ route('packages.show', $package->slug) }}"
-                                       class="w-full text-center py-2.5 px-3 bg-[#171f2e] hover:bg-[#202b3f] text-gray-200 border border-[#242f44] hover:border-[#c59d5f] rounded text-xs font-medium uppercase tracking-wider transition-all">
-                                        Detail Paket
-                                    </a>
-                                    <a href="{{ route('packages.show', $package->slug) }}#kalender"
-                                       class="w-full text-center py-2.5 px-3 bg-[#c59d5f] hover:bg-[#d4ab63] text-black rounded text-xs font-semibold uppercase tracking-wider transition-all">
-                                        Cek Tanggal
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-14 text-center">
-                <a href="{{ route('packages.catalog') }}"
-                   class="inline-flex items-center gap-2 px-8 py-3.5 border border-[#c59d5f] text-[#dfc48e] hover:bg-[#c59d5f] hover:text-black font-semibold text-xs uppercase tracking-[0.2em] rounded transition-all">
-                    <span>Lihat Semua Paket & Harga Lengkap</span>
-                    <span>&rarr;</span>
-                </a>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- LAYANAN UTAMA (4 Kategori) -->
-    <section id="keunggulan" class="py-24 bg-[#0e131d] border-t border-b border-[#1b2438]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#c59d5f] block mb-2">Apa yang Kami Sediakan</span>
-                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">4 Layanan Utama Vantara Production</h2>
-                <div class="flex items-center justify-center gap-3 my-4">
-                    <span class="h-[1px] w-10 bg-[#c59d5f]"></span>
-                    <span class="text-[#c59d5f] text-xs">✦</span>
-                    <span class="h-[1px] w-10 bg-[#c59d5f]"></span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <a href="{{ route('packages.catalog', ['category' => 'Sound System']) }}"
-                   class="group p-6 rounded-xl bg-[#121824] border border-[#242f44] hover:border-[#c59d5f]/60 transition-all hover:-translate-y-1">
-                    <div class="w-12 h-12 rounded-lg bg-[#c59d5f]/15 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] mb-5 group-hover:bg-[#c59d5f] group-hover:text-black transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-white mb-2 group-hover:text-[#c59d5f] transition-colors">Sound System</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Dari akad nikah minimalis hingga orgen tunggal 5000 Watt dengan berbagai pilihan musisi dan vokalis live.</p>
-                    <div class="mt-4 text-xs text-[#c59d5f] font-semibold">Mulai Rp 600.000 &rarr;</div>
-                </a>
-
-                <a href="{{ route('packages.catalog', ['category' => 'Lighting & Special Effect']) }}"
-                   class="group p-6 rounded-xl bg-[#121824] border border-[#242f44] hover:border-[#c59d5f]/60 transition-all hover:-translate-y-1">
-                    <div class="w-12 h-12 rounded-lg bg-[#c59d5f]/15 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] mb-5 group-hover:bg-[#c59d5f] group-hover:text-black transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-white mb-2 group-hover:text-[#c59d5f] transition-colors">Lighting & Special Effect</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Moving beam, dry ice, cold firework, dan parled warna-warni untuk suasana acara yang dramatis dan memukau.</p>
-                    <div class="mt-4 text-xs text-[#c59d5f] font-semibold">Mulai Rp 2.500.000 &rarr;</div>
-                </a>
-
-                <a href="{{ route('packages.catalog', ['category' => 'Videobooth 360']) }}"
-                   class="group p-6 rounded-xl bg-[#121824] border border-[#242f44] hover:border-[#c59d5f]/60 transition-all hover:-translate-y-1">
-                    <div class="w-12 h-12 rounded-lg bg-[#c59d5f]/15 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] mb-5 group-hover:bg-[#c59d5f] group-hover:text-black transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-white mb-2 group-hover:text-[#c59d5f] transition-colors">Videobooth 360°</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Booth 360 derajat dengan iPhone 14, lighting pro, dan monitor preview. Hiburan interaktif yang bikin tamu antusias.</p>
-                    <div class="mt-4 text-xs text-[#c59d5f] font-semibold">Rp 1.800.000 &rarr;</div>
-                </a>
-
-                <a href="{{ route('packages.catalog', ['category' => 'Band Wedding']) }}"
-                   class="group p-6 rounded-xl bg-[#121824] border border-[#242f44] hover:border-[#c59d5f]/60 transition-all hover:-translate-y-1">
-                    <div class="w-12 h-12 rounded-lg bg-[#c59d5f]/15 border border-[#c59d5f]/30 flex items-center justify-center text-[#c59d5f] mb-5 group-hover:bg-[#c59d5f] group-hover:text-black transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-white mb-2 group-hover:text-[#c59d5f] transition-colors">Band Wedding</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Musisi live band wedding 4–6 personil dengan berbagai pilihan formasi dari VA Harmony hingga VA Royal premium.</p>
-                    <div class="mt-4 text-xs text-[#c59d5f] font-semibold">Mulai Rp 5.000.000 &rarr;</div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ITEM TAMBAHAN INFO STRIP -->
-    <section class="py-12 bg-[#0a0d14] border-b border-[#1b2438]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="p-6 rounded-xl bg-[#111722] border border-[#c59d5f]/20">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div>
-                        <div class="text-[11px] uppercase tracking-widest text-[#c59d5f] font-semibold mb-1">Item Tambahan (Add-on)</div>
-                        <h3 class="font-serif text-xl font-bold text-white">Butuh Tambahan Peralatan?</h3>
-                        <p class="text-xs text-gray-400 mt-1.5 max-w-xl">Kami juga menyediakan item tambahan yang bisa dikombinasikan dengan paket utama sesuai kebutuhan acara Anda.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="px-3 py-1.5 bg-[#141b28] border border-[#242f44] rounded text-xs text-gray-300">⚡ Genset mulai Rp 500.000</span>
-                        <span class="px-3 py-1.5 bg-[#141b28] border border-[#242f44] rounded text-xs text-gray-300">📺 Videotron Rp 800.000/m</span>
-                        <span class="px-3 py-1.5 bg-[#141b28] border border-[#242f44] rounded text-xs text-gray-300">💨 Blower Rp 200.000/unit</span>
-                        <span class="px-3 py-1.5 bg-[#141b28] border border-[#242f44] rounded text-xs text-gray-300">💡 Parled & Freshnel (Custom)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-
-    <!-- BOTTOM CTA BANNER -->
-    <section class="py-20 bg-gradient-to-b from-[#0e131d] to-[#07090e] border-t border-[#242f44]">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="p-10 sm:p-14 rounded-2xl bg-gradient-to-r from-[#171f2e] via-[#121824] to-[#171f2e] border border-[#c59d5f]/40 shadow-2xl">
-                <span class="text-xs uppercase tracking-[0.25em] font-semibold text-[#c59d5f] block mb-3">Konsultasi Gratis</span>
-                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Ada Pertanyaan atau Kebutuhan Khusus?
-                </h2>
-                <p class="max-w-2xl mx-auto text-xs sm:text-sm text-gray-300 mb-8 leading-relaxed">
-                    Ceritakan konsep acara Anda kepada kami. Tim Vantara Production siap membantu menyusun kombinasi paket terbaik sesuai anggaran dan kebutuhan event Anda.
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="https://wa.me/6282282422317?text=Halo%20Vantara%20Production,%20saya%20ingin%20konsultasi%20kebutuhan%20sound%20system%20dan%20entertainment%20untuk%20acara%20saya."
-                       target="_blank"
-                       class="w-full sm:w-auto px-8 py-3.5 bg-[#25D366] hover:bg-[#20ba5a] text-white font-semibold text-xs uppercase tracking-wider rounded shadow-xl flex items-center justify-center gap-2 transition-all">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                        Hubungi via WhatsApp
-                    </a>
-                    <a href="{{ route('packages.catalog') }}"
-                       class="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-[#c59d5f] text-[#dfc48e] hover:bg-[#c59d5f] hover:text-black font-semibold text-xs uppercase tracking-wider rounded transition-all">
-                        Lihat Seluruh Katalog Paket
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
+  <!-- CTA Banner Section -->
+  <section class="wrap" style="padding-bottom: 96px">
+    <div style="background: var(--ac); color: var(--acx); border-radius: 28px; padding: 48px 56px; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between">
+      <div style="flex: 1 1 400px">
+        <h2 class="d" style="font-size: 40px; line-height: 1.1; font-weight: 800">Punya acara dalam waktu dekat?</h2>
+        <p style="margin-top: 10px; font-size: 17px; opacity: 0.9">Cek ketersediaan tanggal atau konsultasikan langsung kebutuhan audio visual Anda bersama tim kami.</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+        <a class="btn" href="{{ route('checkout.index') }}" style="background: var(--acx); border-color: var(--acx); color: #fff; min-height: 48px; padding: 0 24px">Booking Sekarang</a>
+        <a class="btn wa" href="https://wa.me/6282282422317?text=Halo%20Admin%20Vantara%20Production%2C%20saya%20ingin%20konsultasi%20mengenai%20sewa%20sound%20system%20dan%20perlengkapan%20event." target="_blank" rel="noopener" style="min-height: 48px; padding: 0 22px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.62C9.33 7.62 9 7.7 8.71 8.01C8.42 8.32 7.6 9.09 7.6 10.65C7.6 12.21 8.74 13.72 8.9 13.93C9.06 14.14 11.14 17.34 14.32 18.72C15.08 19.04 15.67 19.24 16.14 19.38C16.9 19.63 17.59 19.59 18.14 19.51C18.75 19.42 20.03 18.73 20.29 17.98C20.56 17.23 20.56 16.59 20.48 16.45C20.4 16.32 20.19 16.24 19.89 16.09C19.58 15.93 18.08 15.2 17.8 15.1C17.52 15 17.32 14.95 17.11 15.25C16.91 15.56 16.34 16.24 16.17 16.44C16 16.65 15.83 16.67 15.52 16.52C15.22 16.37 14.24 16.05 13.08 15.01C12.18 14.2 11.57 13.2 11.41 12.92C11.25 12.65 11.39 12.5 11.55 12.35C11.69 12.21 11.86 11.99 12.01 11.81C12.16 11.64 12.22 11.51 12.32 11.31C12.42 11.1 12.37 10.92 12.29 10.77C12.21 10.62 11.6 9.12 11.35 8.5C11.1 7.9 10.85 7.98 10.66 7.97C10.48 7.97 10.27 7.96 10.07 7.96C9.86 7.96 9.53 7.62 9.53 7.62Z"/>
+          </svg>
+          <span>Konsultasi Cepat</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
 @endsection
