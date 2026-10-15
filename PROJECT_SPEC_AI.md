@@ -345,7 +345,7 @@ The project adopts a modern high-fidelity aesthetic: **Customer Dark Theme** pai
 ## 8. Directory Structure & Key Codebase Artifacts
 
 ```
-penyewaan(Test)/
+penyewaanTest/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/

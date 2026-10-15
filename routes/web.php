@@ -39,7 +39,10 @@ Route::post('/keranjang/kosongkan', [CartController::class, 'clear'])->name('car
 // Phase 2: Checkout & Pemesanan
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/pesanan/{order_code}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::get('/pesanan/{access_token}', [CheckoutController::class, 'show'])
+    ->where('access_token', '[a-f0-9]{48}')
+    ->middleware('throttle:invoice')
+    ->name('checkout.show');
 
 // Phase 3 & 4: Portal Admin, Operasional & Pelaporan
 Route::prefix('admin')->name('admin.')->group(function () {

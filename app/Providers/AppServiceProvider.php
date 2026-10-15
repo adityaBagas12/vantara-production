@@ -41,5 +41,9 @@ class AppServiceProvider extends ServiceProvider
                         ]);
                 });
         });
+
+        RateLimiter::for('invoice', function (Request $request): Limit {
+            return Limit::perMinute(30)->by('invoice:'.$request->ip());
+        });
     }
 }

@@ -14,6 +14,17 @@ class Order extends Model
     /** @use HasFactory<OrderFactory> */
     use HasFactory, SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order): void {
+            $order->access_token ??= bin2hex(random_bytes(24));
+        });
+    }
+
+    protected $hidden = [
+        'access_token',
+    ];
+
     protected $fillable = [
         'order_code',
         'customer_name',

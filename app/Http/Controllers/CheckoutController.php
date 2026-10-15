@@ -145,16 +145,16 @@ class CheckoutController extends Controller
         // Clear cart session
         session()->forget('cart');
 
-        return redirect()->route('checkout.show', $order->order_code)
+        return redirect()->route('checkout.show', $order->access_token)
             ->with('success', 'Pemesanan berhasil dibuat! Silakan hubungi Admin via WhatsApp untuk konfirmasi dan negosiasi.');
     }
 
     /**
      * Tampilkan konfirmasi & ringkasan pesanan berhasil.
      */
-    public function show(string $orderCode): View
+    public function show(string $accessToken): View
     {
-        $order = Order::with('orderItems.package')->where('order_code', $orderCode)->firstOrFail();
+        $order = Order::with('orderItems.package')->where('access_token', $accessToken)->firstOrFail();
 
         // Template pesan WhatsApp Admin
         $waNumber = '6282282422317';
@@ -184,6 +184,7 @@ class CheckoutController extends Controller
         }
 
         $waText .= "\n💰 *TOTAL ESTIMASI:* Rp ".number_format($order->total_price, 0, ',', '.')."\n\n";
+        $waText .= '🔗 *INVOICE:* '.route('checkout.show', $order->access_token)."\n\n";
         $waText .= 'Mohon bantu cek ketersediaan jadwal serta info proses pembayaran Uang Muka (DP). Terima kasih!';
 
         $waUrl = 'https://wa.me/'.$waNumber.'?text='.urlencode($waText);
