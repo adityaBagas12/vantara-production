@@ -6,7 +6,7 @@
 @section('content')
 <div style="min-height: 1900px"
      x-data="calendarWidget({{ $package->id }})"
-     x-init="selectedDate = '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}'">
+     x-init="selectedDate = '{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}'; rangeStart = selectedDate; rangeEnd = '{{ request('event_end_date') ?? session('event_end_date') }}'">
 
   <!-- Detail Header & Summary -->
   <section class="wrap" style="padding-top: 40px; padding-bottom: 72px">
@@ -94,8 +94,8 @@
               <span x-show="!c.isCurrentMonth"></span>
               <span x-show="c.isCurrentMonth && c.isPast" class="c x" x-text="c.day" title="Tanggal telah berlalu"></span>
               <span x-show="c.isCurrentMonth && !c.isPast && c.isBooked" class="c b" x-text="c.day" title="Sudah dibooking (Terkunci)"></span>
-              <span x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && selectedDate === c.dateString" class="c s" x-text="c.day"></span>
-              <button x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && selectedDate !== c.dateString" class="c" type="button" @click="onDayClick(c)" x-text="c.day" style="width: 100%"></button>
+              <button x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && isDateSelected(c.dateString)" class="c s" type="button" @click="onDayClick(c)" x-text="c.day" style="width: 100%" title="Klik untuk membatalkan pilihan"></button>
+              <button x-show="c.isCurrentMonth && !c.isPast && !c.isBooked && !isDateSelected(c.dateString)" class="c" type="button" @click="onDayClick(c)" x-text="c.day" style="width: 100%"></button>
             </div>
           </template>
         </div>
@@ -104,6 +104,7 @@
           <span><i class="sw"></i>Tersedia</span>
           <span><i class="sw" style="background: repeating-linear-gradient(135deg,#1C1F27,#1C1F27 3px,#14161B 3px,#14161B 6px)"></i>Sudah dibooking</span>
           <span><i class="sw" style="background: var(--ac); border-color: var(--ac)"></i>Dipilih</span>
+          <span><i class="sw" style="background: #7F1D1D; border-color: #991B1B"></i>Reset untuk ganti tanggal mulai</span>
         </div>
       </div>
 
@@ -111,9 +112,11 @@
       <div style="flex: 1 1 300px; align-self: flex-start; background: var(--s2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
         <span class="eye">Hasil pengecekan</span>
         <p style="color: var(--mu)">Tanggal dipilih</p>
-        <strong class="d" style="font-size: 28px; margin-top: -10px" x-text="selectedDate ? selectedDate.split('-').reverse().join(' / ') : 'Belum dipilih'"></strong>
+        <strong class="d" style="font-size: 24px; margin-top: -10px" x-text="dateSummary()"></strong>
+        <span style="color: var(--ac); font-size: 14px" x-show="rangeStart && !rangeEnd">1 hari · Pilih tanggal lain jika ingin menambah hari</span>
+        <span style="color: var(--mu); font-size: 14px" x-show="rangeEnd" x-text="durationLabel()"></span>
 
-        <template x-if="selectedDate && !isDateBooked(selectedDate)">
+        <template x-if="rangeStart && !rangeHasBookedDate()">
           <div>
             <span class="badge inline"><i class="dot"></i>Tersedia</span>
             <span style="display: inline-block; margin-left: 6px; font-size: 12px; color: var(--mu)" x-show="checkResult?.remaining_stock !== undefined">
@@ -121,29 +124,31 @@
             </span>
           </div>
         </template>
-        <template x-if="selectedDate && isDateBooked(selectedDate)">
+        <template x-if="rangeStart && rangeHasBookedDate()">
           <span class="badge inline" style="background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.35); color: #FCA5A5">Sudah Terisi Penuh</span>
         </template>
 
         <p style="color: var(--mu); font-size: 14px" x-text="checkResult?.message ?? 'Lanjutkan booking untuk mengamankan tanggal ini. Harga akhir disepakati bersama Admin lewat WhatsApp.'"></p>
 
-        <form action="{{ route('cart.store') }}" method="POST" @submit="if(!selectedDate || isDateBooked(selectedDate)){ $event.preventDefault(); return false; }">
+        <form action="{{ route('cart.store') }}" method="POST" @submit="if(!selectedDate || rangeHasBookedDate()){ $event.preventDefault(); return false; }">
           @csrf
           <input type="hidden" name="package_id" value="{{ $package->id }}">
           <input type="hidden" name="event_date" :value="selectedDate">
+          <input type="hidden" name="event_end_date" :value="rangeEnd || selectedDate">
 
           <div style="margin-bottom: 14px; background: var(--s1); border: 1px solid var(--line); border-radius: 12px; padding: 12px">
             <label for="detail_qty" style="display: block; font-size: 12px; color: var(--mu); margin-bottom: 6px; font-weight: 600">Jumlah Unit Dipesan:</label>
-            <div style="display: flex; align-items: center; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
               <input id="detail_qty" type="number" name="quantity" value="1" min="1" :max="checkResult?.remaining_stock ?? {{ $package->stock ?? 1 }}"
                      style="width: 70px; background: var(--s2); border: 1px solid #3A3F4C; border-radius: 8px; padding: 6px 10px; color: var(--tx); font-family: var(--font-mono); text-align: center" required>
               <span style="font-size: 13px; color: var(--mu)">Unit (Stok: {{ $package->stock ?? 1 }})</span>
+              <button type="button" x-show="rangeStart" @click="resetRange()" class="btn" style="padding: 8px 12px; min-height: 38px; font-size: 12px; white-space: nowrap; background: #7F1D1D; border-color: #991B1B; color: #FDECEC">Reset pilihan</button>
             </div>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px">
-            <button class="btn p" type="submit" :disabled="!selectedDate || isDateBooked(selectedDate)" style="width: 100%">
-              <span x-text="!selectedDate ? 'Pilih Tanggal Dahulu' : (isDateBooked(selectedDate) ? 'Tanggal Terisi Penuh' : 'Lanjut Booking')"></span>
+            <button class="btn p" type="submit" :disabled="!selectedDate || rangeHasBookedDate()" style="width: 100%">
+              <span x-text="!selectedDate ? 'Pilih Tanggal Dahulu' : (rangeHasBookedDate() ? 'Ada Tanggal Penuh' : `Lanjut Booking ${durationLabel()}`)"></span>
             </button>
             <a class="btn wa" href="https://wa.me/6282282422317?text={{ urlencode('Halo Admin Vantara Production, saya ingin konsultasi ketersediaan dan sewa paket ' . $package->name) }}" target="_blank" rel="noopener" style="width: 100%; text-align: center">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

@@ -19,6 +19,9 @@ class CartController extends Controller
         } elseif ($request->filled('date')) {
             session()->put('event_date', $request->input('date'));
         }
+        if ($request->filled('event_end_date')) {
+            session()->put('event_end_date', $request->input('event_end_date'));
+        }
 
         $cart = session()->get('cart', []);
         $total = 0;
@@ -39,10 +42,14 @@ class CartController extends Controller
             'package_id' => 'required|exists:packages,id',
             'quantity' => 'nullable|integer|min:1',
             'event_date' => 'nullable|date|after_or_equal:today',
+            'event_end_date' => 'nullable|date|after_or_equal:event_date',
         ]);
 
         if ($request->filled('event_date')) {
             session()->put('event_date', $request->input('event_date'));
+        }
+        if ($request->filled('event_end_date')) {
+            session()->put('event_end_date', $request->input('event_end_date'));
         }
 
         $package = Package::where('is_active', true)->findOrFail($request->package_id);

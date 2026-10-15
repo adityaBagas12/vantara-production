@@ -114,14 +114,19 @@
 
           <!-- Tanggal Acara -->
           <div style="background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
-            <label for="cart_event_date" style="font-size: 13px; color: var(--mu); font-weight: 600">Tanggal Acara:</label>
+            <label for="cart_event_date" style="font-size: 13px; color: var(--mu); font-weight: 600">Tanggal Mulai Acara:</label>
             <form action="{{ route('cart.index') }}" method="GET">
               <input type="date" id="cart_event_date" name="event_date"
                      value="{{ old('event_date', request('event_date') ?? request('date') ?? session('event_date')) }}"
                      min="{{ date('Y-m-d') }}" onchange="this.form.submit()"
                      style="width: 100%; background: var(--s1); border: 1px solid #3A3F4C; border-radius: 10px; padding: 10px 12px; color: var(--tx); font-family: var(--font-mono)">
+              <label for="cart_event_end_date" style="font-size: 13px; color: var(--mu); font-weight: 600; margin-top: 10px; display: block">Tanggal Selesai (opsional):</label>
+              <input type="date" id="cart_event_end_date" name="event_end_date"
+                     value="{{ old('event_end_date', request('event_end_date') ?? session('event_end_date')) }}"
+                     min="{{ old('event_date', request('event_date') ?? session('event_date') ?? date('Y-m-d')) }}" onchange="this.form.submit()"
+                     style="width: 100%; background: var(--s1); border: 1px solid #3A3F4C; border-radius: 10px; padding: 10px 12px; color: var(--tx); font-family: var(--font-mono)">
             </form>
-            <span style="font-size: 12px; color: var(--mu)">Tanggal ini akan otomatis diisikan pada form booking.</span>
+            <span style="font-size: 12px; color: var(--mu)">Pilih tanggal mulai dan selesai jika acara berlangsung beberapa hari.</span>
           </div>
 
           <div style="border-top: 1px solid var(--line); padding-top: 18px; display: flex; align-items: baseline">

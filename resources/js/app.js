@@ -17,6 +17,8 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
     bookedDates: [],
     isLoading: false,
     selectedDate: '',
+    rangeStart: '',
+    rangeEnd: '',
     checkResult: null,
     isCheckingDate: false,
 
@@ -27,6 +29,9 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
     },
 
     init() {
+        if (this.rangeStart && this.rangeEnd && this.rangeEnd < this.rangeStart) {
+            this.rangeEnd = '';
+        }
         this.fetchMonthData();
     },
 
@@ -141,8 +146,10 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
         this.calendarDays = days;
 
         // Jika tanggal yang sedang dipilih ternyata sudah penuh (fully booked), batalkan pilihan
-        if (this.selectedDate && this.isDateBooked(this.selectedDate)) {
+        if (this.rangeStart && this.rangeHasBookedDate()) {
             this.selectedDate = '';
+            this.rangeStart = '';
+            this.rangeEnd = '';
             this.checkResult = {
                 available: false,
                 message: 'Tanggal ini sudah terisi penuh dan tidak dapat dipilih.',
@@ -162,6 +169,41 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
         return Boolean(booking && !booking.is_fully_booked);
     },
 
+    isDateInRange(dateStr) {
+        return Boolean(this.rangeStart && this.rangeEnd && dateStr > this.rangeStart && dateStr < this.rangeEnd);
+    },
+
+    isDateSelected(dateStr) {
+        return Boolean(dateStr && (dateStr === this.rangeStart || dateStr === this.rangeEnd || this.isDateInRange(dateStr)));
+    },
+
+    rangeHasBookedDate() {
+        if (!this.rangeStart) return false;
+        const end = this.rangeEnd || this.rangeStart;
+        return this.calendarDays.some(day => day.dateString && day.dateString >= this.rangeStart && day.dateString <= end && this.isDateBooked(day.dateString));
+    },
+
+    dateSummary() {
+        if (!this.rangeStart) return 'Belum dipilih';
+        const start = this.rangeStart.split('-').reverse().join(' / ');
+        const end = (this.rangeEnd || this.rangeStart).split('-').reverse().join(' / ');
+        return this.rangeEnd && this.rangeEnd !== this.rangeStart ? `${start} — ${end}` : start;
+    },
+
+    durationLabel() {
+        if (!this.rangeStart) return '';
+        const start = new Date(`${this.rangeStart}T00:00:00`);
+        const end = new Date(`${this.rangeEnd || this.rangeStart}T00:00:00`);
+        return `${Math.round((end - start) / 86400000) + 1} hari`;
+    },
+
+    resetRange() {
+        this.selectedDate = '';
+        this.rangeStart = '';
+        this.rangeEnd = '';
+        this.checkResult = null;
+    },
+
     getBookingInfo(dateStr) {
         if (!dateStr) return null;
         return this.bookedDates.find(b => b.date === dateStr) || null;
@@ -170,7 +212,17 @@ Alpine.data('calendarWidget', (initialPackageId = null) => ({
     onDayClick(dayObj) {
         // Jangan izinkan klik jika bukan bulan aktif, sudah lewat, atau SUDAH TERISI PENUH
         if (!dayObj.isCurrentMonth || dayObj.isPast || dayObj.isBooked) return;
-        this.selectedDate = dayObj.dateString;
+
+        if (!this.rangeStart) {
+            this.rangeStart = dayObj.dateString;
+            this.rangeEnd = '';
+        } else if (dayObj.dateString >= this.rangeStart) {
+            // Tanggal mulai terkunci; klik berikutnya hanya mengatur tanggal selesai.
+            this.rangeEnd = dayObj.dateString;
+        } else {
+            return;
+        }
+        this.selectedDate = this.rangeStart;
         this.checkSpecificDate(dayObj.dateString);
     },
 

@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\OrderCodeConflictException;
+use App\Exceptions\StockUnavailableException;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Package;
+use App\Services\BookingService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
 {
+    public function __construct(private readonly BookingService $bookingService)
+    {
+    }
+
     /**
      * Tampilkan formulir checkout & isi data diri pemesan.
      */
@@ -22,6 +27,9 @@ class CheckoutController extends Controller
             session()->put('event_date', $request->input('event_date'));
         } elseif ($request->filled('date')) {
             session()->put('event_date', $request->input('date'));
+        }
+        if ($request->filled('event_end_date')) {
+            session()->put('event_end_date', $request->input('event_end_date'));
         }
 
         $cart = session()->get('cart', []);
@@ -59,6 +67,7 @@ class CheckoutController extends Controller
             'customer_email' => 'nullable|email|max:255',
             'event_address' => 'required|string|max:1000',
             'event_date' => 'required|date|after_or_equal:today',
+            'event_end_date' => 'nullable|date|after_or_equal:event_date',
             'notes' => 'nullable|string|max:1000',
         ], [
             'customer_name.required' => 'Silakan masukkan nama lengkap Anda.',
@@ -67,6 +76,7 @@ class CheckoutController extends Controller
             'event_address.required' => 'Silakan masukkan alamat lengkap tempat acara.',
             'event_date.required' => 'Silakan pilih tanggal pelaksanaan acara.',
             'event_date.after_or_equal' => 'Tanggal acara tidak boleh di masa lalu.',
+            'event_end_date.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
         ]);
 
         $totalPrice = 0;
@@ -108,39 +118,11 @@ class CheckoutController extends Controller
             }
         }
 
-        // Generate Order Code via model helper
-        $orderCode = Order::generateOrderCode();
-
-        // Save order and items in DB Transaction
-        $order = DB::transaction(function () use ($validated, $cart, $totalPrice, $orderCode, $startDate, $endDate) {
-            $order = Order::create([
-                'order_code' => $orderCode,
-                'customer_name' => $validated['customer_name'],
-                'customer_phone' => $validated['customer_phone'],
-                'customer_email' => $validated['customer_email'] ?? null,
-                'event_address' => $validated['event_address'],
-                'event_date' => $startDate->format('Y-m-d'),
-                'event_end_date' => $endDate->format('Y-m-d'),
-                'notes' => $validated['notes'] ?? null,
-                'total_price' => $totalPrice,
-                'down_payment' => 0,
-                'status' => 'pending',
-            ]);
-
-            foreach ($cart as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'package_id' => $item['package_id'],
-                    'package_name' => $item['name'],
-                    'unit_price' => $item['price'],
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $item['price'] * $item['quantity'],
-                    'options_json' => isset($item['options']) ? json_encode($item['options']) : null,
-                ]);
-            }
-
-            return $order;
-        });
+        try {
+            $order = $this->bookingService->reserve($validated, $cart, $totalPrice, $startDate, $endDate);
+        } catch (StockUnavailableException|OrderCodeConflictException $exception) {
+            return back()->withInput()->withErrors(['event_date' => $exception->getMessage()]);
+        }
 
         // Clear cart session
         session()->forget('cart');

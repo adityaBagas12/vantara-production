@@ -56,8 +56,12 @@
         <h2 class="d" style="font-size: 24px; margin-top: 18px; padding-top: 28px; border-top: 1px solid var(--line)">Data acara</h2>
         <div class="row">
           <div class="fld">
-            <label for="tgl">Tanggal acara</label>
+            <label for="tgl">Tanggal mulai acara</label>
             <input id="tgl" name="event_date" type="date" required min="{{ date('Y-m-d') }}" value="{{ old('event_date', request('event_date') ?? session('event_date') ?? '') }}">
+          </div>
+          <div class="fld">
+            <label for="tgl_selesai">Tanggal selesai <span style="color: var(--mu); font-weight: 400">(opsional)</span></label>
+            <input id="tgl_selesai" name="event_end_date" type="date" min="{{ old('event_date', request('event_date') ?? session('event_date') ?? date('Y-m-d')) }}" value="{{ old('event_end_date', request('event_end_date') ?? session('event_end_date') ?? '') }}">
           </div>
           <div class="fld">
             <label for="alamat">Alamat / lokasi acara</label>

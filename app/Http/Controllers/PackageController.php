@@ -48,6 +48,9 @@ class PackageController extends Controller
         } elseif ($request->filled('date')) {
             session()->put('event_date', $request->input('date'));
         }
+        if ($request->filled('event_end_date')) {
+            session()->put('event_end_date', $request->input('event_end_date'));
+        }
 
         $request->validate([
             'category' => ['nullable', 'string', 'max:100'],
@@ -106,6 +109,9 @@ class PackageController extends Controller
             session()->put('event_date', $request->input('event_date'));
         } elseif ($request->filled('date')) {
             session()->put('event_date', $request->input('date'));
+        }
+        if ($request->filled('event_end_date')) {
+            session()->put('event_end_date', $request->input('event_end_date'));
         }
 
         $package = Package::active()
