@@ -40,10 +40,9 @@ class CheckoutController extends Controller
         }
 
         $total = 0;
-        $rentDuration = 1;
+        $rentDuration = $this->rentDuration();
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-            $rentDuration = max($rentDuration, (int) ($item['quantity'] ?? 1));
+            $total += $item['price'] * $item['quantity'] * $rentDuration;
         }
 
         return view('pages.checkout', compact('cart', 'total', 'rentDuration'));
@@ -79,11 +78,6 @@ class CheckoutController extends Controller
             'event_end_date.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
         ]);
 
-        $totalPrice = 0;
-        foreach ($cart as $item) {
-            $totalPrice += $item['price'] * $item['quantity'];
-        }
-
         $startDate = Carbon::parse($validated['event_date'])->startOfDay();
         $endDate = $request->filled('event_end_date')
             ? Carbon::parse($request->input('event_end_date'))->startOfDay()
@@ -91,6 +85,12 @@ class CheckoutController extends Controller
 
         if ($endDate->lt($startDate)) {
             $endDate = $startDate->copy();
+        }
+
+        $rentDuration = $startDate->diffInDays($endDate) + 1;
+        $totalPrice = 0;
+        foreach ($cart as $item) {
+            $totalPrice += $item['price'] * $item['quantity'] * $rentDuration;
         }
 
         // Cek kapasitas stok per paket layanan dalam keranjang untuk setiap hari pelaksanaan acara
@@ -127,7 +127,7 @@ class CheckoutController extends Controller
         // Clear cart session
         session()->forget('cart');
 
-        return redirect()->route('checkout.show', $order->access_token)
+        return redirect()->route('checkout.success', $order->access_token)
             ->with('success', 'Pemesanan berhasil dibuat! Silakan hubungi Admin via WhatsApp untuk konfirmasi dan negosiasi.');
     }
 
@@ -171,6 +171,22 @@ class CheckoutController extends Controller
 
         $waUrl = 'https://wa.me/'.$waNumber.'?text='.urlencode($waText);
 
-        return view('pages.order_success', compact('order', 'waUrl'));
+        $showInvoice = request()->routeIs('checkout.show');
+
+        return view('pages.order_success', compact('order', 'waUrl', 'showInvoice'));
+    }
+
+    private function rentDuration(): int
+    {
+        $start = session('event_date');
+        $end = session('event_end_date');
+        if (! $start || ! $end) {
+            return 1;
+        }
+
+        $startDate = Carbon::parse($start)->startOfDay();
+        $endDate = Carbon::parse($end)->startOfDay();
+
+        return $endDate->lt($startDate) ? 1 : $startDate->diffInDays($endDate) + 1;
     }
 }

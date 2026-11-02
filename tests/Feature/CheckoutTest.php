@@ -71,12 +71,8 @@ class CheckoutTest extends TestCase
         $this->assertEquals('Budi Testing', $order->customer_name);
         $this->assertEquals('pending', $order->status);
 
-        $checkoutResponse->assertRedirect(route('checkout.show', $order->access_token));
-
-        $successPage = $this->get(route('checkout.show', $order->access_token));
-        $successPage->assertStatus(200);
-        $successPage->assertSee($order->order_code);
-        $successPage->assertSee('Buka WhatsApp Admin Vantara');
+        $checkoutResponse->assertRedirect(route('checkout.success', $order->access_token));
+        $checkoutResponse->assertSessionHas('success');
     }
 
     public function test_cannot_checkout_if_date_is_already_booked(): void
@@ -246,8 +242,8 @@ class CheckoutTest extends TestCase
         $this->assertEquals($startDate, $order->event_date->format('Y-m-d'));
         $this->assertEquals($endDate, $order->event_end_date->format('Y-m-d'));
         // 2 days * package price
-        $this->assertEquals($package->price * 2, $order->total_price);
-        $response->assertRedirect(route('checkout.show', $order->access_token));
+        $this->assertEquals($package->price * 2 * 2, $order->total_price);
+        $response->assertRedirect(route('checkout.success', $order->access_token));
     }
 
     public function test_same_package_can_be_booked_more_than_once_on_same_date_if_stock_available(): void

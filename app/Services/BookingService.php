@@ -53,6 +53,8 @@ class BookingService
                         }
                     }
 
+                    $rentDuration = $startDate->diffInDays($endDate) + 1;
+
                     $order = Order::create([
                         'order_code' => $this->nextOrderCode(),
                         'customer_name' => $validated['customer_name'],
@@ -74,7 +76,7 @@ class BookingService
                             'package_name' => $item['name'],
                             'unit_price' => $item['price'],
                             'quantity' => $item['quantity'],
-                            'subtotal' => $item['price'] * $item['quantity'],
+                            'subtotal' => $item['price'] * $item['quantity'] * $rentDuration,
                             'options_json' => isset($item['options']) ? json_encode($item['options']) : null,
                         ]);
                     }

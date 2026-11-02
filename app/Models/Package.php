@@ -27,6 +27,7 @@ class Package extends Model
         'is_featured',
         'is_active',
         'image_path',
+        'gallery_images',
     ];
 
     protected function casts(): array
@@ -37,6 +38,7 @@ class Package extends Model
             'is_active' => 'boolean',
             'price' => 'integer',
             'stock' => 'integer',
+            'gallery_images' => 'array',
         ];
     }
 

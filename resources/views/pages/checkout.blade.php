@@ -10,7 +10,7 @@
     <h1 class="d" style="font-size: 52px; line-height: 1.05; font-weight: 800; margin: 8px 0 28px">Form Booking</h1>
 
     <!-- Steps -->
-    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px">
+    <div class="booking-steps" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px">
       <span class="step ok"><b>✓</b>Pilih produk &amp; tanggal</span><i class="rule"></i>
       <span class="step on"><b>2</b>Data diri &amp; acara</span><i class="rule"></i>
       <span class="step"><b>3</b>Invoice &amp; WhatsApp</span>
@@ -32,7 +32,7 @@
 
     <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
       <!-- Form Input Data -->
-      <form action="{{ route('checkout.store') }}" method="POST" class="card" style="flex: 2 1 580px; padding: 40px; display: flex; flex-direction: column; gap: 22px">
+      <form action="{{ route('checkout.store') }}" method="POST" class="card checkout-form" style="flex: 2 1 580px; padding: 40px; display: flex; flex-direction: column; gap: 22px">
         @csrf
 
         <h2 class="d" style="font-size: 24px">Data diri</h2>
@@ -81,7 +81,7 @@
       </form>
 
       <!-- Sidebar Ringkasan Pesanan -->
-      <aside class="card" style="flex: 1 1 340px; padding: 28px; display: flex; flex-direction: column; gap: 20px">
+      <aside class="card checkout-summary" style="flex: 1 1 340px; padding: 28px; display: flex; flex-direction: column; gap: 20px">
         <span class="eye">Ringkasan pesanan</span>
 
         @forelse($cart as $item)
@@ -103,7 +103,7 @@
           <div style="border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 8px">
             <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Harga / hari</span><span>Rp {{ number_format($item['price'], 0, ',', '.') }}</span></div>
             <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Jumlah unit</span><span>{{ $item['quantity'] }} unit</span></div>
-            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Subtotal</span><span style="font-weight: 600">Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span></div>
+            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Subtotal ({{ $rentDuration }} hari)</span><span style="font-weight: 600">Rp {{ number_format($item['price'] * $item['quantity'] * $rentDuration, 0, ',', '.') }}</span></div>
           </div>
         @empty
           <p style="color: var(--mu)">Keranjang kosong.</p>

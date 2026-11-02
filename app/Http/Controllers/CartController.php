@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -24,13 +25,14 @@ class CartController extends Controller
         }
 
         $cart = session()->get('cart', []);
+        $rentDuration = $this->rentDuration();
         $total = 0;
 
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $total += $item['price'] * $item['quantity'] * $rentDuration;
         }
 
-        return view('pages.cart', compact('cart', 'total'));
+        return view('pages.cart', compact('cart', 'total', 'rentDuration'));
     }
 
     /**
@@ -152,5 +154,19 @@ class CartController extends Controller
 
         return redirect()->route('packages.catalog')
             ->with('success', 'Keranjang telah dikosongkan.');
+    }
+
+    private function rentDuration(): int
+    {
+        $start = session('event_date');
+        $end = session('event_end_date');
+        if (! $start || ! $end) {
+            return 1;
+        }
+
+        $startDate = Carbon::parse($start)->startOfDay();
+        $endDate = Carbon::parse($end)->startOfDay();
+
+        return $endDate->lt($startDate) ? 1 : $startDate->diffInDays($endDate) + 1;
     }
 }

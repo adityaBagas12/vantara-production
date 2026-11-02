@@ -46,7 +46,8 @@
 
       <div class="fld" style="flex: 1 1 200px">
         <label for="price">Harga sewa / hari (Rp) *</label>
-        <input id="price" name="price" type="number" min="0" value="{{ old('price') }}" placeholder="Contoh: 1800000" required>
+        <input id="price" name="price" type="text" inputmode="numeric" value="{{ old('price') }}" placeholder="Contoh: 1800000" required oninput="const invalid=/\\D/.test(this.value); this.value=this.value.replace(/\\D/g,''); document.getElementById('price-error').hidden=!invalid; this.setCustomValidity(invalid ? 'Harga hanya boleh diisi angka.' : '')">
+        <small id="price-error" hidden style="display: block; color: #9B1C1C; margin-top: 6px">Harga hanya boleh diisi angka.</small>
       </div>
 
       <div class="fld" style="flex: 1 1 140px">
@@ -63,8 +64,24 @@
     <!-- Foto produk -->
     <div class="fld">
       <label for="image_file">Foto produk (opsional, maks 5MB)</label>
-      <input id="image_file" name="image_file" type="file" accept="image/*">
+      <label for="image_file" class="btn p" style="width: fit-content; cursor: pointer">Pilih foto utama</label>
+      <input id="image_file" name="image_file" type="file" accept="image/*" hidden onchange="document.getElementById('image-file-name').textContent=this.files[0]?.name || 'Belum ada file dipilih'">
+      <span id="image-file-name" style="font-size: 13px; color: var(--admin-mu)">Belum ada file dipilih</span>
       <input type="text" name="image_path" value="{{ old('image_path') }}" placeholder="Atau tempel URL gambar eksternal di sini..." style="margin-top: 6px">
+    </div>
+
+    <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 10px; background: var(--admin-s2)">
+      <h3 class="d" style="font-size: 18px">Galeri Foto Produk</h3>
+      <p style="font-size: 13px; color: var(--admin-mu); margin: 0">Tambahkan hingga 3 gambar pendukung yang tampil di bawah foto utama.</p>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+        @for($slot = 1; $slot <= 3; $slot++)
+          <div style="min-width: 0; display: flex; flex-direction: column; gap: 7px">
+            <label for="gallery_image_{{ $slot }}" class="btn p" style="cursor: pointer; text-align: center">Pilih gambar {{ $slot }}</label>
+            <input id="gallery_image_{{ $slot }}" name="gallery_images[]" type="file" accept="image/*" hidden onchange="document.getElementById('gallery-file-name-{{ $slot }}').textContent=this.files[0]?.name || 'Belum ada file'">
+            <span id="gallery-file-name-{{ $slot }}" style="font-size: 12px; color: var(--admin-mu); overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Belum ada file</span>
+          </div>
+        @endfor
+      </div>
     </div>
 
     <!-- Items rincian paket -->
@@ -82,11 +99,11 @@
     </div>
 
     <div style="display: flex; gap: 20px; align-items: center; border-top: 1px solid var(--admin-line); padding-top: 16px">
-      <label class="chk">
+      <label class="chk" style="color: #17181C">
         <input type="checkbox" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
         Tampilkan di Produk Unggulan
       </label>
-      <label class="chk">
+      <label class="chk" style="color: #17181C">
         <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }}>
         Langsung Aktifkan di Katalog
       </label>

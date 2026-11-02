@@ -22,7 +22,7 @@
     <div class="card" style="display: flex; flex-direction: column; gap: 10px">
       <span class="lbl">Pendapatan kotor</span>
       <strong class="d" style="font-size: 30px; line-height: 1; color: var(--admin-tx)">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</strong>
-      <span style="font-size: 13px; color: var(--admin-mu)">transaksi ACC &amp; selesai</span>
+      <span style="font-size: 13px; color: var(--admin-mu)">DP masuk, dikonfirmasi &amp; selesai</span>
     </div>
 
     <!-- 2. Pesanan pending -->
@@ -130,7 +130,7 @@
         @endforeach
       </svg>
       <p style="font-size: 13px; color: var(--admin-mu)">
-        Hanya transaksi yang sudah di-ACC / memiliki DP yang dihitung.
+        DP dihitung saat diterima; total penuh dihitung setelah dikonfirmasi atau selesai.
       </p>
     </div>
   </div>

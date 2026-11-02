@@ -253,13 +253,13 @@
                         @endforeach
                     </td>
                     <td class="text-right font-bold">
-                        {{ number_format($ord->total_price, 0, ',', '.') }}
+                        {{ number_format($ord->recognizedRevenue(), 0, ',', '.') }}
                         @if ($ord->down_payment > 0)
                             <div style="font-size: 8px; color: #155724;">DP: {{ number_format($ord->down_payment, 0, ',', '.') }}</div>
                         @endif
                     </td>
                     <td class="text-right" style="color: #9B1C1C;">{{ number_format($ord->operationalCosts->sum('amount'), 0, ',', '.') }}</td>
-                    <td class="text-right font-bold" style="color: #155724;">{{ number_format(max(0, $ord->total_price - $ord->operationalCosts->sum('amount')), 0, ',', '.') }}</td>
+                    <td class="text-right font-bold" style="color: #155724;">{{ number_format($ord->netRecognizedRevenue(), 0, ',', '.') }}</td>
                     <td class="text-center">
                         @if ($ord->status === 'pending')
                             <span class="badge badge-pending">Pending</span>

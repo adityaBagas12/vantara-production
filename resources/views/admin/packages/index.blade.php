@@ -24,7 +24,7 @@
       </form>
 
       <div style="overflow-x: auto">
-        <table>
+        <table class="admin-product-table">
           <thead>
             <tr>
               <th>Produk</th>
@@ -61,17 +61,29 @@
                   </span>
                 </td>
                 <td>
-                  <form action="{{ route('admin.packages.toggleActive', $pkg->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" style="background: transparent; border: 0; padding: 0; cursor: pointer" title="Klik untuk ubah status">
+                  <details style="position: relative">
+                    <summary style="list-style: none; cursor: pointer">
                       @if($pkg->is_active)
                         <span class="tg a">Tersedia</span>
                       @else
                         <span class="tg g">Nonaktif</span>
                       @endif
-                    </button>
-                  </form>
+                    </summary>
+                    <div style="position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; min-width: 130px; padding: 6px; background: #fff; border: 1px solid var(--admin-line); border-radius: 10px; box-shadow: 0 8px 20px rgba(13,14,18,.12)">
+                      <form action="{{ route('admin.packages.toggleActive', $pkg->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="is_active" value="1">
+                        <button type="submit" style="width: 100%; border: 0; background: transparent; padding: 8px 10px; text-align: left; cursor: pointer; color: #17653A">Tersedia</button>
+                      </form>
+                      <form action="{{ route('admin.packages.toggleActive', $pkg->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="is_active" value="0">
+                        <button type="submit" style="width: 100%; border: 0; background: transparent; padding: 8px 10px; text-align: left; cursor: pointer; color: #9B1C1C">Nonaktif</button>
+                      </form>
+                    </div>
+                  </details>
                 </td>
                 <td>
                   <div style="display: flex; gap: 8px">

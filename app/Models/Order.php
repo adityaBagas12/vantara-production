@@ -66,6 +66,23 @@ class Order extends Model
     }
 
     /**
+     * Nilai yang diakui sebagai pendapatan berdasarkan status pembayaran.
+     */
+    public function recognizedRevenue(): int
+    {
+        return match ($this->status) {
+            'dp_received' => (int) $this->down_payment,
+            'confirmed', 'completed' => (int) $this->total_price,
+            default => 0,
+        };
+    }
+
+    public function netRecognizedRevenue(): int
+    {
+        return max(0, $this->recognizedRevenue() - (int) $this->operationalCosts->sum('amount'));
+    }
+
+    /**
      * Subtotal tampilan yang mengikuti total kesepakatan terbaru.
      *
      * @return array<int, int>

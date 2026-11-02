@@ -10,6 +10,496 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <style>
+    @media (max-width: 768px) {
+      .cart-layout {
+        display: block !important;
+      }
+
+      .cart-layout > * {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+      }
+
+      .cart-layout > .cart-summary {
+        margin-top: 24px;
+        padding: 20px !important;
+      }
+
+      .cart-item {
+        display: grid !important;
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 14px !important;
+        padding: 16px !important;
+        align-items: start !important;
+      }
+
+      .cart-item .pic {
+        width: 72px !important;
+        height: 72px !important;
+      }
+
+      .cart-item-info {
+        min-width: 0;
+      }
+
+      .cart-item-info h3 {
+        font-size: 17px !important;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+      }
+
+      .cart-item-actions {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-left: 0 !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 10px !important;
+        align-items: center;
+      }
+
+      .cart-item-actions > div {
+        min-width: 0 !important;
+        text-align: right !important;
+      }
+
+      .cart-item-actions > div > div {
+        font-size: 14px !important;
+        white-space: nowrap;
+      }
+
+      .cart-item-actions input {
+        width: 56px !important;
+      }
+
+      .summary-line {
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      .summary-line > span:last-child {
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .summary-total {
+        align-items: center !important;
+        gap: 12px;
+      }
+
+      .summary-total strong:last-child {
+        font-size: 19px !important;
+        white-space: nowrap;
+      }
+
+      .cart-summary {
+        padding: 16px !important;
+        gap: 14px !important;
+      }
+      .cart-summary .summary-lines {
+        gap: 8px !important;
+        font-size: 14px !important;
+      }
+      .cart-summary .summary-line {
+        gap: 8px;
+      }
+      .cart-summary .summary-line > span:last-child {
+        font-size: 14px;
+      }
+      .cart-summary > div[style*="background: var(--s2)"] {
+        padding: 12px !important;
+        gap: 6px !important;
+      }
+      .cart-summary > div[style*="background: var(--s2)"] input[type="date"] {
+        min-height: 42px;
+        padding: 8px 10px !important;
+        display: block;
+        width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .cart-summary > div[style*="background: var(--s2)"] form {
+        width: 100%;
+        min-width: 0;
+      }
+      #cart_event_date,
+      #cart_event_end_date {
+        -webkit-appearance: none;
+        appearance: none;
+        display: block;
+        width: calc(100% - 2px) !important;
+        max-width: calc(100% - 2px) !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden;
+        font-size: 14px !important;
+      }
+      .cart-summary .summary-total {
+        padding-top: 14px !important;
+      }
+      .cart-summary .summary-total strong:first-child {
+        font-size: 14px;
+      }
+      .cart-summary > .btn {
+        min-height: 46px;
+      }
+
+      .wrap > h1[style*="font-size: 52px"] {
+        font-size: 34px !important;
+        margin-bottom: 24px !important;
+      }
+
+      body {
+        font-size: 15px;
+        overflow-x: hidden;
+      }
+
+      .nav-actions .btn.wa span {
+        display: none !important;
+      }
+
+      .wrap {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+      }
+
+      .footer-inner {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 24px 18px !important;
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+      }
+      .footer-brand {
+        grid-column: 1 / -1;
+        gap: 8px !important;
+      }
+      .footer-brand .brand { font-size: 22px; }
+      .footer-brand p {
+        font-size: 13px !important;
+        line-height: 1.45;
+        margin: 0;
+      }
+      .footer-nav,
+      .footer-contact {
+        min-width: 0 !important;
+        gap: 7px !important;
+      }
+      .footer-nav .nl,
+      .footer-contact p,
+      .footer-contact span {
+        font-size: 13px !important;
+        line-height: 1.4;
+      }
+      .footer-contact .btn {
+        width: 100% !important;
+        justify-content: center;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+      }
+
+      .booking-steps {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 8px !important;
+        margin-bottom: 24px !important;
+      }
+      .booking-steps .step {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: 32px auto;
+        justify-items: center;
+        align-content: start;
+        gap: 6px;
+        text-align: center;
+        font-size: 11px;
+        line-height: 1.2;
+      }
+      .booking-steps .step b {
+        width: 32px;
+        height: 32px;
+        align-self: start;
+      }
+      .booking-steps .step.on {
+        transform: none;
+      }
+      .booking-steps .rule {
+        display: block;
+        width: auto;
+        height: auto;
+        background: none;
+        align-self: start;
+        margin-top: 6px;
+        color: var(--ac);
+        font-size: 20px;
+        line-height: 1;
+      }
+      .booking-steps .rule::after {
+        content: '→';
+      }
+
+      .checkout-form {
+        padding: 20px !important;
+        gap: 14px !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden;
+      }
+      .checkout-form h2.d {
+        font-size: 21px !important;
+        margin: 0 !important;
+      }
+      .checkout-form h2.d[style*="border-top"] {
+        margin-top: 8px !important;
+        padding-top: 18px !important;
+      }
+      .checkout-form .row {
+        gap: 12px !important;
+      }
+      .checkout-form > .row:first-of-type {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+      .checkout-form > .row:first-of-type .fld label {
+        min-height: 36px;
+        display: flex;
+        align-items: flex-end;
+        line-height: 1.35;
+      }
+      .checkout-form > .row:first-of-type .fld input {
+        font-size: 14px !important;
+      }
+      .checkout-form .fld {
+        gap: 4px;
+      }
+      .checkout-form .fld input,
+      .checkout-form .fld textarea {
+        min-height: 42px;
+        padding: 9px 11px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .checkout-form #tgl,
+      .checkout-form #tgl_selesai {
+        width: calc(100% - 36px) !important;
+        min-width: 0 !important;
+        max-width: calc(100% - 36px) !important;
+        margin-left: 0 !important;
+        margin-right: 36px !important;
+      }
+      .checkout-form .fld textarea {
+        min-height: 84px;
+      }
+      .checkout-form > .row:nth-of-type(2) {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px !important;
+      }
+      .checkout-form > .row:nth-of-type(2) > .fld:last-child {
+        grid-column: 1 / -1;
+      }
+      .checkout-summary {
+        padding: 20px !important;
+        gap: 14px !important;
+      }
+
+      h1.d {
+        font-size: 34px !important;
+        line-height: 1.12 !important;
+      }
+
+      h2.d {
+        font-size: 26px !important;
+        line-height: 1.18 !important;
+      }
+
+      h3.d {
+        font-size: 20px !important;
+        line-height: 1.25 !important;
+      }
+
+      .card {
+        border-radius: 16px;
+      }
+
+      .btn {
+        min-height: 44px;
+        padding-left: 16px;
+        padding-right: 16px;
+        font-size: 14px;
+      }
+
+      input:not([type="checkbox"]):not([type="radio"]),
+      select,
+      textarea {
+        font-size: 16px !important;
+      }
+
+      .catalog-header {
+        padding-top: 32px !important;
+        padding-bottom: 24px !important;
+      }
+      .catalog-header > div:first-of-type {
+        gap: 8px !important;
+      }
+      .catalog-header > div:first-of-type > span {
+        width: 100%;
+      }
+      .catalog-layout {
+        display: block !important;
+        padding-bottom: 48px !important;
+      }
+      .catalog-filter {
+        width: 100% !important;
+        padding: 18px !important;
+        margin-bottom: 20px;
+      }
+      .catalog-filter .chk {
+        min-height: 36px;
+      }
+      .product-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 16px !important;
+      }
+      .product-card {
+        min-width: 0;
+        border-radius: 14px;
+      }
+      .product-visual {
+        height: 170px !important;
+      }
+      .product-card-body {
+        padding: 16px !important;
+      }
+      .product-card-body strong {
+        font-size: 18px !important;
+        line-height: 1.25 !important;
+        overflow-wrap: anywhere;
+      }
+      .product-card-body .price {
+        font-size: 18px !important;
+        margin: 6px 0 12px !important;
+      }
+      .home-hero {
+        padding-top: 34px !important;
+        padding-bottom: 48px !important;
+        gap: 28px !important;
+      }
+      .home-hero > div:first-child {
+        gap: 18px !important;
+      }
+      .home-hero h1 {
+        font-size: 42px !important;
+        line-height: 1.05 !important;
+      }
+      .home-hero p {
+        font-size: 16px !important;
+        line-height: 1.5;
+      }
+      .home-hero-image {
+        height: 270px !important;
+        border-radius: 18px !important;
+      }
+      .home-services {
+        padding-bottom: 56px !important;
+      }
+      .home-services h2 {
+        font-size: 28px !important;
+        line-height: 1.18 !important;
+      }
+      .services-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+      .service-item {
+        min-height: 104px !important;
+        padding: 16px 12px 18px !important;
+        gap: 12px !important;
+      }
+      .service-item span {
+        font-size: 13px;
+      }
+      .service-item strong {
+        font-size: 16px !important;
+        line-height: 1.2 !important;
+        overflow-wrap: anywhere;
+      }
+      .home-about-image {
+        height: 250px !important;
+        border-radius: 18px !important;
+      }
+
+      .product-main-image {
+        height: 280px !important;
+        border-radius: 18px !important;
+      }
+      .product-gallery {
+        gap: 8px !important;
+      }
+      .product-gallery-image {
+        height: 68px !important;
+        border-radius: 10px !important;
+      }
+
+      /* Detail produk: susun kalender dan hasil pengecekan agar nyaman di HP. */
+      #cek-tanggal-acara > .card {
+        display: block !important;
+        padding: 16px !important;
+        overflow: hidden;
+      }
+
+      #cek-tanggal-acara > .card > div {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: none !important;
+        box-sizing: border-box;
+      }
+
+      #cek-tanggal-acara > .card > div + div {
+        margin-top: 20px;
+        padding: 18px !important;
+      }
+
+      #cek-tanggal-acara .cal {
+        width: 100%;
+        gap: 4px !important;
+      }
+      #cek-tanggal-acara .cal .h {
+        font-size: 11px !important;
+        padding-bottom: 2px;
+      }
+      #cek-tanggal-acara .cal .c {
+        min-height: 38px !important;
+        border-radius: 9px;
+        font-size: 13px;
+      }
+      #cek-tanggal-acara > .card {
+        padding: 12px !important;
+      }
+      #cek-tanggal-acara h2 {
+        font-size: 26px !important;
+        margin-bottom: 16px !important;
+      }
+      #cek-tanggal-acara > .card > div:first-child > div:first-of-type .btn.ic {
+        width: 38px;
+        min-width: 38px;
+        height: 38px;
+        min-height: 38px;
+      }
+      #cek-tanggal-acara > .card > div:first-child > div:first-of-type strong {
+        font-size: 18px !important;
+      }
+      #cek-tanggal-acara > .card > div:first-child > div:last-child {
+        gap: 10px !important;
+        margin-top: 14px !important;
+        font-size: 11px !important;
+      }
+    }
+  </style>
   @stack('styles')
 </head>
 <body style="min-height: 100vh; display: flex; flex-direction: column">
@@ -30,7 +520,6 @@
     <div class="nav-links">
       <a class="nl {{ request()->routeIs('home') ? 'on' : '' }}" href="{{ route('home') }}">Beranda</a>
       <a class="nl {{ request()->routeIs('packages.catalog*') ? 'on' : '' }}" href="{{ route('packages.catalog') }}">Katalog</a>
-      <a class="nl {{ request()->routeIs('availability.*') ? 'on' : '' }}" href="{{ route('availability.index') }}">Cek Ketersediaan</a>
       <a class="nl {{ request()->routeIs('cart.*') ? 'on' : '' }}" href="{{ route('cart.index') }}">
         Keranjang
         @if(count(session('cart', [])) > 0)
@@ -48,13 +537,6 @@
         <span>Konsultasi Cepat</span>
       </a>
 
-      @auth
-        <a class="btn sm" href="{{ route('admin.dashboard') }}">Panel Admin</a>
-      @else
-        <a class="btn sm" href="{{ route('admin.login') }}" style="color: var(--mu)">Login Admin</a>
-      @endauth
-
-      <a class="btn p sm" href="{{ route('checkout.index') }}">Booking Sekarang</a>
     </div>
   </nav>
 
@@ -63,8 +545,8 @@
   </main>
 
   <footer style="border-top: 1px solid var(--line); margin-top: auto">
-    <div class="wrap" style="padding-top: 48px; padding-bottom: 48px; display: flex; flex-wrap: wrap; gap: 40px">
-      <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 12px">
+    <div class="wrap footer-inner" style="padding-top: 48px; padding-bottom: 48px; display: flex; flex-wrap: wrap; gap: 40px">
+      <div class="footer-brand" style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 12px">
         <span class="brand">
           <span class="mark">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -78,15 +560,14 @@
         </span>
         <p style="color: var(--mu); max-width: 360px">Jl. Merapi Ujung No.31, Kel. Panorama, Kec. Singaran Pati, Kota Bengkulu</p>
       </div>
-      <div style="flex: 1 1 180px; display: flex; flex-direction: column; gap: 8px">
+      <div class="footer-nav" style="flex: 1 1 180px; display: flex; flex-direction: column; gap: 8px">
         <strong style="color: var(--tx)">Navigasi</strong>
         <a class="nl" href="{{ route('packages.catalog') }}">Katalog</a>
-        <a class="nl" href="{{ route('availability.index') }}">Cek Ketersediaan</a>
         <a class="nl" href="{{ route('cart.index') }}">Keranjang</a>
         <a class="nl" href="{{ route('checkout.index') }}">Booking</a>
         <a class="nl" href="{{ route('admin.login') }}">Login Admin</a>
       </div>
-      <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 12px">
+      <div class="footer-contact" style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 12px">
         <strong style="color: var(--tx)">Konsultasi Cepat</strong>
         <p style="color: var(--mu); font-size: 14px; margin: 0">Butuh rekomendasi teknis atau paket sound system sesuai venue?</p>
         <a href="https://wa.me/6282282422317?text=Halo%20Admin%20Vantara%20Production%2C%20saya%20ingin%20konsultasi%20mengenai%20sewa%20sound%20system%20dan%20perlengkapan%20event." target="_blank" rel="noopener" class="btn wa sm" style="width: fit-content">

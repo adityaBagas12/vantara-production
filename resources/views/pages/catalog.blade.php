@@ -5,7 +5,7 @@
 
 @section('content')
 <div style="min-height: 1600px">
-  <section class="wrap" style="padding-top: 56px; padding-bottom: 32px">
+  <section class="wrap catalog-header" style="padding-top: 56px; padding-bottom: 32px">
     <span class="eye">Katalog</span>
     <div style="display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-top: 8px">
       <h1 class="d" style="font-size: 52px; line-height: 1.05; font-weight: 800; flex-grow: 1">Pilih perlengkapan acara Anda</h1>
@@ -19,9 +19,9 @@
     </div>
   </section>
 
-  <section class="wrap" style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; padding-bottom: 56px">
+  <section class="wrap catalog-layout" style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; padding-bottom: 56px">
     <!-- Filter Sidebar -->
-    <form action="{{ route('packages.catalog') }}" method="GET" class="card" style="flex: 0 0 280px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+    <form action="{{ route('packages.catalog') }}" method="GET" class="card catalog-filter" style="flex: 0 0 280px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
       <strong class="d" style="font-size: 20px">Filter</strong>
 
       <!-- Urutkan Harga -->
@@ -55,7 +55,7 @@
     </form>
 
     <!-- Product Grid -->
-    <div style="flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
+    <div class="product-grid" style="flex: 999 1 640px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
       @php
         $kStyles = ['', 'k2', 'k3', 'k4'];
       @endphp
@@ -64,8 +64,8 @@
           $kClass = $kStyles[$index % count($kStyles)];
           $catLower = strtolower($p->category);
         @endphp
-        <div class="card" style="overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--line)'">
-          <div class="pic {{ $kClass }}" style="height: 200px">
+        <div class="card product-card" style="overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--line)'">
+          <div class="pic product-visual {{ $kClass }}" style="height: 200px">
             <span class="badge"><i class="dot"></i>Tersedia @if(($p->stock ?? 1) > 1) &bull; {{ $p->stock }} Unit @endif</span>
             @if($p->image_path)
               <img src="{{ $p->image_path }}" alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover">
@@ -81,7 +81,7 @@
               @endif
             @endif
           </div>
-          <div style="padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
+          <div class="product-card-body" style="padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
             <span style="color: var(--mu); font-size: 14px">{{ $p->category }}</span>
             <strong class="d" style="font-size: 20px; line-height: 1.25">{{ $p->name }}</strong>
             <span class="price" style="margin: 8px 0 14px">Rp {{ number_format($p->price, 0, ',', '.') }} <span style="font-size: 14px; color: var(--mu); font-weight: 500">/ hari</span></span>

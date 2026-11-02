@@ -11,7 +11,7 @@
 
   <div class="card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
     <!-- Filter Chips & Search -->
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+    <div class="orders-filters" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
       <a class="chip {{ empty(request('status')) ? 'on' : '' }}" href="{{ route('admin.orders.index') }}">
         Semua · {{ $statusCounts['all'] }}
       </a>
@@ -34,7 +34,7 @@
       <span style="flex-grow: 1"></span>
 
       <!-- Search Input -->
-      <form action="{{ route('admin.orders.index') }}" method="GET" style="display: flex; gap: 8px">
+      <form class="orders-search" action="{{ route('admin.orders.index') }}" method="GET" style="display: flex; gap: 8px">
         @if(request('status'))
           <input type="hidden" name="status" value="{{ request('status') }}">
         @endif
@@ -45,8 +45,8 @@
     </div>
 
     <!-- Table of Orders -->
-    <div style="overflow-x: auto">
-      <table>
+    <div class="orders-table-wrap" style="overflow-x: auto">
+      <table class="orders-table">
         <thead>
           <tr>
             <th>Kode</th>
@@ -79,27 +79,27 @@
               };
             @endphp
             <tr>
-              <td style="color: var(--admin-mu); font-family: var(--font-mono); font-weight: 600">
+              <td data-label="Kode" style="color: var(--admin-mu); font-family: var(--font-mono); font-weight: 600">
                 <a href="{{ route('admin.orders.show', $ord->id) }}">{{ $ord->order_code }}</a>
               </td>
-              <td style="font-weight: 600">
+              <td data-label="Customer" style="font-weight: 600">
                 <a href="{{ route('admin.orders.show', $ord->id) }}">{{ $ord->customer_name }}</a>
                 <p style="font-weight: 400; font-size: 13px; color: var(--admin-mu)">{{ $ord->customer_phone }}</p>
               </td>
-              <td style="white-space: nowrap">{{ \Carbon\Carbon::parse($ord->event_date)->translatedFormat('d M Y') }}</td>
-              <td style="color: var(--admin-mu)">
+              <td data-label="Tanggal acara" style="white-space: nowrap">{{ \Carbon\Carbon::parse($ord->event_date)->translatedFormat('d M Y') }}</td>
+              <td data-label="Produk" style="color: var(--admin-mu)">
                 {{ $ord->orderItems->first()?->package_name ?? 'Layanan' }}
                 @if($ord->orderItems->count() > 1)
                   <span style="font-size: 12px">(+{{ $ord->orderItems->count() - 1 }})</span>
                 @endif
               </td>
-              <td style="white-space: nowrap; font-family: var(--font-mono)">
+              <td data-label="Total" style="white-space: nowrap; font-family: var(--font-mono)">
                 Rp {{ number_format($ord->total_price, 0, ',', '.') }}
               </td>
-              <td>
+              <td data-label="Status">
                 <span class="tg {{ $statusClass }}">{{ $statusLabel }}</span>
               </td>
-              <td>
+              <td data-label="Aksi">
                 <div x-data="{ confirming: false }" style="display: flex; gap: 6px; align-items: center">
                   <a class="btn sm" href="{{ route('admin.orders.show', $ord->id) }}">
                     Kelola →

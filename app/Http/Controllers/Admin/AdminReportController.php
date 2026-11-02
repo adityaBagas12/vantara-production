@@ -89,7 +89,7 @@ class AdminReportController extends Controller
 
         $approvedOrders = $orders->filter(fn ($o) => in_array($o->status, ['dp_received', 'confirmed', 'completed']));
 
-        $totalRevenue = $approvedOrders->sum('total_price');
+        $totalRevenue = $approvedOrders->sum(fn (Order $order): int => $order->recognizedRevenue());
         $totalOperationalCosts = $approvedOrders->sum(fn (Order $order): int => $order->operationalCosts->sum('amount'));
         $totalNetRevenue = max(0, $totalRevenue - $totalOperationalCosts);
         $totalDp = $approvedOrders->sum('down_payment');
@@ -115,9 +115,9 @@ class AdminReportController extends Controller
             DB::raw('YEAR(event_date) as year_val'),
             DB::raw('MONTH(event_date) as month_val'),
             DB::raw('COUNT(*) as total_orders'),
-            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN total_price ELSE 0 END) as revenue'),
+            DB::raw('SUM(CASE WHEN status = "dp_received" THEN down_payment WHEN status IN ("confirmed", "completed") THEN total_price ELSE 0 END) as revenue'),
             DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN (SELECT COALESCE(SUM(amount), 0) FROM operational_costs WHERE operational_costs.order_id = orders.id) ELSE 0 END) as operational_costs'),
-            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN total_price - (SELECT COALESCE(SUM(amount), 0) FROM operational_costs WHERE operational_costs.order_id = orders.id) ELSE 0 END) as net_revenue'),
+            DB::raw('SUM(CASE WHEN status = "dp_received" THEN down_payment - (SELECT COALESCE(SUM(amount), 0) FROM operational_costs WHERE operational_costs.order_id = orders.id) WHEN status IN ("confirmed", "completed") THEN total_price - (SELECT COALESCE(SUM(amount), 0) FROM operational_costs WHERE operational_costs.order_id = orders.id) ELSE 0 END) as net_revenue'),
             DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN down_payment ELSE 0 END) as dp_collected')
         )
             ->groupBy(DB::raw('YEAR(event_date)'), DB::raw('MONTH(event_date)'))

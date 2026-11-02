@@ -48,13 +48,27 @@
 
       <div class="fld">
         <label for="pw">Password</label>
-        <input id="pw" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+        <div style="position: relative">
+          <input id="pw" name="password" type="password" autocomplete="current-password" required placeholder="••••••••" style="padding-right: 48px">
+          <button type="button" id="toggle-password" aria-label="Tampilkan password" title="Tampilkan password" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border: 0; background: transparent; color: #7A7D87; cursor: pointer; display: grid; place-items: center">
+            <svg id="eye-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+              <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       @if ($errors->any() || session('error'))
-        <div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 12px; background: #FDECEC; border: 1px solid #F3B9B9; color: #8F1D1D; font-size: 14px">
+        <div role="alert" style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #FDECEC; border: 1px solid #F3B9B9; color: #8F1D1D; font-size: 14px; line-height: 1.45">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="flex: none"><circle cx="9" cy="9" r="7.5"/><path d="M9 5v5M9 12.5v.5"/></svg>
-          {{ $errors->first() ?? session('error') }}
+          <span>
+            @if ($errors->any())
+              {{ $errors->first() }}
+            @else
+              {{ session('error') }}
+            @endif
+          </span>
         </div>
       @endif
 
@@ -63,6 +77,16 @@
     </form>
   </div>
 </div>
+
+<script>
+  document.getElementById('toggle-password')?.addEventListener('click', function () {
+    const password = document.getElementById('pw');
+    const visible = password.type === 'text';
+    password.type = visible ? 'password' : 'text';
+    this.setAttribute('aria-label', visible ? 'Tampilkan password' : 'Sembunyikan password');
+    this.setAttribute('title', visible ? 'Tampilkan password' : 'Sembunyikan password');
+  });
+</script>
 
 </body>
 </html>

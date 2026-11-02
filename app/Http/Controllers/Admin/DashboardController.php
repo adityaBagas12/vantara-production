@@ -19,9 +19,10 @@ class DashboardController extends Controller
         // 1. Ringkasan Metrik
         $totalOrdersCount = Order::count();
 
-        // Total pendapatan dari transaksi yang sah (DP Received, Confirmed, Completed)
-        $totalRevenue = Order::whereIn('status', ['dp_received', 'confirmed', 'completed'])
-            ->sum('total_price');
+        // DP dihitung saat DP diterima; total penuh baru dihitung saat dikonfirmasi/selesai.
+        $totalRevenue = (int) Order::query()
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = "dp_received" THEN down_payment WHEN status IN ("confirmed", "completed") THEN total_price ELSE 0 END), 0) as total')
+            ->value('total');
 
         // Total DP yang sudah diterima
         $totalDpCollected = Order::whereIn('status', ['dp_received', 'confirmed', 'completed'])
@@ -49,7 +50,7 @@ class DashboardController extends Controller
         $monthlyPerformance = Order::select(
             DB::raw('MONTH(event_date) as month_num'),
             DB::raw('COUNT(*) as total_orders'),
-            DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN total_price ELSE 0 END) as revenue'),
+            DB::raw('SUM(CASE WHEN status = "dp_received" THEN down_payment WHEN status IN ("confirmed", "completed") THEN total_price ELSE 0 END) as revenue'),
             DB::raw('SUM(CASE WHEN status IN ("dp_received", "confirmed", "completed") THEN down_payment ELSE 0 END) as dp_collected')
         )
             ->whereYear('event_date', Carbon::now()->year)

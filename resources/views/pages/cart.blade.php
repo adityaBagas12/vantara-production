@@ -33,21 +33,15 @@
         <a class="btn p" href="{{ route('packages.catalog') }}" style="margin-top: 8px">Lihat Katalog Paket</a>
       </div>
     @else
-      <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+      <div class="cart-layout" style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
         <!-- Cart Items List -->
         <div style="flex: 2 1 580px; display: flex; flex-direction: column; gap: 20px">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px">
+          <div style="display: flex; align-items: center; padding-bottom: 8px">
             <span style="color: var(--mu); font-size: 15px">Terdapat <strong style="color: var(--tx)">{{ count($cart) }}</strong> paket di keranjang</span>
-            <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Kosongkan seluruh keranjang?')">
-              @csrf
-              <button type="submit" style="background: transparent; border: 0; color: #FCA5A5; font: inherit; font-size: 14px; cursor: pointer; text-decoration: underline">
-                Kosongkan Keranjang
-              </button>
-            </form>
           </div>
 
           @foreach ($cart as $id => $item)
-            <div class="card" style="padding: 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+            <div class="card cart-item" style="padding: 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
               @if(!empty($item['image_path']))
                 <div class="pic" style="width: 88px; height: 88px; border-radius: 16px; flex: none; border: 1px solid var(--line)">
                   <img src="{{ $item['image_path'] }}" alt="{{ $item['name'] }}" style="width: 100%; height: 100%; object-fit: cover">
@@ -58,7 +52,7 @@
                 </div>
               @endif
 
-              <div style="flex: 1 1 200px">
+              <div class="cart-item-info" style="flex: 1 1 200px">
                 <span style="color: var(--mu); font-size: 13px">{{ $item['category'] ?? 'Layanan' }}</span>
                 <h3 class="d" style="font-size: 20px">
                   <a href="{{ route('packages.show', $item['slug']) }}">{{ $item['name'] }}</a>
@@ -69,7 +63,7 @@
               </div>
 
               <!-- Quantity & Subtotal -->
-              <div style="display: flex; align-items: center; gap: 20px; margin-left: auto">
+              <div class="cart-item-actions" style="display: flex; align-items: center; gap: 20px; margin-left: auto">
                 <form action="{{ route('cart.update', $id) }}" method="POST" style="display: flex; align-items: center; gap: 8px">
                   @csrf
                   @method('PATCH')
@@ -82,7 +76,7 @@
                 <div style="text-align: right; min-width: 120px">
                   <span style="font-size: 12px; color: var(--mu); text-transform: uppercase">Subtotal</span>
                   <div style="font-family: var(--font-mono); font-weight: 700; font-size: 17px; color: var(--ac)">
-                    Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
+                    Rp {{ number_format($item['price'] * $item['quantity'] * $rentDuration, 0, ',', '.') }}
                   </div>
                 </div>
 
@@ -97,19 +91,23 @@
             </div>
           @endforeach
 
-          <a href="{{ route('packages.catalog') }}" style="color: var(--mu); font-size: 14px; text-decoration: underline; margin-top: 8px">
-            ← Tambah paket lain dari katalog
-          </a>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px">
+            <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Kosongkan seluruh keranjang?')">
+              @csrf
+              <button type="submit" class="btn" style="color: #FCA5A5; border-color: #8F1D1D">Kosongkan Keranjang</button>
+            </form>
+            <a class="btn" href="{{ route('packages.catalog') }}">Tambah Paket dari Katalog</a>
+          </div>
         </div>
 
         <!-- Summary Aside -->
-        <aside class="card" style="flex: 1 1 340px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+        <aside class="card cart-summary" style="flex: 1 1 340px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
           <span class="eye">Ringkasan Biaya</span>
 
-          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px">
-            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Total paket</span><span style="font-family: var(--font-mono)">Rp {{ number_format($total, 0, ',', '.') }}</span></div>
-            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Kru &amp; Teknisi</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
-            <div style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Instalasi &amp; Antar</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
+          <div class="summary-lines" style="display: flex; flex-direction: column; gap: 12px; font-size: 15px">
+            <div class="summary-line" style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Total paket ({{ $rentDuration }} hari)</span><span style="font-family: var(--font-mono)">Rp {{ number_format($total, 0, ',', '.') }}</span></div>
+            <div class="summary-line" style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Kru &amp; Teknisi</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
+            <div class="summary-line" style="display: flex"><span style="flex-grow: 1; color: var(--mu)">Instalasi &amp; Antar</span><span style="color: #4ADE80; font-weight: 600">Termasuk</span></div>
           </div>
 
           <!-- Tanggal Acara -->
@@ -129,7 +127,7 @@
             <span style="font-size: 12px; color: var(--mu)">Pilih tanggal mulai dan selesai jika acara berlangsung beberapa hari.</span>
           </div>
 
-          <div style="border-top: 1px solid var(--line); padding-top: 18px; display: flex; align-items: baseline">
+          <div class="summary-total" style="border-top: 1px solid var(--line); padding-top: 18px; display: flex; align-items: baseline">
             <strong style="flex-grow: 1">Estimasi Total</strong>
             <strong class="d" style="font-size: 26px; color: var(--ac); font-family: var(--font-mono)">
               Rp {{ number_format($total, 0, ',', '.') }}

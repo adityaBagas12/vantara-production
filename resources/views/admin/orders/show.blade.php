@@ -55,8 +55,8 @@
   $netRevenue = max(0, $order->total_price - $operationalCostsTotal);
 @endphp
 
-<div style="display: flex; flex-direction: column; gap: 28px">
-  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px">
+<div class="order-show" style="display: flex; flex-direction: column; gap: 28px">
+  <div class="order-show-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px">
     <div>
       <div style="display: flex; align-items: center; gap: 12px">
         <h1 class="d" style="font-size: 32px; font-weight: 800">{{ $order->order_code }}</h1>
@@ -64,7 +64,7 @@
       </div>
       <p style="color: var(--admin-mu)">Dibuat pada {{ $order->created_at->translatedFormat('d F Y, H:i') }} WIB</p>
     </div>
-    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+    <div class="order-show-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
       <a class="btn" href="{{ route('admin.orders.index') }}">← Kembali ke Daftar</a>
       <a class="btn" href="#printable-invoice" style="background: #fff; border-color: #CFCBC0; color: var(--admin-tx); display: inline-flex; align-items: center; gap: 8px">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h8v12l-2-1-2 1-2-1-2 1zM6 6h4M6 9h4"/></svg>
@@ -96,10 +96,10 @@
     </div>
   </div>
 
-  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+  <div class="order-show-columns" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
     <!-- Left: Order Details & Items Card -->
-    <div style="flex: 2 1 480px; display: flex; flex-direction: column; gap: 24px">
-      <div class="card" style="display: flex; flex-direction: column; gap: 18px">
+    <div class="order-show-left" style="flex: 2 1 480px; display: flex; flex-direction: column; gap: 24px">
+      <div class="card order-detail-card" style="display: flex; flex-direction: column; gap: 18px">
         <h2 class="d" style="font-size: 22px">Data Pemesan &amp; Acara</h2>
         <div style="display: flex; flex-direction: column; gap: 12px">
           <div class="kv"><span>Customer</span><strong style="color: var(--admin-tx)">{{ $order->customer_name }}</strong></div>
@@ -111,7 +111,7 @@
         </div>
       </div>
 
-      <div class="card" style="display: flex; flex-direction: column; gap: 16px">
+      <div class="card order-detail-card" style="display: flex; flex-direction: column; gap: 16px">
         <h2 class="d" style="font-size: 22px">Rincian Paket &amp; Peralatan Disewa</h2>
         <div style="overflow-x: auto">
           <table>
@@ -126,10 +126,10 @@
             <tbody>
               @foreach($order->orderItems as $item)
                 <tr>
-                  <td style="font-weight: 600">{{ $item->package_name }}</td>
-                  <td>{{ $item->quantity }} Hari</td>
-                  <td style="font-family: var(--font-mono)">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                  <td style="text-align: right; font-family: var(--font-mono); font-weight: 700">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
+                  <td data-label="Paket Layanan" style="font-weight: 600">{{ $item->package_name }}</td>
+                  <td data-label="Durasi">{{ $item->quantity }} Hari</td>
+                  <td data-label="Harga / hari" style="font-family: var(--font-mono)">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                  <td data-label="Subtotal" style="text-align: right; font-family: var(--font-mono); font-weight: 700">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
                 </tr>
               @endforeach
             </tbody>
@@ -147,7 +147,7 @@
       </div>
 
       <!-- Card 3: Lembar Invoice Resmi Pesanan -->
-      <div id="printable-invoice" class="paper" style="border: 1px solid var(--admin-line); box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 24px">
+      <div id="printable-invoice" class="paper invoice-card" style="border: 1px solid var(--admin-line); box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 24px">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px">
           <div>
             <span class="d" style="font-weight: 800; font-size: 20px; letter-spacing: .06em; color: #17181C">VANTARA PRODUCTION</span>
@@ -197,10 +197,10 @@
             <tbody>
               @foreach($order->orderItems as $item)
                 <tr>
-                  <td style="font-weight: 600; color: #17181C">{{ $item->package_name }}</td>
-                  <td style="color: #6A6D77">Sewa {{ $item->quantity }} Hari</td>
-                  <td style="font-family: var(--font-mono); color: #6A6D77">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                  <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #17181C">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
+                  <td data-label="Item Layanan" style="font-weight: 600; color: #17181C">{{ $item->package_name }}</td>
+                  <td data-label="Durasi" style="color: #6A6D77">Sewa {{ $item->quantity }} Hari</td>
+                  <td data-label="Harga Satuan" style="font-family: var(--font-mono); color: #6A6D77">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                  <td data-label="Total" style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #17181C">Rp {{ number_format($order->negotiated_subtotals[$item->id] ?? $item->subtotal, 0, ',', '.') }}</td>
                 </tr>
               @endforeach
             </tbody>
@@ -227,7 +227,7 @@
     </div>
 
     <!-- Right: Status & Transaction Management Card -->
-    <div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 20px">
+    <div class="order-show-right" style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 20px">
       <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="card" style="display: flex; flex-direction: column; gap: 18px">
         @csrf
         @method('PATCH')

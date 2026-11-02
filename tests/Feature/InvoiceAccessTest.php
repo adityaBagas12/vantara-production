@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,14 +15,25 @@ class InvoiceAccessTest extends TestCase
     {
         $order = Order::factory()->create(['customer_name' => 'Pelanggan Rahasia']);
 
-        $this->get(route('checkout.show', $order->access_token))
+        $this->actingAs(User::factory()->create(['is_admin' => true]))
+            ->get(route('checkout.show', $order->access_token))
             ->assertOk()
             ->assertSee('Pelanggan Rahasia');
+    }
+
+    public function test_invoice_requires_admin_login(): void
+    {
+        $order = Order::factory()->create();
+
+        $this->get(route('checkout.show', $order->access_token))
+            ->assertRedirect(route('admin.login'));
     }
 
     public function test_order_code_and_wrong_token_return_uniform_not_found(): void
     {
         $order = Order::factory()->create(['customer_name' => 'Pelanggan Rahasia']);
+
+        $this->actingAs(User::factory()->create(['is_admin' => true]));
 
         foreach ([$order->order_code, str_repeat('a', 48)] as $token) {
             $this->get('/pesanan/'.$token)

@@ -22,7 +22,7 @@ class AdminMiddleware
             }
 
             return redirect()->route('admin.login')
-                ->with('error', 'Silakan masuk dengan akun Admin Vantara Production terlebih dahulu.');
+                ->with('error', 'Peringatan: halaman Dashboard Admin hanya dapat dibuka setelah Anda masuk sebagai Admin Vantara Production.');
         }
 
         return $next($request);

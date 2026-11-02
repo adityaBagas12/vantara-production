@@ -25,7 +25,7 @@ Route::get('/katalog', [PackageController::class, 'catalog'])->name('packages.ca
 Route::get('/paket/{slug}', [PackageController::class, 'show'])->name('packages.show');
 
 // Phase 1: Ketersediaan Jadwal & Kalender Interaktif
-Route::get('/cek-jadwal', [AvailabilityController::class, 'index'])->name('availability.index');
+Route::redirect('/cek-jadwal', '/checkout', 302)->name('availability.index');
 Route::get('/api/availability/calendar', [AvailabilityController::class, 'calendarData'])->name('api.availability.calendar');
 Route::post('/api/availability/check', [AvailabilityController::class, 'checkDate'])->name('api.availability.check');
 
@@ -39,9 +39,13 @@ Route::post('/keranjang/kosongkan', [CartController::class, 'clear'])->name('car
 // Phase 2: Checkout & Pemesanan
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/pesanan/{access_token}', [CheckoutController::class, 'show'])
+Route::get('/checkout/success/{access_token}', [CheckoutController::class, 'show'])
     ->where('access_token', '[a-f0-9]{48}')
     ->middleware('throttle:invoice')
+    ->name('checkout.success');
+Route::get('/pesanan/{access_token}', [CheckoutController::class, 'show'])
+    ->where('access_token', '[a-f0-9]{48}')
+    ->middleware([AdminMiddleware::class, 'throttle:invoice'])
     ->name('checkout.show');
 
 // Phase 3 & 4: Portal Admin, Operasional & Pelaporan
@@ -57,6 +61,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Kelola Barang / Paket (CRUD)
         Route::resource('packages', AdminPackageController::class)->except(['show']);
+        Route::delete('packages/{id}/image', [AdminPackageController::class, 'destroyImage'])->name('packages.image.destroy');
+        Route::delete('packages/{package}/gallery-image/{index}', [AdminPackageController::class, 'destroyGalleryImage'])->name('packages.gallery-image.destroy');
         Route::patch('packages/{package}/toggle-active', [AdminPackageController::class, 'toggleActive'])->name('packages.toggleActive');
 
         Route::get('/landing-page', [LandingPageController::class, 'edit'])->name('landing-page.edit');

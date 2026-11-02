@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Package;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -58,6 +59,8 @@ class AdminPackageController extends Controller
             'description' => 'required|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_path' => 'nullable|string|max:1000',
+            'gallery_images' => 'nullable|array|max:3',
+            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'items' => 'required|array|min:1',
             'items.*' => 'required|string|max:255',
             'stock' => 'nullable|integer|min:1',
@@ -81,6 +84,10 @@ class AdminPackageController extends Controller
             $imagePath = '/storage/'.$path;
         }
 
+        $galleryImages = collect($request->file('gallery_images', []))->take(3)->map(function ($file): string {
+            return '/storage/'.$file->store('packages', 'public');
+        })->values()->all();
+
         $slug = Str::slug($validated['name']);
 
         Package::create([
@@ -91,6 +98,7 @@ class AdminPackageController extends Controller
             'stock' => (int) ($validated['stock'] ?? 1),
             'description' => $validated['description'],
             'image_path' => $imagePath,
+            'gallery_images' => $galleryImages ?: null,
             'items' => array_values(array_filter($validated['items'])),
             'is_featured' => $request->boolean('is_featured'),
             'is_active' => $request->boolean('is_active', true),
@@ -126,6 +134,8 @@ class AdminPackageController extends Controller
             'description' => 'required|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_path' => 'nullable|string|max:1000',
+            'gallery_images' => 'nullable|array|max:3',
+            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'items' => 'required|array|min:1',
             'items.*' => 'required|string|max:255',
             'is_featured' => 'nullable|boolean',
@@ -136,6 +146,20 @@ class AdminPackageController extends Controller
             'stock.min' => 'Stok unit minimal 1.',
         ]);
 
+        $slug = $package->slug;
+        if ($validated['name'] !== $package->name) {
+            $slug = Str::slug($validated['name']);
+            $slugTaken = Package::where('slug', $slug)
+                ->where('id', '!=', $package->id)
+                ->exists();
+
+            if ($slugTaken) {
+                return back()->withInput()->withErrors([
+                    'name' => 'Nama paket tersebut sudah menghasilkan slug yang dipakai produk lain. Gunakan nama yang berbeda.',
+                ]);
+            }
+        }
+
         $imagePath = $package->image_path;
 
         if ($request->hasFile('image_file')) {
@@ -145,14 +169,21 @@ class AdminPackageController extends Controller
             $imagePath = $validated['image_path'];
         }
 
+        $galleryImages = $package->gallery_images ?? [];
+        foreach (collect($request->file('gallery_images', []))->take(3) as $file) {
+            $galleryImages[] = '/storage/'.$file->store('packages', 'public');
+        }
+        $galleryImages = array_slice($galleryImages, 0, 3);
+
         $package->update([
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
+            'slug' => $slug,
             'category' => $validated['category'],
             'price' => $validated['price'],
             'stock' => (int) ($validated['stock'] ?? 1),
             'description' => $validated['description'],
             'image_path' => $imagePath,
+            'gallery_images' => $galleryImages ?: null,
             'items' => array_values(array_filter($validated['items'])),
             'is_featured' => $request->boolean('is_featured'),
             'is_active' => $request->boolean('is_active'),
@@ -160,6 +191,43 @@ class AdminPackageController extends Controller
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Paket layanan "'.$package->name.'" berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus foto produk tanpa menghapus paketnya.
+     */
+    public function destroyImage(int $id): RedirectResponse
+    {
+        $package = Package::findOrFail($id);
+        $imagePath = $package->image_path;
+
+        if ($imagePath && Str::startsWith($imagePath, '/storage/')) {
+            Storage::disk('public')->delete(Str::after($imagePath, '/storage/'));
+        }
+
+        $package->update(['image_path' => null]);
+
+        return back()->with('success', 'Foto produk berhasil dihapus.');
+    }
+
+    public function destroyGalleryImage(int $package, int $index): RedirectResponse
+    {
+        $product = Package::findOrFail($package);
+        $galleryImages = $product->gallery_images ?? [];
+
+        if (! array_key_exists($index, $galleryImages)) {
+            return back()->with('error', 'Gambar galeri tidak ditemukan.');
+        }
+
+        $imagePath = $galleryImages[$index];
+        if (Str::startsWith($imagePath, '/storage/')) {
+            Storage::disk('public')->delete(Str::after($imagePath, '/storage/'));
+        }
+
+        array_splice($galleryImages, $index, 1);
+        $product->update(['gallery_images' => array_values($galleryImages) ?: null]);
+
+        return back()->with('success', 'Gambar galeri berhasil dihapus.');
     }
 
     /**
@@ -178,10 +246,12 @@ class AdminPackageController extends Controller
     /**
      * Ubah status aktif/nonaktif paket.
      */
-    public function toggleActive(int $id): RedirectResponse
+    public function toggleActive(Request $request, int $id): RedirectResponse
     {
         $package = Package::findOrFail($id);
-        $package->is_active = ! $package->is_active;
+        $package->is_active = $request->has('is_active')
+            ? $request->boolean('is_active')
+            : ! $package->is_active;
         $package->save();
 
         $statusStr = $package->is_active ? 'diaktifkan' : 'dinonaktifkan';

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Invoice Pesanan ' . $order->order_code . ' — Vantara Production')
-@section('meta_description', 'Invoice dan bukti pemesanan sewa sound system dan perlengkapan hiburan Vantara Production.')
+@section('title', $showInvoice ? 'Invoice Pesanan ' . $order->order_code . ' — Vantara Production' : 'Pemesanan Berhasil — Vantara Production')
+@section('meta_description', $showInvoice ? 'Invoice dan bukti pemesanan sewa sound system dan perlengkapan hiburan Vantara Production.' : 'Konfirmasi pemesanan sewa sound system dan perlengkapan hiburan Vantara Production.')
 
 @section('content')
 <div style="min-height: 1300px">
@@ -10,7 +10,7 @@
     <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 36px">
       <span class="step ok"><b>✓</b>Pilih produk &amp; tanggal</span><i class="rule"></i>
       <span class="step ok"><b>✓</b>Data diri &amp; acara</span><i class="rule"></i>
-      <span class="step on"><b>3</b>Invoice &amp; WhatsApp</span>
+      <span class="step on"><b>3</b>{{ $showInvoice ? 'Invoice & WhatsApp' : 'Konfirmasi & WhatsApp' }}</span>
     </div>
 
     <!-- Success Alert Banner -->
@@ -23,7 +23,8 @@
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
-      <!-- Paper Invoice -->
+      @if($showInvoice)
+      <!-- Paper Invoice (admin only) -->
       <article class="paper" style="flex: 2 1 580px; display: flex; flex-direction: column; gap: 28px">
         <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <div style="flex-grow: 1">
@@ -125,6 +126,7 @@
           Total berupa estimasi. Harga akhir disepakati bersama Admin sebelum transaksi di-ACC.
         </p>
       </article>
+      @endif
 
       <!-- Action Card -->
       <aside class="card" style="flex: 1 1 340px; padding: 32px; display: flex; flex-direction: column; gap: 18px">

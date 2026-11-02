@@ -116,13 +116,13 @@
                 <td style="font-weight: 600">{{ $ord->customer_name }}</td>
                 <td><span class="tg {{ $statusClass }}">{{ $statusLabel }}</span></td>
                 <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono)">
-                  Rp {{ number_format($ord->total_price, 0, ',', '.') }}
+                  Rp {{ number_format($ord->recognizedRevenue(), 0, ',', '.') }}
                 </td>
                 <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono); color: #9B1C1C">
                   Rp {{ number_format($ord->operationalCosts->sum('amount'), 0, ',', '.') }}
                 </td>
                 <td style="text-align: right; white-space: nowrap; font-family: var(--font-mono); font-weight: 700; color: #17653A">
-                  Rp {{ number_format(max(0, $ord->total_price - $ord->operationalCosts->sum('amount')), 0, ',', '.') }}
+                  Rp {{ number_format($ord->netRecognizedRevenue(), 0, ',', '.') }}
                 </td>
               </tr>
             @empty
@@ -167,7 +167,7 @@
           if(in_array($ord->status, ['dp_received', 'confirmed', 'completed'])) {
             $day = (int) \Carbon\Carbon::parse($ord->event_date)->format('j');
             $w = min(5, (int) ceil($day / 7));
-            $weeklyRevenues[$w] += max(0, $ord->total_price - $ord->operationalCosts->sum('amount'));
+            $weeklyRevenues[$w] += $ord->netRecognizedRevenue();
           }
         }
         $maxW = max(collect($weeklyRevenues)->max(), 1);
