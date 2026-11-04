@@ -42,7 +42,9 @@ class AdminPackageController extends Controller
      */
     public function create(): View
     {
-        $categories = ['Sound System', 'Lighting & Special Effect', 'Videobooth 360', 'Band Wedding'];
+        $categories = collect(['Sound System', 'Lighting & Special Effect', 'Videobooth 360', 'Band Wedding'])
+            ->merge(Package::query()->whereNotNull('category')->distinct()->pluck('category'))
+            ->filter()->unique()->values()->all();
 
         return view('admin.packages.create', compact('categories'));
     }
@@ -52,9 +54,14 @@ class AdminPackageController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->input('category') === '__new__') {
+            $request->merge(['category' => $request->input('new_category')]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:packages,name',
             'category' => 'required|string|max:100',
+            'new_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
@@ -114,7 +121,9 @@ class AdminPackageController extends Controller
     public function edit(int $id): View
     {
         $package = Package::findOrFail($id);
-        $categories = ['Sound System', 'Lighting & Special Effect', 'Videobooth 360', 'Band Wedding'];
+        $categories = collect(['Sound System', 'Lighting & Special Effect', 'Videobooth 360', 'Band Wedding'])
+            ->merge(Package::query()->whereNotNull('category')->distinct()->pluck('category'))
+            ->filter()->unique()->values()->all();
 
         return view('admin.packages.edit', compact('package', 'categories'));
     }
@@ -126,9 +135,14 @@ class AdminPackageController extends Controller
     {
         $package = Package::findOrFail($id);
 
+        if ($request->input('category') === '__new__') {
+            $request->merge(['category' => $request->input('new_category')]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:packages,name,'.$package->id,
             'category' => 'required|string|max:100',
+            'new_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
             'stock' => 'nullable|integer|min:1',
             'description' => 'required|string',

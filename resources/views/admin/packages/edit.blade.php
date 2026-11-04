@@ -42,7 +42,9 @@
           @foreach ($categories as $cat)
             <option value="{{ $cat }}" {{ old('category', $package->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
           @endforeach
+          <option value="__new__" {{ old('category') === '__new__' ? 'selected' : '' }}>+ Tambah kategori baru</option>
         </select>
+        <input id="new_category" name="new_category" type="text" value="{{ old('new_category') }}" placeholder="Nama kategori baru" style="{{ old('category') === '__new__' ? '' : 'display: none' }}">
       </div>
 
       <div class="fld" style="flex: 1 1 200px">
@@ -138,6 +140,14 @@
 
 </div>
 <script>
+  document.getElementById('category')?.addEventListener('change', function () {
+    const input = document.getElementById('new_category');
+    const isNew = this.value === '__new__';
+    input.style.display = isNew ? '' : 'none';
+    input.required = isNew;
+    if (!isNew) input.value = '';
+  });
+
   function deletePackageImage(button) {
     if (!confirm('Hapus gambar ini?')) return;
     const form = document.createElement('form');
